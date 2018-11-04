@@ -10,7 +10,7 @@ def scraper_default_init_test():
     assert(scraper._regions == ["au", "be", "ca", "de", "es", "fr",
                     "in", "ie", "it", "nz", "uk", "us"])
     assert(scraper._region == "us")
-    assert(scraper._base_url == "https://pcpartpicker.com")
+    assert(scraper._base_url == "https://pcpartpicker.com/products/")
 
 # Ensure that the scraper default region can be changed
 def scraper_change_region_test():
