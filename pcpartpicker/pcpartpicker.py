@@ -1,5 +1,8 @@
 import asyncio
 import requests
+from .scraper import Scraper
+from .parser import Parser
+from .errors import UnsupportedRegion
 
 class API:
 
@@ -7,6 +10,11 @@ class API:
     _regions = ["au", "be", "ca", "de", "es", "fr",
                     "in", "ie", "it", "nz", "uk", "us"]
     _region = "us"
+    _database = None
+
+    def __init__(self, region: str="us"):
+        self._set_region(region)
+        self._scraper = Scraper(self.region)
 
     @property
     def regions(self):
@@ -20,32 +28,25 @@ class API:
     def region(self):
         return self._region
 
-    def __init__(self, region="us"):
+    def set_region(self, region: str):
         self._set_region(region)
 
-    def _set_region(self, region):
+    def search_part(self, param: str):
+        pass
+
+    def retrieve(self, type: str):
+        pass
+
+    def retrieve_all(self):
+        pass
+
+    def load_data(self):
+        pass
+
+    def dump_data(self):
+        pass
+
+    def _set_region(self, region: str):
         if not region in self._regions:
-            raise UnsupportedRegion("Region {} is not supported!".format(region))
+            raise UnsupportedRegion("Region \'{}\' is not supported!".format(region))
         self._region = region
-
-    def set_region(region: str):
-        self._set_region(region)
-
-    def search_part(param: str):
-        pass
-
-    def retrieve_type(type: str):
-        pass
-
-    def retrieve_all():
-        pass
-
-    def load_data():
-        pass
-
-    def dump_data():
-        pass
-
-
-class UnsupportedRegion(Exception):
-    pass
