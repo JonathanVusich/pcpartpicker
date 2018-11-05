@@ -1,7 +1,6 @@
 import asyncio
 import requests
 from .scraper import Scraper
-from .parser import Parser
 from .errors import UnsupportedRegion
 
 class API:

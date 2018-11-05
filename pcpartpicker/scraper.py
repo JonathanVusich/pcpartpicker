@@ -1,6 +1,9 @@
 from .errors import UnsupportedRegion, UnsupportedPart
-import requests
-import json
+import asyncio
+from itertools import count
+import aiohttp
+
+
 
 class Scraper:
 
@@ -12,6 +15,7 @@ class Scraper:
 
     def __init__(self, region: str="us"):
         self._set_region(region)
+        self._generate_base_url()
 
     @property
     def region(self) -> str:
@@ -23,21 +27,19 @@ class Scraper:
         self._region = region
 
     def _generate_base_url(self):
-        if not region == "us":
+        if not self.region == "us":
             self._base_url = "https://{}.pcpartpicker.com/products/".format(self._region)
 
     def _generate_product_url(self, part: str, page_num: int=1) -> str:
-        return "{}{}/#page={}".format(self._base_url, part, page_num)
+        return "{}{}/fetch/?page={}".format(self._base_url, part, page_num)
 
-    def _retrieve_page_num(self, part: str) -> int:
-        page = requests.get(self._generate_product_url(part))
-        parsed_page = json.loads(page.content.decode('utf-8'))
-        return parsed_page["result"]["paging_data"]["page_blocks"][-1]["page"]
+    def _retrieve_page_data(self, part: str) -> int:
+        return requests.get(self._generate_product_url(part)).json()
 
-    def _yield_part_data(self, part: str):
-        if not part in self._supported_types:
+    async def _yield_part_data(self, part: str):
+        if part not in self._supported_types:
             raise UnsupportedPart("Part of type \'{}\' is not supported!".format(part))
-        part_num = self._retrieve_page_num(part)
-        for x in range(part_num):
+        page_num = None
+        for x in count(1):
             page = requests.get(self._generate_product_url(part, x))
             yield json.loads(page.content.decode('utf-8'))["result"]["html"]
