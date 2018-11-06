@@ -8,8 +8,11 @@ from concurrent.futures import ProcessPoolExecutor
 
 
 class Scraper:
-
-    _supported_types = ["cpu"]
+    _supported_types = ["cpu", "cpu-cooler", "motherboard", "memory", "internal-hard-drive",
+                        "video-card", "power-supply", "case", "case-fan", "fan-controller",
+                        "thermal-paste", "optical-drive", "sound-card", "wired-network-card",
+                        "wireless-network-card", "monitor", "external-hard-drive", "headphones",
+                        "keyboard", "mouse", "speakers", "ups"]
     _regions = ["au", "be", "ca", "de", "es", "fr",
                     "in", "ie", "it", "nz", "uk", "us"]
     _region = "us"
@@ -45,26 +48,14 @@ class Scraper:
         page = await session.request('GET', self._generate_product_url(part, page_num))
         return await page.text()
 
-    async def _process_page(self, part: str, raw_html: str):
-        await self._parser._parse(raw_html)
-
-    async def _retrieve_parsed_parts(self, pool: ProcessPoolExecutor, session: aiohttp.ClientSession, part: str, page_num: int) -> dict:
-        raw_html = self._retrieve_page_data(session, part, page_num)
-        return await asyncio.wrap_future(pool.submit(self._process_page, part, raw_html))
-
-    async def _fetch_data(self, session: aiohttp.ClientSession, part: str, page_numbers: list):
-        pool = ProcessPoolExecutor()
-        coroutines = (self._retrieve_parsed_parts(pool, session, part, num) for num in page_numbers)
-        return await asyncio.gather(*coroutines)
-
-    async def _retrieve_part_data(self, pool: ProcessPoolExecutor, part: str):
+    async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str):
         if part not in self._supported_types:
             raise UnsupportedPart("Part of type \'{}\' is not supported!".format(part))
-        async with aiohttp.ClientSession() as session:
-            page_numbers = await self._retrieve_page_numbers(session, part)
-            await asyncio.wrap_future(pool.submit(setattr(self, part, await self._fetch_data(session, part, page_numbers))))
+        page_numbers = await self._retrieve_page_numbers(session, part)
+        tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
+        return await asyncio.gather(*tasks)
 
-    def _retrieve_all(self):
-        pool = ProcessPoolExecutor()
-        coroutines = (self._retrieve_part_data(pool, part) for part in self._supported_types)
-        asyncio.run_coroutine_threadsafe(*coroutines)
+    async def _retrieve_all(self, loop):
+        async with aiohttp.ClientSession(loop=loop) as session:
+            tasks = [self._retrieve_part_data(session, part) for part in self._supported_types]
+            return await asyncio.gather(*tasks)

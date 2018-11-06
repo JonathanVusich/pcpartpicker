@@ -3,8 +3,8 @@ import asyncio
 
 def main():
     api = API()
-    result = asyncio.get_event_loop().run_until_complete(api._scraper._retrieve_part_data('cpu'))
-    print('hi')
+    api.retrieve_all()
+    print(api._scraper.cpu)
 
 if __name__ == "__main__":
     main()
