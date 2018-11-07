@@ -5,7 +5,7 @@ from .errors import UnsupportedRegion
 
 class API:
 
-    _supported_types = ["cpu", "cpu-cooler", "motherboard", "memory", "internal-hard-drive",
+    _supported_parts = ["cpu", "cpu-cooler", "motherboard", "memory", "internal-hard-drive",
                         "video-card", "power-supply", "case", "case-fan", "fan-controller",
                         "thermal-paste", "optical-drive", "sound-card", "wired-network-card",
                         "wireless-network-card", "monitor", "external-hard-drive", "headphones",
@@ -24,8 +24,8 @@ class API:
         return self._regions
 
     @property
-    def supported_types(self):
-        return self._supported_types
+    def supported_parts(self):
+        return self._supported_parts
 
     @property
     def region(self):
@@ -43,7 +43,7 @@ class API:
     def retrieve_all(self):
         loop = asyncio.get_event_loop()
         start = time.perf_counter()
-        results = loop.run_until_complete(self._scraper._retrieve_all(loop))
+        results = loop.run_until_complete(self._scraper._retrieve_all(loop, self.supported_parts))
         print(time.perf_counter() - start)
         loop.close()
 
