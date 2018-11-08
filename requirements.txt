@@ -1,4 +1,4 @@
-lxml=4.2.5
-aiohttp=3.4.4
-aiodns=1.1.1
-cchardet=2.1.4
+lxml==4.2.5
+aiohttp==3.4.4
+aiodns==1.1.1
+cchardet==2.1.4
