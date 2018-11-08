@@ -2,7 +2,6 @@ import pytest
 from pcpartpicker.scraper import Scraper
 from pcpartpicker.parser import Parser
 import aiohttp
-import asyncio
 
 
 # Ensure that the region defaults to "us"
