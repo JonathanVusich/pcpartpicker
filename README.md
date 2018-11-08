@@ -1,4 +1,5 @@
 # pcpartpicker
-This is an unofficial API for the website pcpartpicker.com.
+This is an unofficial Python 3.6+ API for the website pcpartpicker.com.
+Written using async code for efficient data retrieval. Currently a WIP. 
 
-# TODO: Add travis.ci data
+https://travis-ci.org/JonathanVusich/pcpartpicker.svg?branch=master

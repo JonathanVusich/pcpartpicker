@@ -1,9 +1,11 @@
+sudo: false
 language: python
-
 python:
-
-  - "3.7"
-
+    - "3.6"
+before_install:
+    - pip install pytest pytest-cov
+    - pip install coveralls
 script:
-
-  - python -m pytest
+ - py.test
+ after_success:
+    - coveralls

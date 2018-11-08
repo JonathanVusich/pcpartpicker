@@ -1,12 +1,15 @@
 import asyncio
-import requests
+import time
 from .scraper import Scraper
-from .parser import Parser
 from .errors import UnsupportedRegion
 
 class API:
 
-    _supported_types = ["cpu"]
+    _supported_parts = ["cpu", "cpu-cooler", "motherboard", "memory", "internal-hard-drive",
+                        "video-card", "power-supply", "case", "case-fan", "fan-controller",
+                        "thermal-paste", "optical-drive", "sound-card", "wired-network-card",
+                        "wireless-network-card", "monitor", "external-hard-drive", "headphones",
+                        "keyboard", "mouse", "speakers", "ups"]
     _regions = ["au", "be", "ca", "de", "es", "fr",
                     "in", "ie", "it", "nz", "uk", "us"]
     _region = "us"
@@ -21,8 +24,8 @@ class API:
         return self._regions
 
     @property
-    def supported_types(self):
-        return self._supported_types
+    def supported_parts(self):
+        return self._supported_parts
 
     @property
     def region(self):
@@ -38,7 +41,11 @@ class API:
         pass
 
     def retrieve_all(self):
-        pass
+        loop = asyncio.get_event_loop()
+        start = time.perf_counter()
+        results = loop.run_until_complete(self._scraper._retrieve_all(loop, self.supported_parts))
+        print(time.perf_counter() - start)
+        loop.close()
 
     def load_data(self):
         pass

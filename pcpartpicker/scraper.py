@@ -1,43 +1,47 @@
-from .errors import UnsupportedRegion, UnsupportedPart
-import requests
-import json
+from .parser import Parser
+import asyncio
+import aiohttp
+import demjson
+
 
 class Scraper:
-
-    _supported_types = ["cpu"]
-    _regions = ["au", "be", "ca", "de", "es", "fr",
-                    "in", "ie", "it", "nz", "uk", "us"]
     _region = "us"
-    _base_url = "https://pcpartpicker.com/products/"
+    _base_url = None
+    _parser = None
 
     def __init__(self, region: str="us"):
         self._set_region(region)
-
-    @property
-    def region(self) -> str:
-        return self._region
+        self._generate_base_url()
+        self._parser = Parser()
 
     def _set_region(self, region: str):
-        if not region in self._regions:
-            raise UnsupportedRegion("Region \'{}\' is not supported!".format(region))
         self._region = region
+        self._base_url = self._generate_base_url()
 
-    def _generate_base_url(self):
-        if not region == "us":
-            self._base_url = "https://{}.pcpartpicker.com/products/".format(self._region)
+    def _generate_base_url(self) -> str:
+        if not self._region == "us":
+            return "https://{}.pcpartpicker.com/products/".format(self._region)
+        else:
+            return "https://pcpartpicker.com/products/"
 
     def _generate_product_url(self, part: str, page_num: int=1) -> str:
-        return "{}{}/#page={}".format(self._base_url, part, page_num)
+        return "{}{}/fetch?page={}".format(self._base_url, part, page_num)
 
-    def _retrieve_page_num(self, part: str) -> int:
-        page = requests.get(self._generate_product_url(part))
-        parsed_page = json.loads(page.content.decode('utf-8'))
-        return parsed_page["result"]["paging_data"]["page_blocks"][-1]["page"]
+    async def _retrieve_page_numbers(self, session: aiohttp.ClientSession, part: str) -> list:
+        num = demjson.decode(await self._retrieve_page_data(session, part))["result"]["paging_data"]["page_blocks"][-1]["page"]
+        return [x for x in range(1, num+1)]
 
-    def _yield_part_data(self, part: str):
-        if not part in self._supported_types:
-            raise UnsupportedPart("Part of type \'{}\' is not supported!".format(part))
-        part_num = self._retrieve_page_num(part)
-        for x in range(part_num):
-            page = requests.get(self._generate_product_url(part, x))
-            yield json.loads(page.content.decode('utf-8'))["result"]["html"]
+    async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int=1) -> str:
+        page = await session.request('GET', self._generate_product_url(part, page_num))
+        text = await page.text()
+        return await self._parser._parse(part, demjson.decode(text)['result']['html'])
+
+    async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str):
+        page_numbers = await self._retrieve_page_numbers(session, part)
+        tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
+        return await asyncio.gather(*tasks)
+
+    async def _retrieve_all(self, loop, supported_parts: list):
+        async with aiohttp.ClientSession(loop=loop) as session:
+            tasks = [self._retrieve_part_data(session, part) for part in supported_parts]
+            return await asyncio.gather(*tasks)
