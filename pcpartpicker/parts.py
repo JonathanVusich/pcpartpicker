@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 
 """
@@ -10,22 +10,56 @@ from decimal import Decimal
 
 
 @dataclass
-class CPU:
-    """CPU dataclass."""
+class Part:
+    """The base dataclass for all the different types of parts."""
     _name: str
-    """str: The make and model of this CPU."""
-    _cores: int
-    """int: The number of cores that this CPU has (excludes hyperthreading + SMT)."""
-    _tdp: int
-    """int: The TDP of this CPU."""
-    _clock_speed: str
-    """str: The clock speed of this CPU."""
+    """str: The part descriptor. Typically includes the brand, make and model."""
     _price: Decimal
-    """Decimal: The price of this CPU."""
+    """Decimal: The price of the given part."""
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def price(self):
+        return self._price
+
+
+@dataclass
+class Resolution:
+    _height: int
+    """int: The number of vertical pixels."""
+    _width: int
+    """int: The number of horizontal pixels."""
+    _pixel_count: int = field(init=False)
+    """int: The total number of pixels."""
+
+    def __post_init__(self):
+        self._pixel_count = self.width * self.height
+
+    @property
+    def height(self):
+        return self._height
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def pixel_count(self):
+        return self._pixel_count
+
+
+@dataclass
+class CPU(Part):
+    """CPU dataclass."""
+    _cores: int
+    """int: The number of cores that this CPU has (excludes hyperthreading + SMT)."""
+    _tdp: int
+    """int: The TDP of this CPU."""
+    _clock_speed: int
+    """int: The clock speed of this CPU (in GHz)."""
 
     @property
     def cores(self):
@@ -39,26 +73,14 @@ class CPU:
     def clock_speed(self):
         return self._clock_speed
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class CPUCooler:
+class CPUCooler(Part):
     """CPU Cooler dataclass."""
-    _name: str
-    """str: The make and model of this CPU cooler."""
     _fan_rpm: str
     """str: The RPM of the fans found on this CPU cooler."""
     _decibels: str
     """str: The number of decibels produced by this CPU cooler."""
-    _price: Decimal
-    """Decimal: The price of this CPU cooler"""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def fan_rpm(self):
@@ -68,16 +90,10 @@ class CPUCooler:
     def decibels(self):
         return self._decibels
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class Motherboard:
+class Motherboard(Part):
     """Motherboard dataclass."""
-    _name: str
-    """str: The make and model of this motherboard"""
     _socket: str
     """str: The CPU socket type on this motherboard"""
     _form_factor: str
@@ -86,12 +102,6 @@ class Motherboard:
     """int: The number of RAM slots on this motherboard"""
     _max_ram: str
     """str: The maximum amount of RAM that this motherboard supports (given in GB)"""
-    _price: Decimal
-    """Decimal: The price of this motherboard."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def socket(self):
@@ -109,16 +119,10 @@ class Motherboard:
     def max_ram(self):
         return self._max_ram
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class Memory:
+class Memory(Part):
     """Memory dataclass."""
-    _name: str
-    """str: The make and model of this memory module"""
     _type: str
     """str: The type and frequency of this memory module"""
     _module_type: str
@@ -131,12 +135,6 @@ class Memory:
     """str: The size of the modules that come with this memory configuration"""
     _price_per_gb: Decimal
     """Decimal: The price per GB for this memory configuration"""
-    _price: Decimal
-    """Decimal: The price for this memory configuration"""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def type(self):
@@ -162,16 +160,10 @@ class Memory:
     def price_per_gb(self):
         return self._price_per_gb
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class HDD:
+class HDD(Part):
     """HDD dataclass."""
-    _name: str
-    """str: The make and model of this HDD"""
     _model_line: str
     """str: The model line of this HDD"""
     _form_factor: str
@@ -182,12 +174,6 @@ class HDD:
     """str: The capacity of this HDD"""
     _cache_amount: str
     """str: The cache amount found in this HDD"""
-    _price: Decimal
-    """Decimal: The price for this HDD"""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def model_line(self):
@@ -209,16 +195,10 @@ class HDD:
     def cache_amount(self):
         return self._cache_amount
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class SSD:
+class SSD(Part):
     """SSD dataclass."""
-    _name: str
-    """str: The make and model of this SSD"""
     _model_line: str
     """str: The model line of this SSD"""
     _form_factor: str
@@ -227,12 +207,6 @@ class SSD:
     """str: The capacity of this SSD"""
     _cache_amount: str
     """str: The cache amount found in this SSD"""
-    _price: Decimal
-    """Decimal: The price of this SSD"""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def model_line(self):
@@ -250,15 +224,9 @@ class SSD:
     def cache_amount(self):
         return self._cache_amount
 
-    @property
-    def price(self):
-        return self._price
 
-
-class GPU:
+class GPU(Part):
     """GPU dataclass."""
-    _name: str
-    """str: The make and model of this GPU."""
     _model_line: str
     """str: The model line of this GPU."""
     _chipset: str
@@ -267,12 +235,6 @@ class GPU:
     """str: The amount of video memory in this GPU."""
     _core_clock: str
     """str: The clock speed of this GPU """
-    _price: Decimal
-    """Decimal: The price of this GPU."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def model_line(self):
@@ -290,16 +252,10 @@ class GPU:
     def core_clock(self):
         return self._core_clock
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class PSU:
+class PSU(Part):
     """PSU dataclass."""
-    _name: str
-    """str: The name of this PSU."""
     _model_line: str
     """str: The model line of this PSU."""
     _form_factor: str
@@ -310,12 +266,6 @@ class PSU:
     """str: The watt rating of this PSU."""
     _modular: str
     """str: The modular properties of this PSU."""
-    _price: Decimal
-    """Decimal: The price of this PSU."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def model_line(self):
@@ -337,31 +287,19 @@ class PSU:
     def modular(self):
         return self._modular
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class Case:
+class Case(Part):
     """PC case dataclass."""
-    _name: str
-    """str: The make and model of this case."""
     _form_factor: str
     """str: The form factor of this case."""
     _external_bays: int
     """int: The number of external 5.25" bays in this case."""
     _internal_bays: int
     """int: The number of internal 3.5" bays in this case."""
-    _price: Decimal
-    """Decimal: The price of this case."""
     _psu_wattage: int
     """int: The wattage amount of the internal PSU of this case.
             If no PSU is present, this value will be set to None."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def form_factor(self):
@@ -376,19 +314,13 @@ class Case:
         return self._internal_bays
 
     @property
-    def price(self):
-        return self._price
-
-    @property
     def psu_wattage(self):
         return self._psu_wattage
 
 
 @dataclass
-class Fan:
+class Fan(Part):
     """CPU and case fan dataclass."""
-    _name: str
-    """str: The make and model of this fan."""
     _color: str
     """str: The color of this fan."""
     _size: int
@@ -399,12 +331,6 @@ class Fan:
     """str: The amount of airflow that this fan can produce."""
     _decibels: str
     """str: The decibel amount or range produced by this fan."""
-    _price: Decimal
-    """Decimal: The price of this fan."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def color(self):
@@ -426,28 +352,16 @@ class Fan:
     def decibels(self):
         return self._decibels
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class FanController:
+class FanController(Part):
     """Fan controller dataclass."""
-    _name: str
-    """str: The make and model of this fan controller."""
     _form_factor: str
     """str: The form factor of this fan controller."""
     _channels: str
     """str: The number of fans that this fan controller can control."""
     _channel_wattage: str
     """str: The number of watts that this fan can provide to each channel."""
-    _price: Decimal
-    """Decimal: The price of this fan controller."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def form_factor(self):
@@ -461,39 +375,21 @@ class FanController:
     def channel_wattage(self):
         return self._channel_wattage
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class ThermalPaste:
+class ThermalPaste(Part):
     """Thermal paste dataclass."""
-    _name: str
-    """str: The make and model of this thermal paste."""
     _amount: Decimal
     """Decimal: The amount of thermal paste provided in this product (in grams)."""
-    _price: Decimal
-    """Decimal: The price of this thermal paste."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def amount(self):
         return self._amount
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class OpticalDrive:
+class OpticalDrive(Part):
     """Optical drive dataclass."""
-    _name: str
-    """str: The make and model of this optical drive."""
     _bluray_read_speed: int
     """int: The BluRay read speed of this optical drive."""
     _dvd_read_speed: int
@@ -506,12 +402,6 @@ class OpticalDrive:
     """str: The DVD write speeds of this optical drive."""
     _cd_write_speed: str
     """str: The CD write speeds of this optical drive."""
-    _price: Decimal
-    """Decimal: The price of this optical drive."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def bluray_read_speed(self):
@@ -537,16 +427,10 @@ class OpticalDrive:
     def cd_write_speed(self):
         return self._cd_write_speed
 
-    @property
-    def price(self):
-        return self._price
-
 
 @dataclass
-class SoundCard:
+class SoundCard(Part):
     """Sound card dataclass."""
-    _name: str
-    """str: The make and model of this sound card."""
     _chipset: str
     """str: The chipset of this sound card."""
     _channels: Decimal
@@ -557,12 +441,6 @@ class SoundCard:
     """int: The signal to noise ratio of this sound card."""
     _sample_rate: int
     """int: The sample rate of this sound card."""
-    _price: Decimal
-    """Decimal: The price of this sound card."""
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def chipset(self):
@@ -584,8 +462,230 @@ class SoundCard:
     def sample_rate(self):
         return self._sample_rate
 
-    def price(self):
-        return self._price
+
+@dataclass
+class EthernetCard(Part):
+    """Ethernet card dataclass."""
+    _interface: str
+    """str: The motherboard interface of this Ethernet card."""
+    _port_speed: str
+    """str: The maximum speed that this Ethernet card supports."""
+    _port_number: int
+    """int: The number of Ethernet ports on this card."""
+
+    @property
+    def interface(self):
+        return self._interface
+
+    @property
+    def port_speed(self):
+        return self._port_speed
+
+    @property
+    def port_number(self):
+        return self._port_number
+
+
+@dataclass
+class WirelessCard(Part):
+    """Wireless card dataclass."""
+    _interface: str
+    """str: The motherboard interface of this wireless card."""
+    _supported_protocols: str
+    """str: The supported wireless protocols of this card."""
+
+    @property
+    def interface(self):
+        return self._interface
+
+    @property
+    def supported_protocols(self):
+        return self._supported_protocols
+
+
+@dataclass
+class Monitor(Part):
+    """Monitor dataclass."""
+    _resolution: Resolution
+    """Resolution: The pixel dimensions of this monitor."""
+    _size: int
+    """int: The diagonal display size of this monitor."""
+    _response_time: int
+    """int: The response time of this display (in milliseconds)."""
+    _ips: bool
+    """bool: Returns True if the panel is an IPS display."""
+
+    @property
+    def resolution(self):
+        return self._resolution
+
+    @property
+    def size(self):
+        return self._size
+
+    @property
+    def response_time(self):
+        return self._response_time
+
+    @property
+    def ips(self):
+        return self._ips
+
+
+@dataclass
+class ExternalHDD(Part):
+    """External HDD dataclass."""
+    _model: str
+    """str: The model line of this external HDD."""
+    _type: str
+    """str: The type of this external HDD."""
+    _capacity: str
+    """str: The capacity of this external HDD."""
+    _price_per_gb: str
+    """str: The price per GB of storage of this external HDD."""
+
+    @property
+    def model(self):
+        return self._model
+
+    @property
+    def type(self):
+        return self._type
+
+    @property
+    def capacity(self):
+        return self._capacity
+
+    @property
+    def price_per_gb(self):
+        return self._price_per_gb
+
+
+@dataclass
+class Headphones(Part):
+    """Headphones dataclass."""
+    _type: str
+    """str: The type of this set of headphones."""
+    _has_microphone: bool
+    """bool: Returns True if this set of headphones has a microphone."""
+    _is_wireless: bool
+    """bool: Returns True if this set of headphones is wireless."""
+    _frequency_response: str
+    """str: The frequency response of this set of headphones."""
+
+    @property
+    def type(self):
+        return self._type
+
+    @property
+    def has_microphone(self):
+        return self._has_microphone
+
+    @property
+    def is_wireless(self):
+        return self._is_wireless
+
+    @property
+    def frequency_response(self):
+        return self._frequency_response
+
+
+@dataclass
+class Keyboard(Part):
+    """Keyboard dataclass."""
+    _style: str
+    """str: Describes the style of this keyboard."""
+    _color: str
+    """str: Describes the color of this keyboard."""
+    _switch_type: str
+    """str: Describes the type of switches that this keyboard uses."""
+    _backlight_type: str
+    """str: Describes the available backlight on this device."""
+
+    @property
+    def style(self):
+        return self._style
+
+    @property
+    def color(self):
+        return self._color
+
+    @property
+    def switch_type(self):
+        return self._switch_type
+
+    @property
+    def backlight_type(self):
+        return self._backlight_type
+
+
+@dataclass
+class Mice(Part):
+    """Computer mouse dataclass."""
+    _type: str
+    """str: Describes the type of this mouse."""
+    _connection: str
+    """str: Describes the type of connection that this mouse uses."""
+    _color: str
+    """str: Describes the color of this mouse."""
+
+    @property
+    def type(self):
+        return self._type
+
+    @property
+    def connection(self):
+        return self._connection
+
+    @property
+    def color(self):
+        return self._color
+
+
+@dataclass
+class Speakers(Part):
+    """Computer speakers dataclass."""
+    _channel_configuration: Decimal
+    """Decimal: The channel configuration of this set of computer speakers."""
+    _wattage: int
+    """int: The peak wattage of these speakers."""
+    _frequency_response: str
+    """str: The frequency response of these speakers."""
+
+    @property
+    def channel_configuration(self):
+        return self._channel_configuration
+
+    @property
+    def wattage(self):
+        return self._wattage
+
+    @property
+    def frequency_response(self):
+        return self._frequency_response
+
+
+@dataclass
+class UPS(Part):
+    """UPS dataclass."""
+    _watt_capacity: int
+    """int: The number of watts that this UPS can store."""
+    _va_capacity: int
+    """int: The number of volt-amperes that this UPS can store."""
+
+    @property
+    def watt_capacity(self):
+        return self._watt_capacity
+
+    @property
+    def va_capacity(self):
+        return self._va_capacity
+
+
+
 
 
 # TODO: Finish writing the rest of these dataclasses!
+
+
+
