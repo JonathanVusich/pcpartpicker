@@ -1,6 +1,7 @@
 import pytest
 from pcpartpicker.parts import *
 
+
 # Bytes class tests
 def test_bytes_init():
     bytes = Bytes(50)
@@ -105,6 +106,7 @@ def test_decibel_init():
     assert(decibels.default == args[2])
 
 
+# RPM class test
 def test_rpm_init():
     args = [12.5, 34.5, 22]
     rpm = RPM(*args)
@@ -115,10 +117,22 @@ def test_rpm_init():
 
 # CPU class tests
 def test_cpu_init():
-    args = ["Intel i7-6700k", Decimal("230.00"), 4, 95, Decimal("4.4")]
+    args = ["Intel Core i7-6700k", Decimal("230.00"), 4, 95, ClockSpeed.from_GHz(4.4)]
     cpu = CPU(*args)
     assert(cpu.name == args[0])
     assert(cpu.price == args[1])
     assert(cpu.cores == args[2])
     assert(cpu.tdp == args[3])
     assert(cpu.clock_speed == args[4])
+
+
+# CPU cooler tests
+def test_cpu_cooler_init():
+    args = ["Cooler Master Hyper 212 Evo", Decimal("25.99"), RPM(500, 2400, 1800), Decibels(12.2, 43.8, 30.2)]
+    cpu_cooler = CPUCooler(*args)
+    assert(cpu_cooler.name == args[0])
+    assert(cpu_cooler.price == args[1])
+    assert(cpu_cooler.fan_rpm == args[2])
+    assert(cpu_cooler.decibels == args[3])
+
+    

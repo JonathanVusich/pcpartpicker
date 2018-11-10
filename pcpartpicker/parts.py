@@ -25,6 +25,10 @@ class Part:
     def price(self):
         return self._price
 
+    def __post_init__(self):
+        assert(isinstance(self.name, str))
+        assert(isinstance(self.price, Decimal))
+
 
 @dataclass
 class Range:
@@ -35,6 +39,11 @@ class Range:
     """float: The maximum value for this range."""
     _default: float
     """float: The default value for this range."""
+
+    def __post_init__(self):
+        assert(isinstance(self.min, (float, int)))
+        assert(isinstance(self.max, (float, int)))
+        assert(isinstance(self.default, (float, int)))
 
     @property
     def min(self):
@@ -60,6 +69,8 @@ class Resolution:
     """int: The total number of pixels."""
 
     def __post_init__(self):
+        assert(isinstance(self.width, int))
+        assert(isinstance(self.height, int))
         self._pixel_count = self.width * self.height
 
     @property
@@ -80,6 +91,9 @@ class Bytes:
     """Dataclass that stores byte numbers for easier user manipulation."""
     _num: int
     """int: The number of bytes that this object represents."""
+
+    def __post_init__(self):
+        assert(isinstance(self.num, int))
 
     @property
     def num(self):
@@ -147,25 +161,28 @@ class ClockSpeed:
     _cycles: int
     """int: The total number of clock cycles per second."""
 
+    def __post_init__(self):
+        assert(isinstance(self.cycles, int))
+
     @property
     def cycles(self):
         return self._cycles
 
     @property
     def MHz(self):
-        return self._cycles / 1000000
+        return self._cycles / 1000000.0
 
     @property
     def GHz(self):
-        return self._cycles / 1000000000
+        return self._cycles / 1000000000.0
 
     @classmethod
     def from_GHz(cls, num: float):
-        return cls(num * 1000000000)
+        return cls(int(num * 1000000000))
 
     @classmethod
     def from_MHz(cls, num: float):
-        return cls(num * 1000000)
+        return cls(int(num * 1000000))
 
 
 
@@ -178,6 +195,11 @@ class CPU(Part):
     """int: The TDP of this CPU."""
     _clock_speed: ClockSpeed
     """Clockspeed: The clock speed of this CPU (in GHz)."""
+
+    def __post_init__(self):
+        assert(isinstance(self.cores, int))
+        assert(isinstance(self.tdp, int))
+        assert(isinstance(self.clock_speed, ClockSpeed))
 
     @property
     def cores(self):
@@ -195,10 +217,14 @@ class CPU(Part):
 @dataclass
 class CPUCooler(Part):
     """CPU Cooler dataclass."""
-    _fan_rpm: str
-    """str: The RPM of the fans found on this CPU cooler."""
-    _decibels: str
-    """str: The number of decibels produced by this CPU cooler."""
+    _fan_rpm: RPM
+    """RPM: The RPM information of this CPU cooler."""
+    _decibels: Decibels
+    """Decibels: The decibel information of this CPU cooler."""
+
+    def __post_init__(self):
+        assert(isinstance(self.fan_rpm, RPM))
+        assert(isinstance(self.decibels, Decibels))
 
     @property
     def fan_rpm(self):
