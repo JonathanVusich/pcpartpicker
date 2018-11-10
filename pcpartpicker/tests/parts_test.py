@@ -2,6 +2,13 @@ import pytest
 from pcpartpicker.parts import *
 
 
+def test_check_typing():
+    check_typing(12, int)
+    with pytest.raises(ValueError):
+        check_typing(12.3, int)
+    check_typing(None, int)
+
+
 # Bytes class tests
 def test_bytes_init():
     bytes = Bytes(50)
@@ -177,7 +184,7 @@ def test_cpu_init():
 
 
 def test_cpu_bad_init():
-    args = ["Intel Core i7-6700k", Decimal("230.00"), "4", 95, ClockSpeed.from_GHz(4.4)]
+    args = [6700, Decimal("230.00"), 4, 95, ClockSpeed.from_GHz(4.4)]
     with pytest.raises(ValueError):
         cpu = CPU(*args)
 
@@ -216,5 +223,77 @@ def test_motherboard_bad_init():
         mobo = Motherboard(*args)
 
 
+def test_memory_init():
+    args = ["Corsair Vengeance", Decimal("122.45"), "288-pin DIMM", ClockSpeed.from_GHz(3), "DDR4", 15, 2, Bytes.from_GB(4), Bytes.from_GB(8), 0.08]
+    memory = Memory(*args)
+    assert(memory.name == args[0])
+    assert(memory.price == args[1])
+    assert(memory.type == args[2])
+    assert(memory.speed == args[3])
+    assert(memory.module_type == args[4])
+    assert(memory.cas_timing == args[5])
+    assert(memory.number_of_modules == args[6])
+    assert(memory.module_size == args[7])
+    assert(memory.total_size == args[8])
+    assert(memory.price_per_gb == args[9])
+
+
+def test_memory_bad_init():
+    args = ["Corsair Vengeance", Decimal("122.45"), "288-pin DIMM", ClockSpeed.from_GHz(3), "DDR4", 15, 2,
+            Bytes.from_GB(4), Bytes.from_GB(8), Decimal("0.08")]
+    with pytest.raises(ValueError):
+        memory = Memory(*args)
+
+
+def test_storage_drive_init():
+    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    hdd = StorageDrive(*args)
+    assert(hdd.name == args[0])
+    assert(hdd.price == args[1])
+    assert(hdd.model_line == args[2])
+    assert(hdd.form_factor == args[3])
+    assert(hdd.capacity == args[4])
+    assert(hdd.cache_amount == args[5])
+
+
+def test_storage_drive_bad_init():
+    args = [123, Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    with pytest.raises(ValueError):
+        hdd = StorageDrive(*args)
+
+
+def test_hdd_init():
+    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), 7200]
+    hdd = HDD(*args)
+    assert(hdd.name == args[0])
+    assert(hdd.price == args[1])
+    assert(hdd.model_line == args[2])
+    assert(hdd.form_factor == args[3])
+    assert(hdd.capacity == args[4])
+    assert(hdd.cache_amount == args[5])
+    assert(hdd.platter_rpm == args[6])
+
+
+def test_hdd_bad_init():
+    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), "7200"]
+    with pytest.raises(ValueError):
+        hdd = HDD(*args)
+
+
+def test_ssd_init():
+    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    ssd = SSD(*args)
+    assert(ssd.name == args[0])
+    assert(ssd.price == args[1])
+    assert(ssd.model_line == args[2])
+    assert(ssd.form_factor == args[3])
+    assert(ssd.capacity == args[4])
+    assert(ssd.cache_amount == args[5])
+
+
+def test_ssd_bad_init():
+    args = [1234, Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    with pytest.raises(ValueError):
+        ssd = SSD(*args)
 
 
