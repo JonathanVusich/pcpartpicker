@@ -5,7 +5,7 @@ from decimal import Decimal
     Author: Jonathan Vusich
 
     These classes are general purpose dataclasses designed to hold
-    and represent data collected from https://pcpartpicker.com. 
+    and represent specification data for computer hardware. 
 """
 
 
@@ -28,10 +28,11 @@ class Part:
 
 @dataclass
 class Resolution:
-    _height: int
-    """int: The number of vertical pixels."""
+    """Dataclass that stores resolution data for monitors."""
     _width: int
     """int: The number of horizontal pixels."""
+    _height: int
+    """int: The number of vertical pixels."""
     _pixel_count: int = field(init=False)
     """int: The total number of pixels."""
 
@@ -52,14 +53,88 @@ class Resolution:
 
 
 @dataclass
+class Bytes:
+    """Dataclass that stores byte numbers for easier user manipulation."""
+    _num: Decimal
+    """Decimal: The number of bytes that this object represents."""
+
+    @property
+    def num(self):
+        return self._num
+
+    @property
+    def KB(self):
+        return self._num / Decimal(1000)
+
+    @property
+    def MB(self):
+        return self._num / Decimal(1000000)
+
+    @property
+    def GB(self):
+        return self._num / Decimal(1000000000)
+
+    @property
+    def TB(self):
+        return self._num / Decimal(1000000000000)
+
+    @property
+    def PB(self):
+        return self._num / Decimal(1000000000000000)
+
+    @classmethod
+    def from_KB(cls, num):
+        num_bytes = num * Decimal(1000)
+        return cls(num_bytes)
+
+    @classmethod
+    def from_MB(cls, num):
+        num_bytes = num * Decimal(1000000)
+        return cls(num_bytes)
+
+    @classmethod
+    def from_GB(cls, num):
+        num_bytes = num * Decimal(1000000000)
+        return cls(num_bytes)
+
+    @classmethod
+    def from_TB(cls, num):
+        num_bytes = num * Decimal(1000000000000)
+        return cls(num_bytes)
+
+    @classmethod
+    def from_PB(cls, num):
+        num_bytes = num * Decimal(1000000000000000)
+        return cls(num_bytes)
+
+
+class ClockSpeed:
+    """Dataclass that stores clock speed data for various parts."""
+    _cycles: Decimal
+    """int: The total number of clock cycles per second."""
+
+    @property
+    def cycles(self):
+        return self._cycles
+
+    @property
+    def MHz(self):
+        return self._cycles / Decimal("1000000")
+
+    @property
+    def GHz(self):
+        return self._cycles / Decimal("1000000000")
+
+
+@dataclass
 class CPU(Part):
     """CPU dataclass."""
     _cores: int
     """int: The number of cores that this CPU has (excludes hyperthreading + SMT)."""
     _tdp: int
     """int: The TDP of this CPU."""
-    _clock_speed: int
-    """int: The clock speed of this CPU (in GHz)."""
+    _clock_speed: Decimal
+    """Decimal: The clock speed of this CPU (in GHz)."""
 
     @property
     def cores(self):
@@ -100,8 +175,8 @@ class Motherboard(Part):
     """str: The form factor of this motherboard"""
     _ram_slots: int
     """int: The number of RAM slots on this motherboard"""
-    _max_ram: str
-    """str: The maximum amount of RAM that this motherboard supports (given in GB)"""
+    _max_ram: Bytes
+    """Bytes: The maximum amount of RAM that this motherboard supports (given in GB)"""
 
     @property
     def socket(self):
@@ -131,8 +206,8 @@ class Memory(Part):
     """int: The CAS timing of this memory module"""
     _number_of_modules: int
     """int: The number of modules that come with this memory configuration"""
-    _module_size: str
-    """str: The size of the modules that come with this memory configuration"""
+    _module_size: Bytes
+    """Bytes: The size of the modules that come with this memory configuration"""
     _price_per_gb: Decimal
     """Decimal: The price per GB for this memory configuration"""
 
@@ -170,10 +245,10 @@ class HDD(Part):
     """str: The form factor of this HDD"""
     _platter_rpm: int
     """int: The platter RPM of this HDD"""
-    _capacity: str
-    """str: The capacity of this HDD"""
-    _cache_amount: str
-    """str: The cache amount found in this HDD"""
+    _capacity: Bytes
+    """Bytes: The capacity of this HDD"""
+    _cache_amount: Bytes
+    """Bytes: The cache amount found in this HDD"""
 
     @property
     def model_line(self):
@@ -203,10 +278,10 @@ class SSD(Part):
     """str: The model line of this SSD"""
     _form_factor: str
     """str: The form factor of this SSD"""
-    _capacity: str
-    """str: The capacity of this SSD"""
-    _cache_amount: str
-    """str: The cache amount found in this SSD"""
+    _capacity: Bytes
+    """Bytes: The capacity of this SSD"""
+    _cache_amount: Bytes
+    """Bytes: The cache amount found in this SSD"""
 
     @property
     def model_line(self):
@@ -231,8 +306,8 @@ class GPU(Part):
     """str: The model line of this GPU."""
     _chipset: str
     """str: The chipset of this GPU."""
-    _memory_amount: str
-    """str: The amount of video memory in this GPU."""
+    _memory_amount: Bytes
+    """Bytes: The amount of video memory in this GPU."""
     _core_clock: str
     """str: The clock speed of this GPU """
 
