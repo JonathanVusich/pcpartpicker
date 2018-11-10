@@ -152,17 +152,22 @@ class Bytes:
 
 @dataclass
 class RPM(Range):
-    """Dataclass that stores RPM data for a computer part."""
+    """Dataclass that stores RPM data for computer parts."""
 
 
 @dataclass
 class Decibels(Range):
-    """Dataclass that stores decibel data for a computer part."""
+    """Dataclass that stores decibel data for computer parts."""
 
 
 @dataclass
 class CFM(Range):
     """Dataclass that stores airflow data for computer parts."""
+
+
+@dataclass
+class FrequencyResponse(Range):
+    """Dataclass that stores frequency response data for computer parts."""
 
 
 @dataclass
@@ -299,6 +304,16 @@ class Memory(Part):
     """Bytes: The total size of the modules combined."""
     _price_per_gb: Decimal
     """Decimal: The price per GB for this memory configuration"""
+
+    def __post_init__(self):
+        check_typing(self.type, str)
+        check_typing(self.speed, ClockSpeed)
+        check_typing(self.module_type, str)
+        check_typing(self.cas_timing, int)
+        check_typing(self.number_of_modules, int)
+        check_typing(self.module_size, Bytes)
+        check_typing(self.total_size, Bytes)
+        check_typing(self.price_per_gb, Decimal)
 
     @property
     def type(self):
@@ -530,10 +545,10 @@ class FanController(Part):
     """Fan controller dataclass."""
     _form_factor: str
     """str: The form factor of this fan controller."""
-    _channels: str
-    """str: The number of fans that this fan controller can control."""
-    _channel_wattage: str
-    """str: The number of watts that this fan can provide to each channel."""
+    _channels: int
+    """int: The number of fans that this fan controller can control."""
+    _channel_wattage: int
+    """int: The number of watts that this fan can provide to each channel."""
 
     @property
     def form_factor(self):
@@ -551,8 +566,8 @@ class FanController(Part):
 @dataclass
 class ThermalPaste(Part):
     """Thermal paste dataclass."""
-    _amount: Decimal
-    """Decimal: The amount of thermal paste provided in this product (in grams)."""
+    _amount: float
+    """float: The amount of thermal paste provided in this product (in grams)."""
 
     @property
     def amount(self):
@@ -711,9 +726,9 @@ class ExternalHDD(Part):
     """str: The model line of this external HDD."""
     _type: str
     """str: The type of this external HDD."""
-    _capacity: str
+    _capacity: Bytes
     """str: The capacity of this external HDD."""
-    _price_per_gb: str
+    _price_per_gb: Decimal
     """str: The price per GB of storage of this external HDD."""
 
     @property
@@ -742,7 +757,7 @@ class Headphones(Part):
     """bool: Returns True if this set of headphones has a microphone."""
     _is_wireless: bool
     """bool: Returns True if this set of headphones is wireless."""
-    _frequency_response: str
+    _frequency_response: FrequencyResponse
     """str: The frequency response of this set of headphones."""
 
     @property
@@ -821,7 +836,7 @@ class Speakers(Part):
     """Decimal: The channel configuration of this set of computer speakers."""
     _wattage: int
     """int: The peak wattage of these speakers."""
-    _frequency_response: str
+    _frequency_response: FrequencyResponse
     """str: The frequency response of these speakers."""
 
     @property
