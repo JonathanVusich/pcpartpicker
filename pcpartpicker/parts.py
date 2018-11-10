@@ -9,6 +9,11 @@ from decimal import Decimal
 """
 
 
+def check_typing(attribute, type):
+    if not isinstance(attribute, type):
+        raise ValueError("\'{}\' must be of type \'{}\'!".format(attribute, type))
+
+
 @dataclass
 class Part:
     """The base dataclass for all the different types of parts."""
@@ -26,8 +31,8 @@ class Part:
         return self._price
 
     def __post_init__(self):
-        assert(isinstance(self.name, str))
-        assert(isinstance(self.price, Decimal))
+        check_typing(self.name, str)
+        check_typing(self.price, Decimal)
 
 
 @dataclass
@@ -41,9 +46,9 @@ class Range:
     """float: The default value for this range."""
 
     def __post_init__(self):
-        assert(isinstance(self.min, (float, int)))
-        assert(isinstance(self.max, (float, int)))
-        assert(isinstance(self.default, (float, int)))
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
     @property
     def min(self):
@@ -69,8 +74,8 @@ class Resolution:
     """int: The total number of pixels."""
 
     def __post_init__(self):
-        assert(isinstance(self.width, int))
-        assert(isinstance(self.height, int))
+        check_typing(self.width, int)
+        check_typing(self.height, int)
         self._pixel_count = self.width * self.height
 
     @property
@@ -93,7 +98,7 @@ class Bytes:
     """int: The number of bytes that this object represents."""
 
     def __post_init__(self):
-        assert(isinstance(self.num, int))
+        check_typing(self.num, int)
 
     @property
     def num(self):
@@ -156,13 +161,18 @@ class Decibels(Range):
 
 
 @dataclass
+class CFM(Range):
+    """Dataclass that stores airflow data for computer parts."""
+
+
+@dataclass
 class ClockSpeed:
     """Dataclass that stores clock speed data for various parts."""
     _cycles: int
     """int: The total number of clock cycles per second."""
 
     def __post_init__(self):
-        assert(isinstance(self.cycles, int))
+        check_typing(self.cycles, int)
 
     @property
     def cycles(self):
@@ -197,9 +207,9 @@ class CPU(Part):
     """Clockspeed: The clock speed of this CPU (in GHz)."""
 
     def __post_init__(self):
-        assert(isinstance(self.cores, int))
-        assert(isinstance(self.tdp, int))
-        assert(isinstance(self.clock_speed, ClockSpeed))
+        check_typing(self.cores, int)
+        check_typing(self.tdp, int)
+        check_typing(self.clock_speed, ClockSpeed)
 
     @property
     def cores(self):
@@ -223,8 +233,8 @@ class CPUCooler(Part):
     """Decibels: The decibel information of this CPU cooler."""
 
     def __post_init__(self):
-        assert(isinstance(self.fan_rpm, RPM))
-        assert(isinstance(self.decibels, Decibels))
+        check_typing(self.fan_rpm, RPM)
+        check_typing(self.decibels, Decibels)
 
     @property
     def fan_rpm(self):
@@ -247,6 +257,12 @@ class Motherboard(Part):
     _max_ram: Bytes
     """Bytes: The maximum amount of RAM that this motherboard supports (given in GB)"""
 
+    def __post_init__(self):
+        check_typing(self.socket, str)
+        check_typing(self.form_factor, str)
+        check_typing(self.ram_slots, int)
+        check_typing(self.max_ram, Bytes)
+
     @property
     def socket(self):
         return self._socket
@@ -268,7 +284,9 @@ class Motherboard(Part):
 class Memory(Part):
     """Memory dataclass."""
     _type: str
-    """str: The type and frequency of this memory module"""
+    """str: The type of this memory module"""
+    _speed: ClockSpeed
+    """ClockSpeed: The operating frequency of this memory module."""
     _module_type: str
     """str: The module type of this memory module"""
     _cas_timing: int
@@ -277,12 +295,18 @@ class Memory(Part):
     """int: The number of modules that come with this memory configuration"""
     _module_size: Bytes
     """Bytes: The size of the modules that come with this memory configuration"""
+    _total_size: Bytes
+    """Bytes: The total size of the modules combined."""
     _price_per_gb: Decimal
     """Decimal: The price per GB for this memory configuration"""
 
     @property
     def type(self):
         return self._type
+
+    @property
+    def speed(self):
+        return self._speed
 
     @property
     def module_type(self):
@@ -299,6 +323,10 @@ class Memory(Part):
     @property
     def module_size(self):
         return self._module_size
+
+    @property
+    def total_size(self):
+        return self._total_size
 
     @property
     def price_per_gb(self):
@@ -377,8 +405,8 @@ class GPU(Part):
     """str: The chipset of this GPU."""
     _memory_amount: Bytes
     """Bytes: The amount of video memory in this GPU."""
-    _core_clock: str
-    """str: The clock speed of this GPU """
+    _core_clock: ClockSpeed
+    """ClockSpeed: The clock speed of this GPU """
 
     @property
     def model_line(self):
@@ -469,12 +497,12 @@ class Fan(Part):
     """str: The color of this fan."""
     _size: int
     """int: The size of this fan in millimeters."""
-    _rpm: str
-    """str: The RPM or RPM range of this fan."""
-    _airflow: str
-    """str: The amount of airflow that this fan can produce."""
-    _decibels: str
-    """str: The decibel amount or range produced by this fan."""
+    _rpm: RPM
+    """RPM: The RPM or RPM range of this fan."""
+    _airflow: CFM
+    """CFM: The amount of airflow that this fan can produce."""
+    _decibels: Decibels
+    """Decibels: The decibel amount or range produced by this fan."""
 
     @property
     def color(self):
