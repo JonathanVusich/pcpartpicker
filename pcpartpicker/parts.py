@@ -27,6 +27,29 @@ class Part:
 
 
 @dataclass
+class Range:
+    """Base dataclass for different types of data ranges."""
+    _min: float
+    """float: The minimum value for this range."""
+    _max: float
+    """float: The maximum value for this range."""
+    _default: float
+    """float: The default value for this range."""
+
+    @property
+    def min(self):
+        return self._min
+
+    @property
+    def max(self):
+        return self._max
+
+    @property
+    def default(self):
+        return self._default
+
+
+@dataclass
 class Resolution:
     """Dataclass that stores resolution data for monitors."""
     _width: int
@@ -55,8 +78,8 @@ class Resolution:
 @dataclass
 class Bytes:
     """Dataclass that stores byte numbers for easier user manipulation."""
-    _num: Decimal
-    """Decimal: The number of bytes that this object represents."""
+    _num: int
+    """int: The number of bytes that this object represents."""
 
     @property
     def num(self):
@@ -64,53 +87,64 @@ class Bytes:
 
     @property
     def KB(self):
-        return self._num / Decimal(1000)
+        return self._num / 1000
 
     @property
     def MB(self):
-        return self._num / Decimal(1000000)
+        return self._num / 1000000
 
     @property
     def GB(self):
-        return self._num / Decimal(1000000000)
+        return self._num / 1000000000
 
     @property
     def TB(self):
-        return self._num / Decimal(1000000000000)
+        return self._num / 1000000000000
 
     @property
     def PB(self):
-        return self._num / Decimal(1000000000000000)
+        return self._num / 1000000000000000
 
     @classmethod
-    def from_KB(cls, num):
-        num_bytes = num * Decimal(1000)
+    def from_KB(cls, num: float):
+        num_bytes = num * 1000
         return cls(num_bytes)
 
     @classmethod
-    def from_MB(cls, num):
-        num_bytes = num * Decimal(1000000)
+    def from_MB(cls, num: float):
+        num_bytes = num * 1000000
         return cls(num_bytes)
 
     @classmethod
-    def from_GB(cls, num):
-        num_bytes = num * Decimal(1000000000)
+    def from_GB(cls, num: float):
+        num_bytes = num * 1000000000
         return cls(num_bytes)
 
     @classmethod
-    def from_TB(cls, num):
-        num_bytes = num * Decimal(1000000000000)
+    def from_TB(cls, num: float):
+        num_bytes = num * 1000000000000
         return cls(num_bytes)
 
     @classmethod
-    def from_PB(cls, num):
-        num_bytes = num * Decimal(1000000000000000)
+    def from_PB(cls, num: float):
+        num_bytes = num * 1000000000000000
         return cls(num_bytes)
 
 
+@dataclass
+class RPM(Range):
+    """Dataclass that stores RPM data for a computer part."""
+
+
+@dataclass
+class Decibels(Range):
+    """Dataclass that stores decibel data for a computer part."""
+
+
+@dataclass
 class ClockSpeed:
     """Dataclass that stores clock speed data for various parts."""
-    _cycles: Decimal
+    _cycles: int
     """int: The total number of clock cycles per second."""
 
     @property
@@ -119,11 +153,20 @@ class ClockSpeed:
 
     @property
     def MHz(self):
-        return self._cycles / Decimal("1000000")
+        return self._cycles / 1000000
 
     @property
     def GHz(self):
-        return self._cycles / Decimal("1000000000")
+        return self._cycles / 1000000000
+
+    @classmethod
+    def from_GHz(cls, num: float):
+        return cls(num * 1000000000)
+
+    @classmethod
+    def from_MHz(cls, num: float):
+        return cls(num * 1000000)
+
 
 
 @dataclass
@@ -133,8 +176,8 @@ class CPU(Part):
     """int: The number of cores that this CPU has (excludes hyperthreading + SMT)."""
     _tdp: int
     """int: The TDP of this CPU."""
-    _clock_speed: Decimal
-    """Decimal: The clock speed of this CPU (in GHz)."""
+    _clock_speed: ClockSpeed
+    """Clockspeed: The clock speed of this CPU (in GHz)."""
 
     @property
     def cores(self):
