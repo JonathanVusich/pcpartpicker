@@ -448,6 +448,7 @@ class HybridDrive(StorageDrive):
         check_typing(self.cache_amount, Bytes)
 
 
+@dataclass
 class GPU(Part):
     """GPU dataclass."""
     _model_line: str
@@ -469,7 +470,7 @@ class GPU(Part):
 
     @property
     def model_line(self):
-        return self.model_line
+        return self._model_line
 
     @property
     def chipset(self):
@@ -624,7 +625,7 @@ class FanController(Part):
         check_typing(self.name, str)
         check_typing(self.price, Decimal)
         check_typing(self.form_factor, str)
-        check_typing(self.channnels, int)
+        check_typing(self.channels, int)
         check_typing(self.channel_wattage, int)
 
     @property
@@ -953,7 +954,7 @@ class Keyboard(Part):
 
 
 @dataclass
-class Mice(Part):
+class Mouse(Part):
     """Computer mouse dataclass."""
     _type: str
     """str: Describes the type of this mouse."""
@@ -1033,12 +1034,3 @@ class UPS(Part):
     @property
     def va_capacity(self):
         return self._va_capacity
-
-
-
-
-
-# TODO: Finish writing the rest of these dataclasses!
-
-
-
