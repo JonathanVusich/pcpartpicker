@@ -1,4 +1,5 @@
 from pcpartpicker import API
+from pcpartpicker.parts import CPU
 import asyncio
 
 def main():
