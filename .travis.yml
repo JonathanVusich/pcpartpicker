@@ -8,6 +8,6 @@ before_install:
     - pip install -r requirements.txt
     - python setup.py install
 script:
-    - py.test --cov
+    - py.test --cov pcpartpicker
 after_success:
     - coveralls
