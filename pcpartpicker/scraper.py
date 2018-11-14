@@ -28,13 +28,16 @@ class Scraper:
         return "{}{}/fetch?page={}".format(self._base_url, part, page_num)
 
     async def _retrieve_page_numbers(self, session: aiohttp.ClientSession, part: str) -> list:
-        num = json.loads(await self._retrieve_page_data(session, part))["result"]["paging_data"]["page_blocks"][-1]["page"]
+        data = await self._retrieve_page_data(session, part, parse=False)
+        num = json.loads(data)["result"]["paging_data"]["page_blocks"][-1]["page"]
         return [x for x in range(1, num+1)]
 
-    async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int=1) -> str:
+    async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int=1, parse: bool=True) -> str:
         page = await session.request('GET', self._generate_product_url(part, page_num))
         text = await page.text()
-        return await self._parser._parse(part, json.loads(text)['result']['html'])
+        if parse:
+            return await self._parser._parse(part, json.loads(text)['result']['html'])
+        return text
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str):
         page_numbers = await self._retrieve_page_numbers(session, part)
