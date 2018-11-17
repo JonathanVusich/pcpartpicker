@@ -163,6 +163,11 @@ def test_cfm_bad_init():
         _ = CFM(*args)
 
 
+def test_network_speed_init():
+    network_speed = NetworkSpeed(2000)
+    assert(network_speed.bits_per_second == 2000)
+
+
 def test_cpu_init():
     args = ["Intel Core i7-6700k", Decimal("230.00"), 4, 95, ClockSpeed.from_GHz(4.4)]
     cpu = CPU(*args)
@@ -439,7 +444,7 @@ def test_soundcard_bad_init():
 
 
 def test_ethernet_card_init():
-    args = ["LG", Decimal("60"), "PCI-e x8", "1000 Gbit/s", 2]
+    args = ["LG", Decimal("60"), "PCI-e x8", NetworkSpeed.from_Gbits(1000), 2]
     ethernet_card = EthernetCard(*args)
     assert(ethernet_card.name == args[0])
     assert(ethernet_card.price == args[1])

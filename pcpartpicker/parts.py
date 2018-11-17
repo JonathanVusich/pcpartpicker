@@ -20,20 +20,13 @@ class Part:
     """The base dataclass for all the different types of parts."""
     _name: str
     """str: The part descriptor. Typically includes the brand, make and model."""
-    _price: Decimal
-    """Decimal: The price of the given part."""
 
     def __post_init__(self):
         check_typing(self.name, str)
-        check_typing(self.price, Decimal)
 
     @property
     def name(self):
         return self._name
-
-    @property
-    def price(self):
-        return self._price
 
 
 @dataclass
@@ -127,26 +120,31 @@ class Bytes:
 
     @classmethod
     def from_KB(cls, num: float):
+        check_typing(num, (float, int))
         num_bytes = num * 1000
         return cls(num_bytes)
 
     @classmethod
     def from_MB(cls, num: float):
+        check_typing(num, (float, int))
         num_bytes = num * 1000000
         return cls(num_bytes)
 
     @classmethod
     def from_GB(cls, num: float):
+        check_typing(num, (float, int))
         num_bytes = num * 1000000000
         return cls(num_bytes)
 
     @classmethod
     def from_TB(cls, num: float):
+        check_typing(num, (float, int))
         num_bytes = num * 1000000000000
         return cls(num_bytes)
 
     @classmethod
     def from_PB(cls, num: float):
+        check_typing(num, (float, int))
         num_bytes = num * 1000000000000000
         return cls(num_bytes)
 
@@ -194,23 +192,60 @@ class ClockSpeed:
 
     @classmethod
     def from_GHz(cls, num: float):
+        check_typing(num, (float, int))
         return cls(int(num * 1000000000))
 
     @classmethod
     def from_MHz(cls, num: float):
+        check_typing(num, (float, int))
         return cls(int(num * 1000000))
+
+
+@dataclass
+class NetworkSpeed:
+    """Dataclass that stores network speed data."""
+    _bits_per_second: int
+    """int: The total number of bits per second."""
+
+    def __post_init__(self):
+        check_typing(self._bits_per_second, int)
+
+    @property
+    def bits_per_second(self):
+        return self._bits_per_second
+
+    @property
+    def Mbits(self):
+        return self._bits_per_second / 1000000.0
+
+    @property
+    def Gbits(self):
+        return self._bits_per_second / 1000000000.0
+
+    @classmethod
+    def from_Gbits(cls, num: float):
+        check_typing(num, (float, int))
+        return cls(int(num * 1000000000))
+
+    @classmethod
+    def from_Mbits(cls, num: float):
+        check_typing(num, (float, int))
+        return cls(int(num * 1000000))
+
 
 
 
 @dataclass
 class CPU(Part):
     """CPU dataclass."""
+    _clock_speed: ClockSpeed
+    """Clockspeed: The clock speed of this CPU (in GHz)."""
     _cores: int
     """int: The number of cores that this CPU has (excludes hyperthreading + SMT)."""
     _tdp: int
     """int: The TDP of this CPU."""
-    _clock_speed: ClockSpeed
-    """Clockspeed: The clock speed of this CPU (in GHz)."""
+    _price: Decimal
+    """Decimal: The price of the CPU."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -218,6 +253,7 @@ class CPU(Part):
         check_typing(self.cores, int)
         check_typing(self.tdp, int)
         check_typing(self.clock_speed, ClockSpeed)
+        check_typing(self.price, Decimal)
 
     @property
     def cores(self):
@@ -231,6 +267,9 @@ class CPU(Part):
     def clock_speed(self):
         return self._clock_speed
 
+    @property
+    def price(self):
+        return self._price
 
 @dataclass
 class CPUCooler(Part):
@@ -239,6 +278,8 @@ class CPUCooler(Part):
     """RPM: The RPM information of this CPU cooler."""
     _decibels: Decibels
     """Decibels: The decibel information of this CPU cooler."""
+    _price: Decimal
+    """Decimal: The price of the CPU cooler."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -254,6 +295,10 @@ class CPUCooler(Part):
     def decibels(self):
         return self._decibels
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class Motherboard(Part):
@@ -266,6 +311,8 @@ class Motherboard(Part):
     """int: The number of RAM slots on this motherboard"""
     _max_ram: Bytes
     """Bytes: The maximum amount of RAM that this motherboard supports (given in GB)"""
+    _price: Decimal
+    """Decimal: The price of this motherboard."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -291,6 +338,10 @@ class Motherboard(Part):
     def max_ram(self):
         return self._max_ram
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class Memory(Part):
@@ -311,6 +362,8 @@ class Memory(Part):
     """Bytes: The total size of the modules combined."""
     _price_per_gb: float
     """float: The price per GB for this memory configuration"""
+    _price: Decimal
+    """Decimal: The price of this memory module."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -356,18 +409,26 @@ class Memory(Part):
     def price_per_gb(self):
         return self._price_per_gb
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class StorageDrive(Part):
-    """Base dataclass for storage devices."""
+    """Dataclass for storage devices."""
     _model_line: str
-    """str: The model line of this HDD"""
+    """str: The model line of this storage device."""
     _form_factor: str
-    """str: The form factor of this HDD"""
+    """str: The form factor of this storage device."""
+    _type: str
+    """str: The type of this storage device."""
     _capacity: Bytes
-    """Bytes: The capacity of this HDD"""
+    """Bytes: The capacity of this storage device."""
     _cache_amount: Bytes
-    """Bytes: The cache amount found in this HDD"""
+    """Bytes: The cache amount found in this storage device."""
+    _price: Decimal
+    """Decimal: The price of this storage device."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -394,6 +455,10 @@ class StorageDrive(Part):
     @property
     def cache_amount(self):
         return self._cache_amount
+
+    @property
+    def price(self):
+        return self._price
 
 
 @dataclass
@@ -431,7 +496,6 @@ class SSD(StorageDrive):
         check_typing(self.form_factor, str)
         check_typing(self.capacity, Bytes)
         check_typing(self.cache_amount, Bytes)
-
 
 @dataclass
 class HybridDrive(StorageDrive):
@@ -484,6 +548,10 @@ class GPU(Part):
     def core_clock(self):
         return self._core_clock
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class PSU(Part):
@@ -528,6 +596,10 @@ class PSU(Part):
     def modular(self):
         return self._modular
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class Case(Part):
@@ -565,6 +637,10 @@ class Case(Part):
     @property
     def psu_wattage(self):
         return self._psu_wattage
+
+    @property
+    def price(self):
+        return self._price
 
 
 @dataclass
@@ -610,6 +686,10 @@ class Fan(Part):
     def decibels(self):
         return self._decibels
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class FanController(Part):
@@ -640,6 +720,10 @@ class FanController(Part):
     def channel_wattage(self):
         return self._channel_wattage
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class ThermalPaste(Part):
@@ -655,6 +739,10 @@ class ThermalPaste(Part):
     @property
     def amount(self):
         return self._amount
+
+    @property
+    def price(self):
+        return self._price
 
 
 @dataclass
@@ -707,6 +795,10 @@ class OpticalDrive(Part):
     def cd_write_speed(self):
         return self._cd_write_speed
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class SoundCard(Part):
@@ -751,14 +843,18 @@ class SoundCard(Part):
     def sample_rate(self):
         return self._sample_rate
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class EthernetCard(Part):
     """Ethernet card dataclass."""
     _interface: str
     """str: The motherboard interface of this Ethernet card."""
-    _port_speed: str
-    """str: The maximum speed that this Ethernet card supports."""
+    _port_speed: NetworkSpeed
+    """NetworkSpeed: The maximum speed that this Ethernet card supports."""
     _port_number: int
     """int: The number of Ethernet ports on this card."""
 
@@ -766,7 +862,7 @@ class EthernetCard(Part):
         check_typing(self.name, str)
         check_typing(self.price, Decimal)
         check_typing(self.interface, str)
-        check_typing(self.port_speed, str)
+        check_typing(self.port_speed, NetworkSpeed)
         check_typing(self.port_number, int)
 
     @property
@@ -780,6 +876,10 @@ class EthernetCard(Part):
     @property
     def port_number(self):
         return self._port_number
+
+    @property
+    def price(self):
+        return self._price
 
 
 @dataclass
@@ -803,6 +903,10 @@ class WirelessCard(Part):
     @property
     def supported_protocols(self):
         return self._supported_protocols
+
+    @property
+    def price(self):
+        return self._price
 
 
 @dataclass
@@ -841,6 +945,10 @@ class Monitor(Part):
     def ips(self):
         return self._ips
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class ExternalHDD(Part):
@@ -877,6 +985,10 @@ class ExternalHDD(Part):
     @property
     def price_per_gb(self):
         return self._price_per_gb
+
+    @property
+    def price(self):
+        return self._price
 
 
 @dataclass
@@ -915,6 +1027,10 @@ class Headphones(Part):
     def frequency_response(self):
         return self._frequency_response
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class Keyboard(Part):
@@ -952,6 +1068,10 @@ class Keyboard(Part):
     def backlight_type(self):
         return self._backlight_type
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class Mouse(Part):
@@ -981,6 +1101,10 @@ class Mouse(Part):
     @property
     def color(self):
         return self._color
+
+    @property
+    def price(self):
+        return self._price
 
 
 @dataclass
@@ -1012,6 +1136,10 @@ class Speakers(Part):
     def frequency_response(self):
         return self._frequency_response
 
+    @property
+    def price(self):
+        return self._price
+
 
 @dataclass
 class UPS(Part):
@@ -1034,3 +1162,7 @@ class UPS(Part):
     @property
     def va_capacity(self):
         return self._va_capacity
+
+    @property
+    def price(self):
+        return self._price
