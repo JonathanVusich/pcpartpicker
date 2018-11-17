@@ -75,14 +75,13 @@ def test_bytes_from_pb():
 
 
 def test_part_init():
-    part = Part("Test", Decimal("23.12"))
+    part = Part("Test")
     assert(part.name == "Test")
-    assert(part.price == Decimal("23.12"))
 
 
 def test_part_bad_init():
     with pytest.raises(ValueError):
-        _ = Part("Hi there", 23.12)
+        _ = Part(23.13)
 
 
 def test_resolution_init():
@@ -169,28 +168,28 @@ def test_network_speed_init():
 
 
 def test_cpu_init():
-    args = ["Intel Core i7-6700k", Decimal("230.00"), 4, 95, ClockSpeed.from_GHz(4.4)]
+    args = ["Intel Core i7-6700k", 4, 95, ClockSpeed.from_GHz(4.4), Decimal("230.00")]
     cpu = CPU(*args)
     assert(cpu.name == args[0])
-    assert(cpu.price == args[1])
-    assert(cpu.cores == args[2])
-    assert(cpu.tdp == args[3])
-    assert(cpu.clock_speed == args[4])
+    assert(cpu.cores == args[1])
+    assert(cpu.tdp == args[2])
+    assert(cpu.clock_speed == args[3])
+    assert (cpu.price == args[4])
 
 
 def test_cpu_bad_init():
-    args = [6700, Decimal("230.00"), 4, 95, ClockSpeed.from_GHz(4.4)]
+    args = [6700, 4, 95, ClockSpeed.from_GHz(4.4), Decimal("230.00")]
     with pytest.raises(ValueError):
         _ = CPU(*args)
 
 
 def test_cpu_cooler_init():
-    args = ["Cooler Master Hyper 212 Evo", Decimal("25.99"), RPM(500, 2400, 1800), Decibels(12.2, 43.8, 30.2)]
+    args = ["Cooler Master Hyper 212 Evo", RPM(500, 2400, 1800), Decibels(12.2, 43.8, 30.2), Decimal("25.99")]
     cpu_cooler = CPUCooler(*args)
     assert(cpu_cooler.name == args[0])
-    assert(cpu_cooler.price == args[1])
-    assert(cpu_cooler.fan_rpm == args[2])
-    assert(cpu_cooler.decibels == args[3])
+    assert(cpu_cooler.fan_rpm == args[1])
+    assert(cpu_cooler.decibels == args[2])
+    assert(cpu_cooler.price == args[3])
 
 
 def test_cpu_cooler_bad_init():
@@ -200,14 +199,14 @@ def test_cpu_cooler_bad_init():
 
 
 def test_motherboard_init():
-    args = ["MSI Z170", Decimal("89.11"), "Z170", "ATX", 2, Bytes.from_GB(8)]
+    args = ["MSI Z170", "Z170", "ATX", 2, Bytes.from_GB(8), Decimal("89.11")]
     mobo = Motherboard(*args)
     assert(mobo.name == args[0])
-    assert(mobo.price == args[1])
-    assert(mobo.socket == args[2])
-    assert(mobo.form_factor == args[3])
-    assert(mobo.ram_slots == args[4])
-    assert(mobo.max_ram == args[5])
+    assert(mobo.socket == args[1])
+    assert(mobo.form_factor == args[2])
+    assert(mobo.ram_slots == args[3])
+    assert(mobo.max_ram == args[4])
+    assert(mobo.price == args[5])
 
 
 def test_motherboard_bad_init():
@@ -217,18 +216,18 @@ def test_motherboard_bad_init():
 
 
 def test_memory_init():
-    args = ["Corsair Vengeance", Decimal("122.45"), "288-pin DIMM", ClockSpeed.from_GHz(3), "DDR4", 15, 2, Bytes.from_GB(4), Bytes.from_GB(8), 0.08]
+    args = ["Corsair Vengeance", "DDR4-3000", "288-pin DIMM", 15, " 2x8GB", Bytes.from_GB(16), 9.12, Decimal("122.45")]
     memory = Memory(*args)
     assert(memory.name == args[0])
-    assert(memory.price == args[1])
-    assert(memory.type == args[2])
-    assert(memory.speed == args[3])
-    assert(memory.module_type == args[4])
-    assert(memory.cas_timing == args[5])
-    assert(memory.number_of_modules == args[6])
-    assert(memory.module_size == args[7])
-    assert(memory.total_size == args[8])
-    assert(memory.price_per_gb == args[9])
+    assert(memory.price == args[-1])
+    assert(memory.type == "DDR4")
+    assert(memory.speed == ClockSpeed.from_MHz(3000))
+    assert(memory.module_type == args[2])
+    assert(memory.cas_timing == args[3])
+    assert(memory.number_of_modules == 2)
+    assert(memory.module_size == Bytes.from_GB(8))
+    assert(memory.total_size == args[-3])
+    assert(memory.price_per_gb == args[-2])
 
 
 def test_memory_bad_init():
