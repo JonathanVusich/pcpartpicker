@@ -15,6 +15,13 @@ def check_typing(attribute, type):
             raise ValueError("\'{}\' must be of type \'{}\'!".format(attribute, type))
 
 
+def _determine_type(type: str):
+    if [x for x in type if x.isnumeric()]:
+        return "HDD"
+    return type
+
+
+
 @dataclass
 class Part:
     """The base dataclass for all the different types of parts."""
@@ -346,24 +353,29 @@ class Motherboard(Part):
 @dataclass
 class Memory(Part):
     """Memory dataclass."""
-    _type: str
-    """str: The type of this memory module"""
-    _speed: ClockSpeed
-    """ClockSpeed: The operating frequency of this memory module."""
+    _module_speed_data: str
+    """str: The raw speed data for this module."""
     _module_type: str
     """str: The module type of this memory module"""
     _cas_timing: int
     """int: The CAS timing of this memory module"""
-    _number_of_modules: int
-    """int: The number of modules that come with this memory configuration"""
-    _module_size: Bytes
-    """Bytes: The size of the modules that come with this memory configuration"""
+    _module_data: str
+    """int: The number of modules and the amount of memory that these modules contain in this configuration."""
     _total_size: Bytes
     """Bytes: The total size of the modules combined."""
     _price_per_gb: float
     """float: The price per GB for this memory configuration"""
     _price: Decimal
     """Decimal: The price of this memory module."""
+    _type: str = field(init=False)
+    """str: The type of this memory module"""
+    _speed: ClockSpeed = field(init=False)
+    """ClockSpeed: The operating frequency of this memory module."""
+    _number_of_modules: int = field(init=False)
+    """int: The number of modules in this memory configuration."""
+    _module_size: Bytes
+    """Bytes: The size of the modules that come with this memory configuration"""
+
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -376,6 +388,28 @@ class Memory(Part):
         check_typing(self.module_size, Bytes)
         check_typing(self.total_size, Bytes)
         check_typing(self.price_per_gb, float)
+        self._determine_type()
+        self._determine_speed()
+        self._determine_module_number()
+        self._determine_module_size()
+
+    def _determine_type(self):
+        memory_type = [x for x in self._module_speed_data.strip() if not (x == "-" or x.isnumeric())]
+        self._type = "".join(memory_type)
+
+    def _determine_speed(self):
+        speed = [x for x in self._module_speed_data.strip() if x.isnumeric()]
+        self._speed = ClockSpeed.from_MHz(speed)
+
+    def _determine_module_number(self):
+        self._number_of_modules = int(self._module_data.strip()[0])
+
+    def _determine_module_size(self):
+        size = int("".join([x for x in self._module_data.strip()[2:] if x.isnumeric()]))
+        if "GB" in self._module_data:
+            self._module_size = Bytes.from_GB(size)
+        else:
+            self._module_size = Bytes.from_MB(size)
 
     @property
     def type(self):
@@ -421,14 +455,17 @@ class StorageDrive(Part):
     """str: The model line of this storage device."""
     _form_factor: str
     """str: The form factor of this storage device."""
-    _type: str
-    """str: The type of this storage device."""
+    _model_data: str
+    """str: The raw data about the type of this storage device."""
     _capacity: Bytes
     """Bytes: The capacity of this storage device."""
     _cache_amount: Bytes
     """Bytes: The cache amount found in this storage device."""
     _price: Decimal
     """Decimal: The price of this storage device."""
+    _type: str = field(init=False)
+    """str: The type of the storage device."""
+    _platter_rpm: int = field(init=False)
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -439,6 +476,20 @@ class StorageDrive(Part):
         check_typing(self.form_factor, str)
         check_typing(self.capacity, Bytes)
         check_typing(self.cache_amount, Bytes)
+        self._determine_type()
+        self._retrieve_platter_rpm()
+
+    def _determine_type(self):
+        if [x for x in self._model_data if x.isnumeric()]:
+            self._type = "HDD"
+        self._type = self._model_data
+
+    def _retrieve_platter_rpm(self):
+        nums = [x for x in self._model_data if x.isnumeric()]
+        if nums:
+            self._platter_rpm = int("".join(nums))
+        else:
+            self._platter_rpm = None
 
     @property
     def model_line(self):
@@ -460,56 +511,13 @@ class StorageDrive(Part):
     def price(self):
         return self._price
 
-
-@dataclass
-class HDD(StorageDrive):
-    """HDD dataclass."""
-    _platter_rpm: int
-    """int: The platter RPM of this HDD"""
-
-    def __post_init__(self):
-        check_typing(self.name, str)
-        check_typing(self.price, Decimal)
-        check_typing(self.name, str)
-        check_typing(self.price, Decimal)
-        check_typing(self.model_line, str)
-        check_typing(self.form_factor, str)
-        check_typing(self.capacity, Bytes)
-        check_typing(self.cache_amount, Bytes)
-        check_typing(self.platter_rpm, int)
+    @property
+    def type(self):
+        return self._type
 
     @property
     def platter_rpm(self):
         return self._platter_rpm
-
-
-@dataclass
-class SSD(StorageDrive):
-    """SSD dataclass."""
-
-    def __post_init__(self):
-        check_typing(self.name, str)
-        check_typing(self.price, Decimal)
-        check_typing(self.name, str)
-        check_typing(self.price, Decimal)
-        check_typing(self.model_line, str)
-        check_typing(self.form_factor, str)
-        check_typing(self.capacity, Bytes)
-        check_typing(self.cache_amount, Bytes)
-
-@dataclass
-class HybridDrive(StorageDrive):
-    """Hybrid drive dataclass."""
-
-    def __post_init__(self):
-        check_typing(self.name, str)
-        check_typing(self.price, Decimal)
-        check_typing(self.name, str)
-        check_typing(self.price, Decimal)
-        check_typing(self.model_line, str)
-        check_typing(self.form_factor, str)
-        check_typing(self.capacity, Bytes)
-        check_typing(self.cache_amount, Bytes)
 
 
 @dataclass
@@ -523,6 +531,8 @@ class GPU(Part):
     """Bytes: The amount of video memory in this GPU."""
     _core_clock: ClockSpeed
     """ClockSpeed: The clock speed of this GPU """
+    _price: Decimal
+    """Decimal: The price of this GPU."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -566,6 +576,8 @@ class PSU(Part):
     """int: The watt rating of this PSU."""
     _modular: str
     """str: The modular properties of this PSU."""
+    _price: Decimal
+    """Decimal: The price of this PSU."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -613,6 +625,8 @@ class Case(Part):
     _psu_wattage: int
     """int: The wattage amount of the internal PSU of this case.
             If no PSU is present, this value will be set to None."""
+    _price: Decimal
+    """Decimal: The price of this GPU."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -700,6 +714,8 @@ class FanController(Part):
     """int: The number of fans that this fan controller can control."""
     _channel_wattage: int
     """int: The number of watts that this fan can provide to each channel."""
+    _price: Decimal
+    """Decimal: The price of this fan controller."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -730,6 +746,8 @@ class ThermalPaste(Part):
     """Thermal paste dataclass."""
     _amount: float
     """float: The amount of thermal paste provided in this product (in grams)."""
+    _price: Decimal
+    """Decimal: The price of this thermal paste."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -760,6 +778,8 @@ class OpticalDrive(Part):
     """str: The DVD write speeds of this optical drive."""
     _cd_write_speed: str
     """str: The CD write speeds of this optical drive."""
+    _price: Decimal
+    """Decimal: The price of this optical drive."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -810,9 +830,11 @@ class SoundCard(Part):
     _bitrate: int
     """int: The bitrate of this sound card."""
     _snr: int
-    """int: The signal to noise ratio of this sound card."""
+    """int: The signal to noise ratio of this sound card in dB."""
     _sample_rate: int
-    """int: The sample rate of this sound card."""
+    """int: The sample rate of this sound card in kHz."""
+    _price: Decimal
+    """Decimal: The price of this sound card."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -857,6 +879,8 @@ class EthernetCard(Part):
     """NetworkSpeed: The maximum speed that this Ethernet card supports."""
     _port_number: int
     """int: The number of Ethernet ports on this card."""
+    _price: Decimal
+    """Decimal: The price of this Ethernet card."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -889,6 +913,8 @@ class WirelessCard(Part):
     """str: The motherboard interface of this wireless card."""
     _supported_protocols: str
     """str: The supported wireless protocols of this card."""
+    _price: Decimal
+    """Decimal: The price of this wireless card."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -915,11 +941,13 @@ class Monitor(Part):
     _resolution: Resolution
     """Resolution: The pixel dimensions of this monitor."""
     _size: float
-    """float: The diagonal display size of this monitor."""
+    """float: The diagonal display size of this monitor in inches."""
     _response_time: int
     """int: The response time of this display (in milliseconds)."""
     _ips: bool
     """bool: Returns True if the panel is an IPS display."""
+    _price: Decimal
+    """Decimal: The price of this monitor."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -961,6 +989,8 @@ class ExternalHDD(Part):
     """Bytes: The capacity of this external HDD."""
     _price_per_gb: float
     """float: The price per GB of storage of this external HDD."""
+    _price: Decimal
+    """Decimal: The price of this external HDD."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -1002,6 +1032,8 @@ class Headphones(Part):
     """bool: Returns True if this set of headphones is wireless."""
     _frequency_response: FrequencyResponse
     """str: The frequency response of this set of headphones."""
+    _price: Decimal
+    """Decimal: The price of these headphones."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -1043,6 +1075,8 @@ class Keyboard(Part):
     """str: Describes the type of switches that this keyboard uses."""
     _backlight_type: str
     """str: Describes the available backlight on this device."""
+    _price: Decimal
+    """Decimal: The price of this keyboard."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -1082,6 +1116,8 @@ class Mouse(Part):
     """str: Describes the type of connection that this mouse uses."""
     _color: str
     """str: Describes the color of this mouse."""
+    _price: Decimal
+    """Decimal: The price of this mouse."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -1116,6 +1152,8 @@ class Speakers(Part):
     """int: The peak wattage of these speakers."""
     _frequency_response: FrequencyResponse
     """FrequencyResponse: The frequency response of these speakers."""
+    _price: Decimal
+    """Decimal: The price of these speakers."""
 
     def __post_init__(self):
         check_typing(self.name, str)
@@ -1148,6 +1186,8 @@ class UPS(Part):
     """int: The number of watts that this UPS can store."""
     _va_capacity: int
     """int: The number of volt-amperes that this UPS can store."""
+    _price: Decimal
+    """Decimal: The price of this UPS."""
 
     def __post_init__(self):
         check_typing(self.name, str)
