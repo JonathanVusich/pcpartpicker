@@ -373,17 +373,19 @@ class Memory(Part):
     """ClockSpeed: The operating frequency of this memory module."""
     _number_of_modules: int = field(init=False)
     """int: The number of modules in this memory configuration."""
-    _module_size: Bytes = field(init=False)
+    _module_size: Bytes
     """Bytes: The size of the modules that come with this memory configuration"""
 
 
     def __post_init__(self):
         check_typing(self.name, str)
         check_typing(self.price, Decimal)
-        check_typing(self._module_speed_data, str)
-        check_typing(self._module_type, str)
-        check_typing(self._module_data, str)
+        check_typing(self.type, str)
+        check_typing(self.speed, ClockSpeed)
+        check_typing(self.module_type, str)
         check_typing(self.cas_timing, int)
+        check_typing(self.number_of_modules, int)
+        check_typing(self.module_size, Bytes)
         check_typing(self.total_size, Bytes)
         check_typing(self.price_per_gb, float)
         self._determine_type()
@@ -392,25 +394,12 @@ class Memory(Part):
         self._determine_module_size()
 
     def _determine_type(self):
-        self._module_speed_data = self._module_speed_data.strip()
-        hyphen = self._module_speed_data.find("-")
-        if not hyphen == -1 and not [x for x in self._module_speed_data if x.isnumeric()]:
-            self._type = self._module_speed_data
-        else:
-            memory_type = [x for x in self._module_speed_data[:hyphen]]
+        memory_type = [x for x in self._module_speed_data.strip() if not (x == "-" or x.isnumeric())]
         self._type = "".join(memory_type)
 
     def _determine_speed(self):
-        hyphen = self._module_speed_data.find("-")
-        if hyphen == -1:
-            speed_data = [x for x in self._module_speed_data if x.isnumeric()]
-            if speed_data:
-                self._speed = ClockSpeed.from_MHz(int("".join(speed_data)))
-            else:
-                self._speed = None
-        else:
-            speed_data = [x for x in self._module_speed_data[hyphen:] if x.isnumeric()]
-            self._speed = ClockSpeed.from_MHz(int("".join(speed_data)))
+        speed = [x for x in self._module_speed_data.strip() if x.isnumeric()]
+        self._speed = ClockSpeed.from_MHz(speed)
 
     def _determine_module_number(self):
         self._number_of_modules = int(self._module_data.strip()[0])
