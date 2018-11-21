@@ -1,7 +1,7 @@
 import asyncio
 import time
 from .scraper import Scraper
-from .errors import UnsupportedRegion
+from .errors import UnsupportedRegion, UnsupportedPart
 from .parser import Parser
 from .parts import *
 
@@ -17,11 +17,13 @@ class API:
     _region = "us"
     _database = None
     _parser = None
+    _last_refresh = time.time()
 
     def __init__(self, region: str="us"):
         self._set_region(region)
         self._scraper = Scraper(self.region)
         self._parser = Parser()
+        self._last_refresh = time.time()
 
     @property
     def regions(self):
@@ -41,24 +43,43 @@ class API:
     def search_part(self, param: str):
         pass
 
-    def retrieve(self, type: str):
-        pass
+    def retrieve(self, part: str, force_refresh=False):
 
-    def retrieve_all(self):
-        loop = asyncio.get_event_loop()
-        start = time.perf_counter()
+        # Check part validity
+        if part not in self.supported_parts:
+            raise UnsupportedPart(f"Part '{part}' is not supported!")
+
+        # Determine whether not a refresh of the part data should occur
+        if time.time() - self._last_refresh < 600 and not force_refresh:
+            attr_name = self._parser._part_class_mappings[part].__name__.lower()
+            if hasattr(self, attr_name):
+                return getattr(self, attr_name)
+
+        loop = asyncio.new_event_loop()
+        results = loop.run_until_complete(self._scraper._retrieve_part(loop, part))
+        loop.close()
+        results_to_return = []
+        for data in results:
+            parsed_data = self._parser._parse(part, data)
+            if parsed_data:
+                results_to_return.extend(parsed_data)
+        if results_to_return:
+            setattr(self, type(results[0]).__name__.lower(), results_to_return)
+            return results_to_return
+
+    def retrieve_all(self, force_refresh=False):
+        loop = asyncio.new_event_loop()
         results = loop.run_until_complete(self._scraper._retrieve_all(loop, self.supported_parts))
         loop.close()
-        print(time.perf_counter() - start)
-        start = time.perf_counter()
+        results_to_return = {}
         for part, data_list in zip(self.supported_parts, results):
             results = []
             for data in data_list:
                 results.extend(self._parser._parse(part, data))
             if results:
-                setattr(self, type(results[0]).__name__, tuple(results))
-        print(time.perf_counter() - start)
-        print('hi')
+                results_to_return[part] = results
+                setattr(self, type(results[0]).__name__.lower(), results)
+        return results_to_return
 
     def load_data(self):
         pass

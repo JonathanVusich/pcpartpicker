@@ -38,6 +38,12 @@ class Scraper:
         tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
         return await asyncio.gather(*tasks)
 
+    async def _retrieve_part(self, loop, part: str):
+        async with aiohttp.ClientSession(loop=loop) as session:
+            page_numbers = await self._retrieve_page_numbers(session, part)
+            tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
+            return await asyncio.gather(*tasks)
+
     async def _retrieve_all(self, loop, supported_parts: list):
         async with aiohttp.ClientSession(loop=loop) as session:
             tasks = [self._retrieve_part_data(session, part) for part in supported_parts]
