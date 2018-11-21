@@ -2,6 +2,8 @@ import asyncio
 import time
 from .scraper import Scraper
 from .errors import UnsupportedRegion
+from .parser import Parser
+from .parts import *
 
 class API:
 
@@ -14,10 +16,12 @@ class API:
                     "in", "ie", "it", "nz", "uk", "us"]
     _region = "us"
     _database = None
+    _parser = None
 
     def __init__(self, region: str="us"):
         self._set_region(region)
         self._scraper = Scraper(self.region)
+        self._parser = Parser()
 
     @property
     def regions(self):
@@ -44,8 +48,15 @@ class API:
         loop = asyncio.get_event_loop()
         start = time.perf_counter()
         results = loop.run_until_complete(self._scraper._retrieve_all(loop, self.supported_parts))
-        print(time.perf_counter() - start)
         loop.close()
+        for part, data_list in zip(self.supported_parts, results):
+            results = []
+            for data in data_list:
+                results.extend(self._parser._parse(part, data))
+            if results:
+                setattr(self, type(results[0]).__name__, tuple(results))
+        print(time.perf_counter() - start)
+        print('hi')
 
     def load_data(self):
         pass
