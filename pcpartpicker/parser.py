@@ -11,7 +11,7 @@ class Parser:
     _net_speeds = ["Mbit/s", "Gbit/s"]
     _wireless_protocol_id = ["802.11"]
     _case_types = ["ATX", "ITX", "HTPC"]
-    _psu_types = {"ATX", "ITX", "SFX", "TFX", "EPS", "BTX", "-"}
+    _psu_types = {"ATX", "SFX", "TFX", "EPS", "BTX", "Flex ATX", "Micro ATX", "Mini ITX"}
     _psu_modularity = {"No", "Semi", "Full"}
     _dollar_sign = ["$"]
     _clock_speed = ["GHz", "MHz"]
@@ -30,7 +30,7 @@ class Parser:
 
     async def _parse(self, part: str, raw_html: str):
         part_list = []
-        if part == "power-supply":
+        if part in self._part_funcs:
             start = time.perf_counter()
             html = lxml.html.fromstring(raw_html)
             tags = html.xpath('.//*/text()')
@@ -42,7 +42,11 @@ class Parser:
 
     @staticmethod
     async def _retrieve_data(tags: list):
-        tags = [tag for tag in tags if not tag.startswith(" (")]
+        tags = [
+            tag
+            for tag in tags
+            if not tag.startswith(" (")
+        ]
         start_index = 0
         it = None
         while start_index < len(tags):
@@ -56,9 +60,9 @@ class Parser:
     async def _parse_token(self, part: str, data: list):
         parsed_data = [data[0]]
         called_funcs = []
-        x = 0
-        for token in islice(data, 1, None):
-            for func in islice(self._part_funcs[part], x, None):
+        func_index = 0
+        for x, token in enumerate(islice(data, 1, None)):
+            for func in islice(self._part_funcs[part], func_index, None):
                 result = await func(token)
                 called_funcs.append(func)
                 if result:
@@ -68,12 +72,17 @@ class Parser:
                         parsed_data.append(result.value)
                     if result.iterate:
                         break
+                    func_index += 1
                     continue
                 continue
-            x = x + 1
+            func_index += 1
 
         # Ensure price is set
-        uncalled_funcs = [func for func in self._part_funcs[part] if not func in called_funcs]
+        uncalled_funcs = [
+                         func
+                         for func in self._part_funcs[part]
+                         if not func in called_funcs
+                         ]
         if uncalled_funcs:
             for func in uncalled_funcs:
                 result = await func(None)
@@ -91,21 +100,24 @@ class Parser:
 
 
     async def _network_speed(self, network_speed: str):
-        for speed in self._net_speeds:
-            if speed in network_speed:
-                nums = re.findall(self._float_string, network_speed)
-                if not nums:
-                    return None, False
-                else:
-                    bits = int(nums[0])
-                    if speed == "Mbit/s":
-                        speed = NetworkSpeed.from_Mbits(bits)
-                    else:
-                        speed = NetworkSpeed.from_Gbits(bits)
-                    if len(nums) == 2:
-                        return (speed, int(nums[1])), True
-                    else:
-                        return (speed, 1), True
+        compatible_speeds = [
+            speed
+            for speed in self._net_speeds
+            if speed in network_speed
+        ]
+        if compatible_speeds:
+            speed = re.findall(self._float_string, network_speed)
+            if not speed:
+                return Result(None)
+            number = int(speed[0])
+            if speed[0] == "Mbit/s" and len(speed) == 1:
+                return Result((NetworkSpeed.from_Mbits(number), 1), tuple=True)
+            elif speed[0] == "Mbit/s" and len(speed) == 2:
+                return Result((NetworkSpeed.from_Mbits(number), int(speed[1])), tuple=True)
+            elif len(speed) == 1:
+                return Result((NetworkSpeed.from_Gbits(number), 1), tuple=True)
+            return Result(NetworkSpeed.from_Gbits(number), int(speed[1]), tuple=True)
+        return Result(None, iterate=False)
 
     async def _interface(self, interface: str):
         for inter in self._interface_types:
@@ -128,7 +140,7 @@ class Parser:
             return None
 
     async def _psu_wattage(self, psu_string: str):
-        if "W" in psu_string:
+        if " W" in psu_string and len([x for x in psu_string if x.isnumeric()]) > 2:
             return Result(int(re.findall(self._float_string, psu_string)[0]))
 
     async def _psu_type(self, psu_type: str):
@@ -146,10 +158,9 @@ class Parser:
         return Result(series)
 
     async def _psu_efficiency(self, efficiency: str):
-        wattage = await self._psu_wattage(efficiency)
-        if not wattage:
-           return Result(efficiency)
-        return Result(None, iterate=False)
+        if efficiency == "-":
+            return Result(None)
+        return Result(efficiency)
 
     async def _price(self, price: str):
         if not price:
