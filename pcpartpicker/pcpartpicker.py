@@ -49,6 +49,8 @@ class API:
         start = time.perf_counter()
         results = loop.run_until_complete(self._scraper._retrieve_all(loop, self.supported_parts))
         loop.close()
+        print(time.perf_counter() - start)
+        start = time.perf_counter()
         for part, data_list in zip(self.supported_parts, results):
             results = []
             for data in data_list:

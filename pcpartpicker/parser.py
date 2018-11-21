@@ -3,7 +3,6 @@ import re
 import time
 from itertools import islice, chain
 from .parts import *
-import cProfile as profile
 
 class Parser:
 
@@ -34,8 +33,6 @@ class Parser:
     def _parse(self, part: str, raw_html: str):
         part_list = []
         if part in self._part_funcs:
-            profiler = profile.Profile()
-            profiler.enable()
             html = lxml.html.fromstring(raw_html)
             tags = html.xpath('.//*/text()')
             tags = [
@@ -45,8 +42,6 @@ class Parser:
                     ]
             for token in Parser._retrieve_data(tags):
                 part_list.append(self._parse_token(part, token))
-            profiler.disable()
-            profiler.dump_stats(f"{part}.prof")
         return part_list
 
     @staticmethod
