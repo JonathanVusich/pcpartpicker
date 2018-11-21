@@ -9,11 +9,11 @@ class Parser:
     _float_string = r"(?<![a-zA-Z:])[-+]?\d*\.?\d+"
     _interface_types = ["PCI", "USB"]
     _net_speeds = ["Mbit/s", "Gbit/s"]
-    _wireless_protocol_id = "802.11"
+    _wireless_protocol_id = ["802.11"]
     _case_types = ["ATX", "ITX", "HTPC"]
-    _psu_types = ["ATX", "ITX", "SFX", "TFX", "EPS", "BTX"]
-    _psu_modularity = ["No", "Semi", "Full"]
-    _dollar_sign = "$"
+    _psu_types = {"ATX", "ITX", "SFX", "TFX", "EPS", "BTX", "-"}
+    _psu_modularity = {"No", "Semi", "Full"}
+    _dollar_sign = ["$"]
     _clock_speed = ["GHz", "MHz"]
     _tdp = [" W"]
 
@@ -21,13 +21,10 @@ class Parser:
         self._part_funcs = {"wired-network-card":[self._interface, self._network_speed],
                             "wireless-network-card":[self._interface, self._wireless_protocols],
                             "case":[self._case_type, self._retrieve_int, self._retrieve_int, self._psu_wattage],
-                            "power-supply":[self._default, self._psu_type, self._default, self._psu_wattage, self._psu_modular]
+                            "power-supply":[self._psu_series, self._psu_type, self._psu_efficiency, self._psu_wattage, self._psu_modular]
                             }
         for func_list in self._part_funcs.values():
             func_list.append(self._price)
-
-        self._ids = list(chain(self._interface_types, self._net_speeds, self._wireless_protocol_id, self._case_types,
-                          self._psu_types, self._psu_modularity, self._dollar_sign, self._clock_speed, self._tdp))
         self._part_class_mappings = {"wired-network-card":EthernetCard, "wireless-network-card":WirelessCard,
                                      "case":Case, "power-supply":PSU}
 
@@ -65,21 +62,27 @@ class Parser:
                 result = await func(token)
                 called_funcs.append(func)
                 if result:
-                    result, proceed = result
-                    if isinstance(result, tuple):
-                        parsed_data.extend(result)
+                    if result.tuple:
+                        parsed_data.extend(result.value)
                     else:
-                        parsed_data.append(result)
-                    if proceed:
+                        parsed_data.append(result.value)
+                    if result.iterate:
                         break
-                else:
                     continue
+                continue
             x = x + 1
+
         # Ensure price is set
         uncalled_funcs = [func for func in self._part_funcs[part] if not func in called_funcs]
         if uncalled_funcs:
             for func in uncalled_funcs:
-                parsed_data.append(await func(None))
+                result = await func(None)
+                if result:
+                    if result.tuple:
+                        parsed_data.extend(result.value)
+                    else:
+                        parsed_data.append(result.value)
+
         _class = self._part_class_mappings[part]
         try:
             return _class(*parsed_data)
@@ -92,7 +95,7 @@ class Parser:
             if speed in network_speed:
                 nums = re.findall(self._float_string, network_speed)
                 if not nums:
-                    return None, None
+                    return None, False
                 else:
                     bits = int(nums[0])
                     if speed == "Mbit/s":
@@ -107,48 +110,60 @@ class Parser:
     async def _interface(self, interface: str):
         for inter in self._interface_types:
             if inter in interface:
-                return interface, True
+                return Result(interface)
 
     async def _wireless_protocols(self, protocols: str):
-        if self._wireless_protocol_id in protocols:
-            return protocols, True
+        if [x for x in self._wireless_protocol_id if x in protocols]:
+            return Result(protocols)
 
     async def _case_type(self, case_type: str):
         for case in self._case_types:
             if case in case_type:
-                return case_type, True
+                return Result(case_type)
 
     async def _retrieve_int(self, string: str):
         try:
-            return int(string), True
+            return Result(int(string))
         except ValueError:
             return None
 
     async def _psu_wattage(self, psu_string: str):
-        if not psu_string:
-            return None
-        elif "W" in psu_string:
-            return int(re.findall(self._float_string, psu_string)[0]), True
-        return None
+        if "W" in psu_string:
+            return Result(int(re.findall(self._float_string, psu_string)[0]))
 
     async def _psu_type(self, psu_type: str):
-        for psu in self._psu_types:
-            if psu in psu_type:
-                return psu_type, True
+        if psu_type in self._psu_types:
+            return Result(psu_type)
 
     async def _psu_modular(self, psu_modularity: str):
-        for psu in self._psu_modularity:
-            if psu in psu_modularity:
-                return psu_modularity, True
+        if psu_modularity in self._psu_modularity:
+            return Result(psu_modularity)
 
-    async def _default(self, default: str):
-        for string in self._ids:
-            if string in default or string == default:
-                return None
-        return default, True
+    async def _psu_series(self, series: str):
+        psu_type = await self._psu_type(series)
+        if psu_type:
+            return Result(None, iterate=False)
+        return Result(series)
+
+    async def _psu_efficiency(self, efficiency: str):
+        wattage = await self._psu_wattage(efficiency)
+        if not wattage:
+           return Result(efficiency)
+        return Result(None, iterate=False)
 
     async def _price(self, price: str):
         if not price:
-            return Decimal("0.00")
-        elif self._dollar_sign in price:
-            return Decimal(re.findall(self._float_string, price)[0]), True
+            return Result(Decimal("0.00"))
+        elif [x for x in self._dollar_sign if x in price]:
+            return Result(Decimal(re.findall(self._float_string, price)[0]))
+
+
+class Result:
+
+    def __init__(self, value, iterate=True, tuple=False):
+        self.value = value
+        self.iterate = iterate
+        self.tuple = tuple
+
+    def __repr__(self):
+        return f"Value: {self.value}, Iterate: {self.iterate}, Tuple: {self.tuple}"
