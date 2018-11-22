@@ -11,16 +11,19 @@ class Parser:
     _float_string = r"(?<![a-zA-Z:])[-+]?\d*\.?\d+"
     _interface_types = ["PCI", "USB"]
     _net_speeds = ["Mbit/s", "Gbit/s"]
+    _byte_size_types = {"GB":Bytes.from_GB, "TB":Bytes.from_TB, "MB":Bytes.from_MB,
+                        "KB":Bytes.from_KB, "PB":Bytes.from_PB}
     _wireless_protocol_id = ["802.11"]
     _case_types = ["ATX", "ITX", "HTPC"]
     _psu_types = {"ATX", "SFX", "TFX", "EPS", "BTX", "Flex ATX", "Micro ATX", "Mini ITX"}
     _psu_modularity = {"No", "Semi", "Full"}
+    _chipset_types = ["GeForce ", "Radeon ", "Vega ", "Titan ", "Quadro ", "NVS ", "FirePro ", "FireGL "]
     _currency_symbol_mappings = {"us" : "$", "au" : "$", "ca" : "$", "be" : "€", "de" : "€", "es" : "€", "fr" : "€",
                                  "ie" : "€", "it" : "€", "nl" : "€", "nz" : "$", "se" : "kr", "uk" : "£", "in" : "₹"}
     _currency_class_mappings = {"us" : USD, "au" : AUD, "ca" : CAD, "be" : EUR, "de" : EUR, "es" : EUR, "fr" : EUR,
                                 "ie" : EUR, "it" : EUR, "nl" : EUR, "nz" : NZD, "se" : SEK, "uk" : GBP, "in": INR}
     _currency_sign = "$"
-    _clock_speed = ["GHz", "MHz"]
+    _clock_speed = {"GHz":ClockSpeed.from_GHz, "MHz":ClockSpeed.from_MHz}
     _tdp = [" W"]
     _region = "us"
 
@@ -28,12 +31,14 @@ class Parser:
         self._part_funcs = {"wired-network-card":[self._interface, self._network_speed],
                             "wireless-network-card":[self._interface, self._wireless_protocols],
                             "case":[self._case_type, self._retrieve_int, self._retrieve_int, self._psu_wattage],
-                            "power-supply":[self._psu_series, self._psu_type, self._psu_efficiency, self._psu_wattage, self._psu_modular]
+                            "power-supply":[self._psu_series, self._psu_type, self._psu_efficiency, self._psu_wattage,
+                                            self._psu_modular],
+                            "video-card":[self._gpu_series, self._gpu_chipset, self._bytes, self._core_clock]
                             }
         for func_list in self._part_funcs.values():
             func_list.append(self._price)
         self._part_class_mappings = {"wired-network-card":EthernetCard, "wireless-network-card":WirelessCard,
-                                     "case":Case, "power-supply":PSU}
+                                     "case":Case, "power-supply":PSU, "video-card":GPU}
 
         self._optional_funcs = {self._psu_series}
 
@@ -95,6 +100,20 @@ class Parser:
         except (TypeError, ValueError) as _:
             print('hi')
 
+    def _bytes(self, byte_string: str):
+        for byte_type, func in self._byte_size_types.items():
+            if byte_type in byte_string:
+                byte_num = float(re.findall(self._float_string, byte_string)[0])
+                return Result(func(byte_num))
+
+    def _core_clock(self, core_clock: str):
+        if not core_clock or self._currency_sign in core_clock:
+            return Result(None, iterate=False)
+        for speed_type, func in self._clock_speed.items():
+            if speed_type in core_clock:
+                clock_number = float(re.findall(self._float_string, core_clock)[0])
+                return Result(func(clock_number))
+
     def _network_speed(self, network_speed: str):
         compatible_speeds = [
             speed
@@ -148,6 +167,17 @@ class Parser:
     def _psu_modular(self, psu_modularity: str):
         if psu_modularity in self._psu_modularity:
             return Result(psu_modularity)
+
+    def _gpu_series(self, series: str):
+        chipset_matches = [chipset for chipset in self._chipset_types if chipset in series]
+        if not chipset_matches:
+            return Result(series)
+        return Result(None, iterate=False)
+
+    def _gpu_chipset(self, chipset: str):
+        for c in self._chipset_types:
+            if c in chipset:
+                return Result(chipset)
 
     def _psu_series(self, series: list):
         psu_type = self._psu_type(series[0])
