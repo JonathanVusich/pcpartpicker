@@ -15,11 +15,14 @@ def check_typing(attribute, class_type):
             raise ValueError(f"'{attribute}' must be of type '{class_type}'!")
 
 
-def parse_int(int_string: str):
+def parse_num(string: str):
     try:
-        return int(int_string)
+        return int(string)
     except ValueError:
-        raise ValueError("Error! String argument must be a valid integer or float!")
+        try:
+            return float(string)
+        except ValueError:
+            raise ValueError("Error! String argument must be a valid integer or float!")
 
 
 @dataclass(frozen=True)
@@ -83,7 +86,7 @@ class Bytes:
     @classmethod
     def from_KB(cls, num):
         if isinstance(num, str):
-            num = parse_int(num)
+            num = parse_num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000)
@@ -92,7 +95,7 @@ class Bytes:
     @classmethod
     def from_MB(cls, num):
         if isinstance(num, str):
-            num = parse_int(num)
+            num = parse_num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000)
@@ -101,7 +104,7 @@ class Bytes:
     @classmethod
     def from_GB(cls, num):
         if isinstance(num, str):
-            num = parse_int(num)
+            num = parse_num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000000)
@@ -110,7 +113,7 @@ class Bytes:
     @classmethod
     def from_TB(cls, num):
         if isinstance(num, str):
-            num = parse_int(num)
+            num = parse_num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000000000)
@@ -119,7 +122,7 @@ class Bytes:
     @classmethod
     def from_PB(cls, num):
         if isinstance(num, str):
-            num = parse_int(num)
+            num = parse_num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000000000000)
@@ -166,7 +169,7 @@ class ClockSpeed:
     @classmethod
     def from_GHz(cls, num):
         if isinstance(num, str):
-            num = parse_int(num)
+            num = parse_num(num)
         else:
             check_typing(num, (float, int))
         return cls(int(num * 1000000000))
@@ -174,10 +177,10 @@ class ClockSpeed:
     @classmethod
     def from_MHz(cls, num):
         if isinstance(num, str):
-            num = parse_int(num)
+            num = parse_num(num)
         else:
             check_typing(num, (float, int))
-        return cls(int(num * 1000000000))
+        return cls(int(num * 1000000))
 
 
 @dataclass(frozen=True)
@@ -639,7 +642,7 @@ class ExternalHDD:
     """str: The type of this external HDD."""
     capacity: Bytes
     """Bytes: The capacity of this external HDD."""
-    price_per_gb: float
+    price_per_gb: Money
     """float: The price per GB of storage of this external HDD."""
     price: Money
     """Money: The price of this external HDD."""
@@ -649,7 +652,7 @@ class ExternalHDD:
         check_typing(self.model_line, str)
         check_typing(self.type, str)
         check_typing(self.capacity, Bytes)
-        check_typing(self.price_per_gb, (float, int))
+        check_typing(self.price_per_gb, Money)
         check_typing(self.price, Money)
 
 
