@@ -18,7 +18,7 @@ def scraper_default_init_test():
 # Ensure that the scraper default region can be changed
 def scraper_change_region_test():
     scraper = Scraper()
-    scraper._set_region = "nz"
+    scraper._update_region = "nz"
     assert(scraper.region == "nz")
     assert(scraper._base_url == "https://nz.pcpartpicker.com/products/")
 
@@ -26,7 +26,7 @@ def scraper_change_region_test():
 # Ensure that the scraper throws an error if an unsupported region is attempted to be selected
 def scraper_region_exception_test():
     scraper = Scraper()
-    scraper._set_region("oc")
+    scraper._update_region("oc")
     assert scraper.region == 'oc'
 
 

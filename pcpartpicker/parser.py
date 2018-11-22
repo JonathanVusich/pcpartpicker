@@ -1,8 +1,10 @@
-import lxml.html
+import lxml.html, lxml.etree
 import re
 import time
-from itertools import islice, chain
+from itertools import islice
 from .parts import *
+import rapidjson as json
+from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
 
 class Parser:
 
@@ -13,9 +15,14 @@ class Parser:
     _case_types = ["ATX", "ITX", "HTPC"]
     _psu_types = {"ATX", "SFX", "TFX", "EPS", "BTX", "Flex ATX", "Micro ATX", "Mini ITX"}
     _psu_modularity = {"No", "Semi", "Full"}
-    _dollar_sign = ["$"]
+    _currency_symbol_mappings = {"us" : "$", "au" : "$", "ca" : "$", "be" : "€", "de" : "€", "es" : "€", "fr" : "€",
+                                 "ie" : "€", "it" : "€", "nl" : "€", "nz" : "$", "se" : "kr", "uk" : "£", "in" : "₹"}
+    _currency_class_mappings = {"us" : USD, "au" : AUD, "ca" : CAD, "be" : EUR, "de" : EUR, "es" : EUR, "fr" : EUR,
+                                "ie" : EUR, "it" : EUR, "nl" : EUR, "nz" : NZD, "se" : SEK, "uk" : GBP, "in": INR}
+    _currency_sign = "$"
     _clock_speed = ["GHz", "MHz"]
     _tdp = [" W"]
+    _region = "us"
 
     def __init__(self):
         self._part_funcs = {"wired-network-card":[self._interface, self._network_speed],
@@ -30,15 +37,20 @@ class Parser:
 
         self._optional_funcs = {self._psu_series}
 
+    def _update_region(self, region: str):
+        self._region = region
+        self._currency_sign = self._currency_symbol_mappings[self._region]
+
     def _parse(self, part: str, raw_html: str):
         part_list = []
         if part in self._part_funcs:
-            html = lxml.html.fromstring(raw_html)
+            html = json.loads(raw_html)['result']['html']
+            html = lxml.html.fromstring(html)
             tags = html.xpath('.//*/text()')
             tags = [
                     tag
                     for tag in tags
-                    if not tag.startswith(" (") if not tag.startswith("{")
+                    if not tag.startswith(" (")
                     ]
             for token in Parser._retrieve_data(tags):
                 part_list.append(self._parse_token(part, token))
@@ -83,8 +95,7 @@ class Parser:
         except (TypeError, ValueError) as _:
             print('hi')
 
-
-    def _network_speed(self, network_speed: list):
+    def _network_speed(self, network_speed: str):
         compatible_speeds = [
             speed
             for speed in self._net_speeds
@@ -95,9 +106,9 @@ class Parser:
             if not speed:
                 return Result(None)
             number = int(speed[0])
-            if speed[0] == "Mbit/s" and len(speed) == 1:
+            if "Mbit/s" in compatible_speeds and len(speed) == 1:
                 return Result((NetworkSpeed.from_Mbits(number), 1), tuple=True)
-            elif speed[0] == "Mbit/s" and len(speed) == 2:
+            elif "Mbit/s" in compatible_speeds and len(speed) == 2:
                 return Result((NetworkSpeed.from_Mbits(number), int(speed[1])), tuple=True)
             elif len(speed) == 1:
                 return Result((NetworkSpeed.from_Gbits(number), 1), tuple=True)
@@ -125,9 +136,9 @@ class Parser:
             return None
 
     def _psu_wattage(self, psu_string: str):
-        if not psu_string or "$" in psu_string:
+        if not psu_string or self._currency_sign in psu_string:
             return Result(None, iterate=False)
-        if " W" in psu_string and len([x for x in psu_string if x.isnumeric()]) > 1:
+        elif " W" in psu_string:
             return Result(int(re.findall(self._float_string, psu_string)[0]))
 
     def _psu_type(self, psu_type: str):
@@ -154,9 +165,9 @@ class Parser:
 
     def _price(self, price: str):
         if not price:
-            return Result(Decimal("0.00"))
-        elif [x for x in self._dollar_sign if x in price]:
-            return Result(Decimal(re.findall(self._float_string, price)[0]))
+            return Result(Money("0.00", self._currency_class_mappings[self._region]))
+        elif [x for x in self._currency_sign if x in price]:
+            return Result(Money(re.findall(self._float_string, price)[0], self._currency_class_mappings[self._region]))
 
 
 class Result:

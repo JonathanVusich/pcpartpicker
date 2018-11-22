@@ -8,18 +8,17 @@ class Scraper:
     _base_url = None
 
     def __init__(self, region: str="us"):
-        self._set_region(region)
+        self._update_region(region)
         self._generate_base_url()
 
-    def _set_region(self, region: str):
+    def _update_region(self, region: str):
         self._region = region
         self._base_url = self._generate_base_url()
 
     def _generate_base_url(self) -> str:
         if not self._region == "us":
             return "https://{}.pcpartpicker.com/products/".format(self._region)
-        else:
-            return "https://pcpartpicker.com/products/"
+        return "https://pcpartpicker.com/products/"
 
     def _generate_product_url(self, part: str, page_num: int=1) -> str:
         return "{}{}/fetch?page={}".format(self._base_url, part, page_num)

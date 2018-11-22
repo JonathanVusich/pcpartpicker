@@ -1,5 +1,6 @@
 import pytest
 from pcpartpicker.parts import *
+from moneyed import Money, USD
 
 
 def test_check_typing():
@@ -74,21 +75,10 @@ def test_bytes_from_pb():
     assert(size.PB == 50)
 
 
-def test_part_init():
-    part = Part("Test")
-    assert(part.name == "Test")
-
-
-def test_part_bad_init():
-    with pytest.raises(ValueError):
-        _ = Part(23.13)
-
-
 def test_resolution_init():
     resolution = Resolution(1920, 1080)
     assert(resolution.width == 1920)
     assert(resolution.height == 1080)
-    assert(resolution.pixel_count == 2073600)
 
 
 def test_resolution_bad_init():
@@ -167,24 +157,46 @@ def test_network_speed_init():
     assert(network_speed.bits_per_second == 2000)
 
 
+def test_network_speed_init():
+    with pytest.raises(ValueError):
+        _ = NetworkSpeed.from_Gbits("2")
+
+
+def test_network_speed_from_mbits():
+    network_speed = NetworkSpeed.from_Mbits(1000)
+    assert network_speed.Mbits == 1000
+    assert network_speed.Gbits == 1
+
+
+def test_network_speed_from_gbits():
+    network_speed = NetworkSpeed.from_Gbits(2)
+    assert network_speed.Mbits == 2000
+    assert network_speed.Gbits == 2
+
+
 def test_cpu_init():
-    args = ["Intel Core i7-6700k", 4, 95, ClockSpeed.from_GHz(4.4), Decimal("230.00")]
+    args = ["Intel Core i7-6700k", 4, 95, ClockSpeed.from_GHz(4.4), Money("230.00", USD)]
     cpu = CPU(*args)
-    assert(cpu.name == args[0])
+    assert(cpu.model == args[0])
     assert(cpu.cores == args[1])
     assert(cpu.tdp == args[2])
     assert(cpu.clock_speed == args[3])
     assert (cpu.price == args[4])
 
 
+def test_modify_cpu():
+    args = ["Intel Core i7-6700k", 4, 95, ClockSpeed.from_GHz(4.4), Money("230.00", USD)]
+    cpu = CPU(*args)
+    cpu.model = "Core i5 6600k"
+
 def test_cpu_bad_init():
-    args = [6700, 4, 95, ClockSpeed.from_GHz(4.4), Decimal("230.00")]
+    args = [6700, 4, 95, ClockSpeed.from_GHz(4.4), Money("230.00")]
     with pytest.raises(ValueError):
         _ = CPU(*args)
 
 
 def test_cpu_cooler_init():
-    args = ["Cooler Master Hyper 212 Evo", RPM(500, 2400, 1800), Decibels(12.2, 43.8, 30.2), Decimal("25.99")]
+    args = ["Cooler Master Hyper 212 Evo", RPM(500, 2400, 1800), Decibels(12.2, 43.8, 30.2), Money("25.99")]
     cpu_cooler = CPUCooler(*args)
     assert(cpu_cooler.name == args[0])
     assert(cpu_cooler.fan_rpm == args[1])
@@ -193,13 +205,13 @@ def test_cpu_cooler_init():
 
 
 def test_cpu_cooler_bad_init():
-    args = ["Cooler Master Hyper 212 Evo", Decimal("25.99"), 5000, Decibels(12.2, 43.8, 30.2)]
+    args = ["Cooler Master Hyper 212 Evo", Money("25.99"), 5000, Decibels(12.2, 43.8, 30.2)]
     with pytest.raises(ValueError):
         _ = CPUCooler(*args)
 
 
 def test_motherboard_init():
-    args = ["MSI Z170", "Z170", "ATX", 2, Bytes.from_GB(8), Decimal("89.11")]
+    args = ["MSI Z170", "Z170", "ATX", 2, Bytes.from_GB(8), Money("89.11")]
     mobo = Motherboard(*args)
     assert(mobo.name == args[0])
     assert(mobo.socket == args[1])
@@ -210,13 +222,13 @@ def test_motherboard_init():
 
 
 def test_motherboard_bad_init():
-    args = ["MSI Z170", Decimal("89.11"), "Z170", "ATX", "2", Bytes.from_GB(8)]
+    args = ["MSI Z170", Money("89.11"), "Z170", "ATX", "2", Bytes.from_GB(8)]
     with pytest.raises(ValueError):
         _ = Motherboard(*args)
 
 
 def test_memory_init():
-    args = ["Corsair Vengeance", "DDR4-3000", "288-pin DIMM", 15, " 2x8GB", Bytes.from_GB(16), 9.12, Decimal("122.45")]
+    args = ["Corsair Vengeance", "DDR4-3000", "288-pin DIMM", 15, " 2x8GB", Bytes.from_GB(16), 9.12, Money("122.45")]
     memory = Memory(*args)
     assert(memory.name == args[0])
     assert(memory.price == args[-1])
@@ -231,14 +243,14 @@ def test_memory_init():
 
 
 def test_memory_bad_init():
-    args = ["Corsair Vengeance", Decimal("122.45"), "288-pin DIMM", ClockSpeed.from_GHz(3), "DDR4", 15, 2,
-            Bytes.from_GB(4), Bytes.from_GB(8), Decimal("0.08")]
+    args = ["Corsair Vengeance", Money("122.45"), "288-pin DIMM", ClockSpeed.from_GHz(3), "DDR4", 15, 2,
+            Bytes.from_GB(4), Bytes.from_GB(8), Money("0.08")]
     with pytest.raises(ValueError):
         _ = Memory(*args)
 
 
 def test_storage_drive_init():
-    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    args = ["Seagate", Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
     hdd = StorageDrive(*args)
     assert(hdd.name == args[0])
     assert(hdd.price == args[1])
@@ -249,13 +261,13 @@ def test_storage_drive_init():
 
 
 def test_storage_drive_bad_init():
-    args = [123, Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    args = [123, Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
     with pytest.raises(ValueError):
         _ = StorageDrive(*args)
 
 
 def test_hdd_init():
-    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), 7200]
+    args = ["Seagate", Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), 7200]
     hdd = HDD(*args)
     assert(hdd.name == args[0])
     assert(hdd.price == args[1])
@@ -267,13 +279,13 @@ def test_hdd_init():
 
 
 def test_hdd_bad_init():
-    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), "7200"]
+    args = ["Seagate", Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), "7200"]
     with pytest.raises(ValueError):
         _ = HDD(*args)
 
 
 def test_ssd_init():
-    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    args = ["Seagate", Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
     ssd = SSD(*args)
     assert(ssd.name == args[0])
     assert(ssd.price == args[1])
@@ -284,13 +296,13 @@ def test_ssd_init():
 
 
 def test_ssd_bad_init():
-    args = [1234, Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    args = [1234, Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
     with pytest.raises(ValueError):
         _ = SSD(*args)
 
 
 def test_hybriddrive_init():
-    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    args = ["Seagate", Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
     hybrid_drive = HybridDrive(*args)
     assert (hybrid_drive.name == args[0])
     assert (hybrid_drive.price == args[1])
@@ -301,13 +313,13 @@ def test_hybriddrive_init():
 
 
 def test_hybriddrive_bad_init():
-    args = ["Seagate", Decimal("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), 256]
+    args = ["Seagate", Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), 256]
     with pytest.raises(ValueError):
         _ = HybridDrive(*args)
 
 
 def test_gpu_init():
-    args = ["EVGA", Decimal("500"), "RTX 2080", "T104", Bytes.from_GB(8), ClockSpeed.from_GHz(2)]
+    args = ["EVGA", Money("500"), "RTX 2080", "T104", Bytes.from_GB(8), ClockSpeed.from_GHz(2)]
     gpu = GPU(*args)
     assert(gpu.name == args[0])
     assert(gpu.price == args[1])
@@ -324,7 +336,7 @@ def test_gpu_bad_init():
 
 
 def test_psu_init():
-    args = ["EVGA", Decimal("120"), "G1", "ATX", "80+ Gold", 800, "Fully modular"]
+    args = ["EVGA", Money("120"), "G1", "ATX", "80+ Gold", 800, "Fully modular"]
     psu = PSU(*args)
     assert(psu.name == args[0])
     assert(psu.price == args[1])
@@ -336,12 +348,12 @@ def test_psu_init():
 
 
 def test_psu_bad_init():
-    args = ["EVGA", Decimal("120"), "G1", "ATX", "80+ Gold", "800", "Fully modular"]
+    args = ["EVGA", Money("120"), "G1", "ATX", "80+ Gold", "800", "Fully modular"]
     with pytest.raises(ValueError):
         _ = PSU(*args)
 
 def test_case_init():
-    args = ["Lian Li", Decimal("120"), "ATX", 4, 4, None]
+    args = ["Lian Li", Money("120"), "ATX", 4, 4, None]
     case = Case(*args)
     assert(case.name == args[0])
     assert(case.price == args[1])
@@ -358,7 +370,7 @@ def test_case_bad_init():
 
 
 def test_fan_init():
-    args = ["Cooler Master", Decimal("23.34"), "black", 120, RPM(800, 2500, 1800), CFM(4, 21, 16), Decibels(21, 45, 33)]
+    args = ["Cooler Master", Money("23.34"), "black", 120, RPM(800, 2500, 1800), CFM(4, 21, 16), Decibels(21, 45, 33)]
     fan = Fan(*args)
     assert(fan.name == args[0])
     assert(fan.price == args[1])
@@ -370,13 +382,13 @@ def test_fan_init():
 
 
 def test_fan_bad_init():
-    args = ["Cooler Master", Decimal("23.34"), "black", "120", RPM(800, 2500, 1800), CFM(4, 21, 16), Decibels(21, 45, 33)]
+    args = ["Cooler Master", Money("23.34"), "black", "120", RPM(800, 2500, 1800), CFM(4, 21, 16), Decibels(21, 45, 33)]
     with pytest.raises(ValueError):
         _ = Fan(*args)
 
 
 def test_fan_controller_init():
-    args = ["Cooler Master", Decimal("60"), "5.25\'", 5, 12]
+    args = ["Cooler Master", Money("60"), "5.25\'", 5, 12]
     fan_controller = FanController(*args)
     assert(fan_controller.name == args[0])
     assert(fan_controller.price == args[1])
@@ -392,7 +404,7 @@ def test_fan_controller_bad_init():
 
 
 def test_thermalpaste_init():
-    args = ["Cooler Master", Decimal("23.45"), 23]
+    args = ["Cooler Master", Money("23.45"), 23]
     thermalpaste = ThermalPaste(*args)
     assert(thermalpaste.name == args[0])
     assert(thermalpaste.price == args[1])
@@ -400,13 +412,13 @@ def test_thermalpaste_init():
 
 
 def test_thermalpaste_bad_init():
-    args = ["Cooler Master", Decimal("23.45"), "23"]
+    args = ["Cooler Master", Money("23.45"), "23"]
     with pytest.raises(ValueError):
         _ = ThermalPaste(*args)
 
 
 def test_opticaldrive_init():
-    args = ["LG", Decimal("60"), 12, 24, 48, "12", "24", "48"]
+    args = ["LG", Money("60"), 12, 24, 48, "12", "24", "48"]
     drive = OpticalDrive(*args)
     assert(drive.name == args[0])
     assert(drive.price == args[1])
@@ -419,13 +431,13 @@ def test_opticaldrive_init():
 
 
 def test_opticaldrive_bad_init():
-    args = ["LG", Decimal("60"), 12, 24, 48, 12, "24", "48"]
+    args = ["LG", Money("60"), 12, 24, 48, 12, "24", "48"]
     with pytest.raises(ValueError):
         _ = OpticalDrive(*args)
 
 
 def test_soundcard_init():
-    args = ["SoundBlaster", Decimal("60"), "ATX", 5.1, 2048, 231, 96000]
+    args = ["SoundBlaster", Money("60"), "ATX", 5.1, 2048, 231, 96000]
     soundcard = SoundCard(*args)
     assert(soundcard.name == args[0])
     assert(soundcard.price == args[1])
@@ -437,13 +449,13 @@ def test_soundcard_init():
 
 
 def test_soundcard_bad_init():
-    args = ["SoundBlaster", Decimal("60"), 1234, 5.1, 2048, 231, 96000]
+    args = ["SoundBlaster", Money("60"), 1234, 5.1, 2048, 231, 96000]
     with pytest.raises(ValueError):
         _ = SoundCard(*args)
 
 
 def test_ethernet_card_init():
-    args = ["LG", Decimal("60"), "PCI-e x8", NetworkSpeed.from_Gbits(1000), 2]
+    args = ["LG", Money("60"), "PCI-e x8", NetworkSpeed.from_Gbits(1000), 2]
     ethernet_card = EthernetCard(*args)
     assert(ethernet_card.name == args[0])
     assert(ethernet_card.price == args[1])
@@ -459,7 +471,7 @@ def test_ethernet_card_bad_init():
 
 
 def test_wireless_card_init():
-    args = ["Realtek", Decimal("60"), "PCI-e x8", "b/g/n/ac"]
+    args = ["Realtek", Money("60"), "PCI-e x8", "b/g/n/ac"]
     wireless_card = WirelessCard(*args)
     assert(wireless_card.name == args[0])
     assert(wireless_card.price == args[1])
@@ -474,7 +486,7 @@ def test_wireless_card_bad_init():
 
 
 def test_monitor_init():
-    args = ["MSI Optix", Decimal("300"), Resolution(1920, 1080), 27, 4, True]
+    args = ["MSI Optix", Money("300"), Resolution(1920, 1080), 27, 4, True]
     monitor = Monitor(*args)
     assert(monitor.name == args[0])
     assert(monitor.price == args[1])
@@ -492,7 +504,7 @@ def test_monitor_bad_init():
 
 
 def test_externalhdd_init():
-    args = ["Seagate", Decimal("80"), "Barracuda", "2000", Bytes.from_TB(3), .09]
+    args = ["Seagate", Money("80"), "Barracuda", "2000", Bytes.from_TB(3), .09]
     hdd = ExternalHDD(*args)
     assert(hdd.name == args[0])
     assert(hdd.price == args[1])
@@ -503,13 +515,13 @@ def test_externalhdd_init():
 
 
 def test_externalhdd_bad_init():
-    args = ["Seagate", Decimal("80"), "Barracuda", 2000, Bytes.from_TB(3), .09]
+    args = ["Seagate", Money("80"), "Barracuda", 2000, Bytes.from_TB(3), .09]
     with pytest.raises(ValueError):
         _ = ExternalHDD(*args)
 
 
 def test_headphones_init():
-    args = ["Audio-Technica", Decimal("150"), "Overear", False, False, FrequencyResponse(48, 128000, 24000)]
+    args = ["Audio-Technica", Money("150"), "Overear", False, False, FrequencyResponse(48, 128000, 24000)]
     headphones = Headphones(*args)
     assert(headphones.name == args[0])
     assert(headphones.price == args[1])
@@ -520,13 +532,13 @@ def test_headphones_init():
 
 
 def test_headphones_bad_init():
-    args = ["Audio-Technica", Decimal("150"), "Overear", "No", False, FrequencyResponse(48, 128000, 24000)]
+    args = ["Audio-Technica", Money("150"), "Overear", "No", False, FrequencyResponse(48, 128000, 24000)]
     with pytest.raises(ValueError):
         _ = Headphones(*args)
 
 
 def test_keyboard_init():
-    args = ["Cooler Master MX-50", Decimal("100"), "Mechanical", "Red", "Cherry MX", "RGB"]
+    args = ["Cooler Master MX-50", Money("100"), "Mechanical", "Red", "Cherry MX", "RGB"]
     keyboard = Keyboard(*args)
     assert(keyboard.name == args[0])
     assert(keyboard.price == args[1])
@@ -543,7 +555,7 @@ def test_keyboard_bad_init():
 
 
 def test_mouse_init():
-    args = ["Logitech G903", Decimal("150"), "optical", "wireless", "black"]
+    args = ["Logitech G903", Money("150"), "optical", "wireless", "black"]
     mouse = Mouse(*args)
     assert(mouse.name == args[0])
     assert(mouse.price == args[1])
@@ -559,7 +571,7 @@ def test_mouse_bad_init():
 
 
 def test_speakers_init():
-    args = ["Logitech", Decimal("60"), 5.1, 89, FrequencyResponse(96, 48000, 21000)]
+    args = ["Logitech", Money("60"), 5.1, 89, FrequencyResponse(96, 48000, 21000)]
     speakers = Speakers(*args)
     assert(speakers.name == args[0])
     assert(speakers.price == args[1])
@@ -575,7 +587,7 @@ def test_speakers_bad_init():
 
 
 def test_ups_init():
-    args = ["PowerMaster", Decimal("200"), 1200, 24]
+    args = ["PowerMaster", Money("200"), 1200, 24]
     ups = UPS(*args)
     assert(ups.name == args[0])
     assert(ups.price == args[1])
@@ -584,6 +596,6 @@ def test_ups_init():
 
 
 def test_ups_bad_init():
-    args = ["PowerMaster", Decimal("200"), 1200, "24"]
+    args = ["PowerMaster", Money("200"), 1200, "24"]
     with pytest.raises(ValueError):
         _ = UPS(*args)

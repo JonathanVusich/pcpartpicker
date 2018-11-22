@@ -12,17 +12,16 @@ class API:
                         "thermal-paste", "optical-drive", "sound-card", "wired-network-card",
                         "wireless-network-card", "monitor", "external-hard-drive", "headphones",
                         "keyboard", "mouse", "speakers", "ups"]
-    _regions = ["au", "be", "ca", "de", "es", "fr",
+    _regions = ["au", "be", "ca", "de", "es", "fr", "se",
                     "in", "ie", "it", "nz", "uk", "us"]
     _region = "us"
-    _database = None
     _parser = None
-    _last_refresh = time.time()
+    _last_refresh = None
 
     def __init__(self, region: str="us"):
-        self._set_region(region)
         self._scraper = Scraper(self.region)
         self._parser = Parser()
+        self._set_region(region)
         self._last_refresh = time.time()
 
     @property
@@ -49,11 +48,10 @@ class API:
         if part not in self.supported_parts:
             raise UnsupportedPart(f"Part '{part}' is not supported!")
 
-        # Determine whether not a refresh of the part data should occur
-        if time.time() - self._last_refresh < 600 and not force_refresh:
-            attr_name = self._parser._part_class_mappings[part].__name__.lower()
-            if hasattr(self, attr_name):
-                return getattr(self, attr_name)
+        # Determine whether or not a refresh of the part data should occur
+        if hasattr(self, self._parser._part_class_mappings[part].__name__.lower()):
+            if time.time() - self._last_refresh < 600 and not force_refresh:
+                return getattr(self, part)
 
         loop = asyncio.new_event_loop()
         results = loop.run_until_complete(self._scraper._retrieve_part(loop, part))
@@ -64,7 +62,8 @@ class API:
             if parsed_data:
                 results_to_return.extend(parsed_data)
         if results_to_return:
-            setattr(self, type(results[0]).__name__.lower(), results_to_return)
+            setattr(self, type(results_to_return[0]).__name__.lower(), results_to_return)
+            self._last_refresh = time.time()
             return results_to_return
 
     def retrieve_all(self, force_refresh=False):
@@ -79,7 +78,9 @@ class API:
             if results:
                 results_to_return[part] = results
                 setattr(self, type(results[0]).__name__.lower(), results)
-        return results_to_return
+        if results_to_return:
+            self._last_refresh = time.time()
+            return results_to_return
 
     def load_data(self):
         pass
@@ -91,3 +92,5 @@ class API:
         if not region in self._regions:
             raise UnsupportedRegion("Region \'{}\' is not supported!".format(region))
         self._region = region
+        self._scraper._update_region(self._region)
+        self._parser._update_region(self._region)

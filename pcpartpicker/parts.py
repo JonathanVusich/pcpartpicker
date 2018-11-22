@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from decimal import Decimal
+from moneyed import Money
 
 """
     Author: Jonathan Vusich
@@ -9,16 +9,10 @@ from decimal import Decimal
 """
 
 
-def check_typing(attribute, type):
+def check_typing(attribute, class_type):
     if attribute:
         if not isinstance(attribute, type):
-            raise ValueError("\'{}\' must be of type \'{}\'!".format(attribute, type))
-
-
-def _determine_type(type: str):
-    if [x for x in type if x.isnumeric()]:
-        return "HDD"
-    return type
+            raise ValueError(f"'{attribute}' must be of type '{class_type}'!")
 
 
 @dataclass(frozen=True)
@@ -193,22 +187,21 @@ class CPU:
 
     model: str
     """str: The model of this CPU."""
-    clock_speed: ClockSpeed
-    """Clockspeed: The clock speed of this CPU (in GHz)."""
     cores: int
     """int: The number of cores that this CPU has (excludes hyperthreading + SMT)."""
     tdp: int
     """int: The TDP of this CPU."""
-    price: Decimal
-    """Decimal: The price of the CPU."""
+    clock_speed: ClockSpeed
+    """Clockspeed: The clock speed of this CPU (in GHz)."""
+    price: Money
+    """Money: The price of the CPU."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.cores, int)
         check_typing(self.tdp, int)
         check_typing(self.clock_speed, ClockSpeed)
-        check_typing(self.price, Decimal)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -221,14 +214,14 @@ class CPUCooler:
     """RPM: The RPM information of this CPU cooler."""
     decibels: Decibels
     """Decibels: The decibel information of this CPU cooler."""
-    price: Decimal
-    """Decimal: The price of the CPU cooler."""
+    price: Money
+    """Money: The price of the CPU cooler."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.fan_rpm, RPM)
         check_typing(self.decibels, Decibels)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -245,8 +238,8 @@ class Motherboard:
     """int: The number of RAM slots on this motherboard"""
     max_ram: Bytes
     """Bytes: The maximum amount of RAM that this motherboard supports (given in GB)"""
-    price: Decimal
-    """Decimal: The price of this motherboard."""
+    price: Money
+    """Money: The price of this motherboard."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -254,7 +247,7 @@ class Motherboard:
         check_typing(self.form_factor, str)
         check_typing(self.ram_slots, int)
         check_typing(self.max_ram, Bytes)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -279,8 +272,8 @@ class Memory:
     """Bytes: The total size of the modules combined."""
     price_per_gb: float
     """float: The price per GB for this memory configuration"""
-    price: Decimal
-    """Decimal: The price of this memory module."""
+    price: Money
+    """Money: The price of this memory module."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -292,7 +285,7 @@ class Memory:
         check_typing(self.module_size, Bytes)
         check_typing(self.total_size, Bytes)
         check_typing(self.price_per_gb, float)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -313,8 +306,8 @@ class StorageDrive:
     """Bytes: The capacity of this storage device."""
     cache_amount: Bytes
     """Bytes: The cache amount found in this storage device."""
-    price: Decimal
-    """Decimal: The price of this storage device."""
+    price: Money
+    """Money: The price of this storage device."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -324,7 +317,7 @@ class StorageDrive:
         check_typing(self.platter_rpm, int)
         check_typing(self.capacity, Bytes)
         check_typing(self.cache_amount, Bytes)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -340,8 +333,8 @@ class GPU:
     """Bytes: The amount of video memory in this GPU."""
     core_clock: ClockSpeed
     """ClockSpeed: The clock speed of this GPU """
-    price: Decimal
-    """Decimal: The price of this GPU."""
+    price: Money
+    """Money: The price of this GPU."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -349,7 +342,7 @@ class GPU:
         check_typing(self.chipset, str)
         check_typing(self.memory_amount, Bytes)
         check_typing(self.core_clock, ClockSpeed)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -367,8 +360,8 @@ class PSU:
     """int: The watt rating of this PSU."""
     modular: str
     """str: The modular properties of this PSU."""
-    price: Decimal
-    """Decimal: The price of this PSU."""
+    price: Money
+    """Money: The price of this PSU."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -377,7 +370,7 @@ class PSU:
         check_typing(self.efficiency_rating, str)
         check_typing(self.watt_rating, int)
         check_typing(self.modular, str)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -395,8 +388,8 @@ class Case:
     psu_wattage: int
     """int: The wattage amount of the internal PSU of this case.
             If no PSU is present, this value will be set to None."""
-    price: Decimal
-    """Decimal: The price of this GPU."""
+    price: Money
+    """Money: The price of this GPU."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -404,7 +397,7 @@ class Case:
         check_typing(self.external_bays, int)
         check_typing(self.internal_bays, int)
         check_typing(self.psu_wattage, int)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -423,8 +416,8 @@ class Fan:
     """CFM: The amount of airflow that this fan can produce."""
     decibels: Decibels
     """Decibels: The decibel amount or range produced by this fan."""
-    price: Decimal
-    """Decimal: The price of this fan."""
+    price: Money
+    """Money: The price of this fan."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -433,7 +426,7 @@ class Fan:
         check_typing(self.rpm, RPM)
         check_typing(self.airflow, CFM)
         check_typing(self.decibels, Decibels)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -448,15 +441,15 @@ class FanController:
     """int: The number of fans that this fan controller can control."""
     channel_wattage: int
     """int: The number of watts that this fan can provide to each channel."""
-    price: Decimal
-    """Decimal: The price of this fan controller."""
+    price: Money
+    """Money: The price of this fan controller."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.form_factor, str)
         check_typing(self.channels, int)
         check_typing(self.channel_wattage, int)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -467,13 +460,13 @@ class ThermalPaste:
     """str: The model of this thermal paste."""
     amount: float
     """float: The amount of thermal paste provided in this product (in grams)."""
-    price: Decimal
-    """Decimal: The price of this thermal paste."""
+    price: Money
+    """Money: The price of this thermal paste."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.amount, (float, int))
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -494,8 +487,8 @@ class OpticalDrive:
     """str: The DVD write speeds of this optical drive."""
     cd_write_speed: str
     """str: The CD write speeds of this optical drive."""
-    price: Decimal
-    """Decimal: The price of this optical drive."""
+    price: Money
+    """Money: The price of this optical drive."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -505,7 +498,7 @@ class OpticalDrive:
         check_typing(self.bluray_write_speed, str)
         check_typing(self.dvd_write_speed, str)
         check_typing(self.cd_write_speed, str)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -524,8 +517,8 @@ class SoundCard:
     """int: The signal to noise ratio of this sound card in dB."""
     sample_rate: int
     """int: The sample rate of this sound card in kHz."""
-    price: Decimal
-    """Decimal: The price of this sound card."""
+    price: Money
+    """Money: The price of this sound card."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -534,7 +527,7 @@ class SoundCard:
         check_typing(self.bitrate, int)
         check_typing(self.snr, int)
         check_typing(self.sample_rate, int)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -549,15 +542,15 @@ class EthernetCard:
     """NetworkSpeed: The maximum speed that this Ethernet card supports."""
     port_number: int
     """int: The number of Ethernet ports on this card."""
-    price: Decimal
-    """Decimal: The price of this Ethernet card."""
+    price: Money
+    """Money: The price of this Ethernet card."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.interface, str)
         check_typing(self.port_speed, NetworkSpeed)
         check_typing(self.port_number, int)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -570,14 +563,14 @@ class WirelessCard:
     """str: The motherboard interface of this wireless card."""
     supported_protocols: str
     """str: The supported wireless protocols of this card."""
-    price: Decimal
-    """Decimal: The price of this wireless card."""
+    price: Money
+    """Money: The price of this wireless card."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.interface, str)
         check_typing(self.supported_protocols, str)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -594,8 +587,8 @@ class Monitor:
     """int: The response time of this display (in milliseconds)."""
     ips: bool
     """bool: Returns True if the panel is an IPS display."""
-    price: Decimal
-    """Decimal: The price of this monitor."""
+    price: Money
+    """Money: The price of this monitor."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -603,7 +596,7 @@ class Monitor:
         check_typing(self.size, (float, int))
         check_typing(self.response_time, int)
         check_typing(self.ips, bool)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -620,8 +613,8 @@ class ExternalHDD:
     """Bytes: The capacity of this external HDD."""
     price_per_gb: float
     """float: The price per GB of storage of this external HDD."""
-    price: Decimal
-    """Decimal: The price of this external HDD."""
+    price: Money
+    """Money: The price of this external HDD."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -629,7 +622,7 @@ class ExternalHDD:
         check_typing(self.type, str)
         check_typing(self.capacity, Bytes)
         check_typing(self.price_per_gb, (float, int))
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -646,8 +639,8 @@ class Headphones:
     """bool: Returns True if this set of headphones is wireless."""
     frequency_response: FrequencyResponse
     """str: The frequency response of this set of headphones."""
-    price: Decimal
-    """Decimal: The price of these headphones."""
+    price: Money
+    """Money: The price of these headphones."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -655,7 +648,7 @@ class Headphones:
         check_typing(self.has_microphone, bool)
         check_typing(self.is_wireless, bool)
         check_typing(self.frequency_response, FrequencyResponse)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -672,8 +665,8 @@ class Keyboard:
     """str: Describes the type of switches that this keyboard uses."""
     backlight_type: str
     """str: Describes the available backlight on this device."""
-    price: Decimal
-    """Decimal: The price of this keyboard."""
+    price: Money
+    """Money: The price of this keyboard."""
 
     def __post_init__(self):
         check_typing(self.model, str)
@@ -681,7 +674,7 @@ class Keyboard:
         check_typing(self.color, str)
         check_typing(self.switch_type, str)
         check_typing(self.backlight_type, str)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -696,15 +689,15 @@ class Mouse:
     """str: Describes the type of connection that this mouse uses."""
     color: str
     """str: Describes the color of this mouse."""
-    price: Decimal
-    """Decimal: The price of this mouse."""
+    price: Money
+    """Money: The price of this mouse."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.type, str)
         check_typing(self.connection, str)
         check_typing(self.color, str)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -719,15 +712,15 @@ class Speakers:
     """int: The peak wattage of these speakers."""
     frequency_response: FrequencyResponse
     """FrequencyResponse: The frequency response of these speakers."""
-    price: Decimal
-    """Decimal: The price of these speakers."""
+    price: Money
+    """Money: The price of these speakers."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.channel_configuration, (float, int))
         check_typing(self.wattage, int)
         check_typing(self.frequency_response, FrequencyResponse)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
 
 
 @dataclass(frozen=True)
@@ -740,11 +733,11 @@ class UPS:
     """int: The number of watts that this UPS can store."""
     va_capacity: int
     """int: The number of volt-amperes that this UPS can store."""
-    price: Decimal
-    """Decimal: The price of this UPS."""
+    price: Money
+    """Money: The price of this UPS."""
 
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.watt_capacity, int)
         check_typing(self.va_capacity, int)
-        check_typing(self.price, Decimal)
+        check_typing(self.price, Money)
