@@ -1,6 +1,7 @@
 import pytest
 from pcpartpicker.parts import *
 from moneyed import Money, USD
+from dataclasses import FrozenInstanceError
 
 
 def test_check_typing():
@@ -94,21 +95,44 @@ def test_clock_speed_init():
 
 def test_clock_speed_bad_init():
     with pytest.raises(ValueError):
-        _ = ClockSpeed("3450000000")
+        _ = ClockSpeed("This is a test")
 
 
-def test_clock_speed_from_GHz():
+def test_clock_speed_from_GHz_float():
     clock_speed = ClockSpeed.from_GHz(3.45)
-    assert (clock_speed.MHz == 3450)
-    assert(clock_speed.GHz == 3.45)
-    assert(clock_speed.cycles == 3450000000)
+    assert clock_speed.MHz == 3450
+    assert clock_speed.GHz == 3.45
+    assert clock_speed.cycles == 3450000000
 
 
-def test_clock_speed_from_MHz():
+def test_clock_speed_from_GHz_str():
+    clock_speed = ClockSpeed.from_GHz("3.45")
+    assert clock_speed.MHz == 3450
+    assert clock_speed.GHz == 3.45
+    assert clock_speed.cycles == 3450000000
+
+
+def test_clock_speed_from_GHz_bad_str():
+    with pytest.raises(ValueError):
+        _ = ClockSpeed.from_GHz("This is a test")
+
+def test_clock_speed_from_MHz_float():
     clock_speed = ClockSpeed.from_MHz(3450)
-    assert(clock_speed.MHz == 3450)
-    assert(clock_speed.GHz == 3.45)
-    assert(clock_speed.cycles == 3450000000)
+    assert clock_speed.MHz == 3450
+    assert clock_speed.GHz == 3.45
+    assert clock_speed.cycles == 3450000000
+
+
+def test_clock_speed_from_MHz_str():
+    clock_speed = ClockSpeed.from_MHz("3450")
+    assert clock_speed.MHz == 3450
+    assert clock_speed.GHz == 3.45
+    assert clock_speed.cycles == 3450000000
+
+
+def test_clock_speed_from_MHz_bad_str():
+    with pytest.raises(ValueError):
+        _ = ClockSpeed.from_MHz("this is a test")
 
 
 def test_decibel_init():
@@ -157,7 +181,7 @@ def test_network_speed_init():
     assert(network_speed.bits_per_second == 2000)
 
 
-def test_network_speed_init():
+def test_network_speed_bad_init():
     with pytest.raises(ValueError):
         _ = NetworkSpeed.from_Gbits("2")
 
@@ -187,33 +211,35 @@ def test_cpu_init():
 def test_modify_cpu():
     args = ["Intel Core i7-6700k", 4, 95, ClockSpeed.from_GHz(4.4), Money("230.00", USD)]
     cpu = CPU(*args)
-    cpu.model = "Core i5 6600k"
+    with pytest.raises(FrozenInstanceError):
+        cpu.model = "Core i5 6600k"
+
 
 def test_cpu_bad_init():
-    args = [6700, 4, 95, ClockSpeed.from_GHz(4.4), Money("230.00")]
+    args = [6700, 4, 95, ClockSpeed.from_GHz("4.4"), Money("230.00", USD)]
     with pytest.raises(ValueError):
         _ = CPU(*args)
 
 
 def test_cpu_cooler_init():
-    args = ["Cooler Master Hyper 212 Evo", RPM(500, 2400, 1800), Decibels(12.2, 43.8, 30.2), Money("25.99")]
+    args = ["Cooler Master Hyper 212 Evo", RPM(500, 2400, 1800), Decibels(12.2, 43.8, 30.2), Money("25.99", USD)]
     cpu_cooler = CPUCooler(*args)
-    assert(cpu_cooler.name == args[0])
+    assert(cpu_cooler.model == args[0])
     assert(cpu_cooler.fan_rpm == args[1])
     assert(cpu_cooler.decibels == args[2])
     assert(cpu_cooler.price == args[3])
 
 
 def test_cpu_cooler_bad_init():
-    args = ["Cooler Master Hyper 212 Evo", Money("25.99"), 5000, Decibels(12.2, 43.8, 30.2)]
+    args = ["Cooler Master Hyper 212 Evo", 5000, Decibels(12.2, 43.8, 30.2), Money("25.99", USD)]
     with pytest.raises(ValueError):
         _ = CPUCooler(*args)
 
 
 def test_motherboard_init():
-    args = ["MSI Z170", "Z170", "ATX", 2, Bytes.from_GB(8), Money("89.11")]
+    args = ["MSI Z170", "Z170", "ATX", 2, Bytes.from_GB(8), Money("89.11", USD)]
     mobo = Motherboard(*args)
-    assert(mobo.name == args[0])
+    assert(mobo.model == args[0])
     assert(mobo.socket == args[1])
     assert(mobo.form_factor == args[2])
     assert(mobo.ram_slots == args[3])
@@ -222,46 +248,47 @@ def test_motherboard_init():
 
 
 def test_motherboard_bad_init():
-    args = ["MSI Z170", Money("89.11"), "Z170", "ATX", "2", Bytes.from_GB(8)]
+    args = ["MSI Z170", "Z170", "ATX", "2", Bytes.from_GB(8), Money("89.11", USD)]
     with pytest.raises(ValueError):
         _ = Motherboard(*args)
 
 
 def test_memory_init():
-    args = ["Corsair Vengeance", "DDR4-3000", "288-pin DIMM", 15, " 2x8GB", Bytes.from_GB(16), 9.12, Money("122.45")]
+    args = ["Corsair Vengeance", "DDR4", ClockSpeed.from_MHz("3000"), "288-pin DIMM", 15,
+            2, Bytes.from_GB(8), Bytes.from_GB(16), Money("0.22", USD), Money("122.45", USD)]
     memory = Memory(*args)
-    assert(memory.name == args[0])
-    assert(memory.price == args[-1])
-    assert(memory.type == "DDR4")
-    assert(memory.speed == ClockSpeed.from_MHz(3000))
-    assert(memory.module_type == args[2])
-    assert(memory.cas_timing == args[3])
-    assert(memory.number_of_modules == 2)
-    assert(memory.module_size == Bytes.from_GB(8))
-    assert(memory.total_size == args[-3])
-    assert(memory.price_per_gb == args[-2])
+    assert memory.model == args[0]
+    assert memory.module_type == args[1]
+    assert memory.speed == args[2]
+    assert memory.form_factor == args[3]
+    assert memory.cas_timing == args[4]
+    assert memory.number_of_modules == args[5]
+    assert memory.module_size == args[6]
+    assert memory.total_size == args[7]
+    assert memory.price_per_gb == args[8]
+    assert memory.price == args[9]
 
 
 def test_memory_bad_init():
-    args = ["Corsair Vengeance", Money("122.45"), "288-pin DIMM", ClockSpeed.from_GHz(3), "DDR4", 15, 2,
-            Bytes.from_GB(4), Bytes.from_GB(8), Money("0.08")]
+    args = ["Corsair Vengeance", "DDR4", ClockSpeed.from_MHz("3000"), "288-pin DIMM", 15,
+            2, Bytes.from_GB(8), Bytes.from_GB(16), 0.22, Money("122.45", USD)]
     with pytest.raises(ValueError):
         _ = Memory(*args)
 
 
 def test_storage_drive_init():
-    args = ["Seagate", Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    args = ["Seagate", "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), Money("80.00")]
     hdd = StorageDrive(*args)
-    assert(hdd.name == args[0])
-    assert(hdd.price == args[1])
-    assert(hdd.model_line == args[2])
-    assert(hdd.form_factor == args[3])
-    assert(hdd.capacity == args[4])
-    assert(hdd.cache_amount == args[5])
+    assert hdd.model == args[0]
+    assert hdd.model_line == args[1]
+    assert hdd.form_factor == args[2]
+    assert hdd.capacity == args[3]
+    assert hdd.cache_amount == args[4]
+    assert hdd.price == args[5]
 
 
 def test_storage_drive_bad_init():
-    args = [123, Money("80.00"), "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256)]
+    args = ["Seagate", "WD Black", "2.5 in", Bytes.from_TB(4), Bytes.from_MB(256), Money("80.00")]
     with pytest.raises(ValueError):
         _ = StorageDrive(*args)
 

@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from moneyed import Money
 
 """
@@ -11,8 +11,15 @@ from moneyed import Money
 
 def check_typing(attribute, class_type):
     if attribute:
-        if not isinstance(attribute, type):
+        if not isinstance(attribute, class_type):
             raise ValueError(f"'{attribute}' must be of type '{class_type}'!")
+
+
+def parse_int(int_string: str):
+    try:
+        return int(int_string)
+    except ValueError:
+        raise ValueError("Error! String argument must be a valid integer or float!")
 
 
 @dataclass(frozen=True)
@@ -74,32 +81,47 @@ class Bytes:
         return self.total / 1000000000000000
 
     @classmethod
-    def from_KB(cls, num: float):
-        check_typing(num, (float, int))
+    def from_KB(cls, num):
+        if isinstance(num, str):
+            num = parse_int(num)
+        else:
+            check_typing(num, (float, int))
         num_bytes = int(num * 1000)
         return cls(num_bytes)
 
     @classmethod
-    def from_MB(cls, num: float):
-        check_typing(num, (float, int))
+    def from_MB(cls, num):
+        if isinstance(num, str):
+            num = parse_int(num)
+        else:
+            check_typing(num, (float, int))
         num_bytes = int(num * 1000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_GB(cls, num: float):
-        check_typing(num, (float, int))
+    def from_GB(cls, num):
+        if isinstance(num, str):
+            num = parse_int(num)
+        else:
+            check_typing(num, (float, int))
         num_bytes = int(num * 1000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_TB(cls, num: float):
-        check_typing(num, (float, int))
+    def from_TB(cls, num):
+        if isinstance(num, str):
+            num = parse_int(num)
+        else:
+            check_typing(num, (float, int))
         num_bytes = int(num * 1000000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_PB(cls, num: float):
-        check_typing(num, (float, int))
+    def from_PB(cls, num):
+        if isinstance(num, str):
+            num = parse_int(num)
+        else:
+            check_typing(num, (float, int))
         num_bytes = int(num * 1000000000000000)
         return cls(num_bytes)
 
@@ -142,14 +164,20 @@ class ClockSpeed:
         return self.cycles / 1000000000.0
 
     @classmethod
-    def from_GHz(cls, num: float):
-        check_typing(num, (float, int))
+    def from_GHz(cls, num):
+        if isinstance(num, str):
+            num = parse_int(num)
+        else:
+            check_typing(num, (float, int))
         return cls(int(num * 1000000000))
 
     @classmethod
-    def from_MHz(cls, num: float):
-        check_typing(num, (float, int))
-        return cls(int(num * 1000000))
+    def from_MHz(cls, num):
+        if isinstance(num, str):
+            num = parse_int(num)
+        else:
+            check_typing(num, (float, int))
+        return cls(int(num * 1000000000))
 
 
 @dataclass(frozen=True)
@@ -270,7 +298,7 @@ class Memory:
     """Bytes: The size of the modules that come with this memory configuration"""
     total_size: Bytes
     """Bytes: The total size of the modules combined."""
-    price_per_gb: float
+    price_per_gb: Money
     """float: The price per GB for this memory configuration"""
     price: Money
     """Money: The price of this memory module."""
@@ -284,7 +312,7 @@ class Memory:
         check_typing(self.number_of_modules, int)
         check_typing(self.module_size, Bytes)
         check_typing(self.total_size, Bytes)
-        check_typing(self.price_per_gb, float)
+        check_typing(self.price_per_gb, Money)
         check_typing(self.price, Money)
 
 
