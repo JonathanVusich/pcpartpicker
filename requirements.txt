@@ -2,3 +2,5 @@ lxml==4.2.5
 aiohttp==3.4.4
 aiodns==1.1.1
 cchardet==2.1.4
+python-rapidjson==0.6.3
+py-moneyed==0.8.0
