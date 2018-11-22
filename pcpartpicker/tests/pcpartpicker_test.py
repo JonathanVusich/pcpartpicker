@@ -1,4 +1,5 @@
 import pytest
+import time
 from pcpartpicker import API
 from pcpartpicker.errors import UnsupportedRegion
 
@@ -12,10 +13,13 @@ def test_api_default_init():
                         "thermal-paste", "optical-drive", "sound-card", "wired-network-card",
                         "wireless-network-card", "monitor", "external-hard-drive", "headphones",
                         "keyboard", "mouse", "speakers", "ups"]
+
     assert api.regions == ["au", "be", "ca", "de", "es", "fr", "se",
                             "in", "ie", "it", "nz", "uk", "us"]
+
     assert api._parser._region == 'us'
     assert api._scraper._region == 'us'
+
 
 # Ensure that API can be initialized with a different region
 def test_api_region_init():
@@ -50,3 +54,21 @@ def test_api_set_region_incorrect_region():
         api = API()
         api.set_region('oc')
     assert 'Region \'oc\' is not supported!' in str(excinfo)
+
+
+# Check that parts can be fetched
+def test_api_retrieve_cpu():
+    api = API()
+    results = api.retrieve("case")
+    uninitialized_objects = [result for result in results if not result]
+    assert not uninitialized_objects
+
+
+# Check that parts are cached
+def test_api_check_single_part_caching():
+    api = API()
+    results = api.retrieve("case")
+    start = time.time()
+    results = api.retrieve("case")
+    if not time.time() - start < .1:
+        raise AssertionError

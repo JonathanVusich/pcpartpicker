@@ -89,7 +89,7 @@ class API:
         pass
 
     def _set_region(self, region: str):
-        if not region in self._regions:
+        if region not in self._regions:
             raise UnsupportedRegion("Region \'{}\' is not supported!".format(region))
         self._region = region
         self._scraper._update_region(self._region)
