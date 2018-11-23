@@ -59,7 +59,7 @@ def test_api_set_region_incorrect_region():
 # Check that parts can be fetched
 def test_api_retrieve_cpu():
     api = API()
-    results = api.retrieve("case")
+    results = api.retrieve("cpu")
     uninitialized_objects = [result for result in results if not result]
     assert not uninitialized_objects
 
@@ -67,8 +67,104 @@ def test_api_retrieve_cpu():
 # Check that parts are cached
 def test_api_check_single_part_caching():
     api = API()
-    results = api.retrieve("case")
+    results = api.retrieve("cpu")
     start = time.time()
-    results = api.retrieve("case")
+    results = api.retrieve("cpu")
     if not time.time() - start < .1:
+        raise AssertionError
+
+
+def test_supported_parts_us():
+    api = API()
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
+        raise AssertionError
+
+
+def test_supported_parts_australia():
+    api = API("au")
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
+        raise AssertionError
+
+
+def test_supported_parts_canada():
+    api = API("ca")
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
+        raise AssertionError
+
+
+def test_supported_parts_europe():
+    api = API("be")
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
+        raise AssertionError
+
+
+def test_supported_parts_sweden():
+    api = API("se")
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
+        raise AssertionError
+
+
+def test_supported_parts_india():
+    api = API("in")
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
+        raise AssertionError
+
+
+def test_supported_parts_new_zealand():
+    api = API("nz")
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
+        raise AssertionError
+
+
+def test_supported_parts_uk():
+    api = API("uk")
+    results = []
+    current = "internal-hard-drive"
+    for part in api._parser._part_funcs:
+        if not part == current:
+            results.extend(api.retrieve(part))
+    failures = [result for result in results if not result]
+    if failures:
         raise AssertionError

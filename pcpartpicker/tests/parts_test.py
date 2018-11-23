@@ -198,17 +198,17 @@ def test_network_speed_from_gbits():
 
 
 def test_cpu_init():
-    args = ["Intel Core i7-6700k", 4, 95, ClockSpeed.from_GHz(4.4), Money("230.00", USD)]
+    args = ["Intel Core i7-6700k", ClockSpeed.from_GHz(4.4), 4, 95, Money("230.00", USD)]
     cpu = CPU(*args)
     assert cpu.model == args[0]
-    assert cpu.cores == args[1]
-    assert cpu.tdp == args[2]
-    assert cpu.clock_speed == args[3]
+    assert cpu.clock_speed == args[1]
+    assert cpu.cores == args[2]
+    assert cpu.tdp == args[3]
     assert cpu.price == args[4]
 
 
 def test_cpu_bad_init():
-    args = [6700, 4, 95, ClockSpeed.from_GHz("4.4"), Money("230.00", USD)]
+    args = [6700, ClockSpeed.from_GHz("4.4"), 4, 95, Money("230.00", USD)]
     with pytest.raises(ValueError):
         _ = CPU(*args)
 
@@ -269,7 +269,7 @@ def test_memory_bad_init():
 
 
 def test_storage_drive_init():
-    args = ["Seagate", "WD Black", "2.5 in", "HDD", None, Bytes.from_TB(4), Bytes.from_MB(256), Money("123.00", USD)]
+    args = ["Seagate", "WD Black", "2.5 in", "HDD", None, Bytes.from_TB(4), Bytes.from_MB(256), Money("0.08", USD), Money("123.00", USD)]
     hdd = StorageDrive(*args)
     assert hdd.model == args[0]
     assert hdd.model_line == args[1]
@@ -278,10 +278,13 @@ def test_storage_drive_init():
     assert hdd.platter_rpm == args[4]
     assert hdd.capacity == args[5]
     assert hdd.cache_amount == args[6]
-    assert hdd.price == args[7]
+    assert hdd.price_per_gb == args[7]
+    assert hdd.price == args[8]
+
 
 def test_storage_drive_bad_init():
-    args = ["Seagate", "WD Black", "2.5 in", 7200, None, Bytes.from_TB(4), Bytes.from_MB(256), Money("123.00", USD)]
+    args = ["Seagate", "WD Black", "2.5 in", 7200, None, Bytes.from_TB(4), Bytes.from_MB(256), Money("0.08", USD),
+            Money("123.00", USD)]
     with pytest.raises(ValueError):
         _ = StorageDrive(*args)
 
