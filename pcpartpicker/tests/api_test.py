@@ -2,6 +2,7 @@ import pytest
 import time
 from pcpartpicker import API
 from pcpartpicker.errors import UnsupportedRegion
+from pcpartpicker.parts import CPU
 
 
 # Ensure that API is initialized with the correct data
@@ -57,6 +58,13 @@ def test_api_check_single_part_caching():
     results = api.retrieve("cpu")
     if not time.time() - start < .1:
         raise AssertionError
+
+
+def test_api_cpu():
+    api = API()
+    cpu = api.retrieve("cpu")
+    for item in cpu["cpu"]:
+        assert isinstance(item, CPU)
 
 
 def test_supported_parts_us():
