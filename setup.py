@@ -17,7 +17,7 @@ setup(
     license="GPL",
     keywords="pcpartpicker api webscraper",
     url="https://github.com/JonathanVusich/pcpartpicker",
-    packages=find_packages(exclude=["tests"]),
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=read("requirements.txt"),
     classifiers=[
         "Development Status :: 4 - Beta",
