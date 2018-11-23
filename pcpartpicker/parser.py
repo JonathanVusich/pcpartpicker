@@ -1,4 +1,4 @@
-import lxml.html, lxml.etree
+import lxml.html
 import re
 import time
 from itertools import islice
@@ -6,9 +6,12 @@ from .parts import *
 import rapidjson as json
 from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
 
+
 class Parser:
 
     _float_string = r"(?<![a-zA-Z:])[-+]?\d*\.?\d+"
+    _hdd_form_factors = {"1.8\"", "2.5\"", "3.5\"", "M.2-22110", "M.2-2242",
+                         "M.2-2260", "M.2-2280", "mSATA", "PCI-E"}
     _interface_types = ["PCI", "USB"]
     _net_speeds = ["Mbit/s", "Gbit/s"]
     _byte_size_types = {"GB":Bytes.from_GB, "TB":Bytes.from_TB, "MB":Bytes.from_MB,
@@ -30,15 +33,24 @@ class Parser:
     def __init__(self):
         self._part_funcs = {"wired-network-card":[self._interface, self._network_speed],
                             "wireless-network-card":[self._interface, self._wireless_protocols],
-                            "case":[self._case_type, self._retrieve_int, self._retrieve_int, self._psu_wattage],
-                            "power-supply":[self._psu_series, self._psu_type, self._psu_efficiency, self._psu_wattage,
+                            "case":[self._case_type, self._retrieve_int, self._retrieve_int, self._wattage],
+                            "power-supply":[self._psu_series, self._psu_type, self._psu_efficiency, self._wattage,
                                             self._psu_modular],
-                            "video-card":[self._gpu_series, self._gpu_chipset, self._bytes, self._core_clock]
+                            "video-card":[self._gpu_series, self._gpu_chipset, self._bytes, self._core_clock],
+                            "cpu":[self._core_clock, self._retrieve_int, self._wattage],
+                            "cpu-cooler":[self._fan_rpm, self._decibels],
+                            "motherboard":[self._default, self._default, self._retrieve_int, self._bytes],
+                            "memory": [self._memory_type, self._default, self._retrieve_int,
+                                       self._memory_sizes, self._bytes, self._price],
+                            "internal-hard-drive": [self._hdd_series, self._default, self._hdd_data, self._bytes,
+                                                    self._hdd_cache, self._price]
                             }
         for func_list in self._part_funcs.values():
             func_list.append(self._price)
-        self._part_class_mappings = {"wired-network-card":EthernetCard, "wireless-network-card":WirelessCard,
-                                     "case":Case, "power-supply":PSU, "video-card":GPU}
+        self._part_class_mappings = {"cpu": CPU, "cpu-cooler": CPUCooler, "motherboard": Motherboard, "memory": Memory,
+                                     "wired-network-card": EthernetCard, "wireless-network-card": WirelessCard,
+                                     "case": Case, "power-supply": PSU, "video-card": GPU,
+                                     "internal-hard-drive": StorageDrive}
 
         self._optional_funcs = {self._psu_series}
 
@@ -100,11 +112,13 @@ class Parser:
         except (TypeError, ValueError) as _:
             print('hi')
 
-    def _bytes(self, byte_string: str):
+    def _bytes(self, byte_string: str, result=True):
         for byte_type, func in self._byte_size_types.items():
             if byte_type in byte_string:
                 byte_num = float(re.findall(self._float_string, byte_string)[0])
-                return Result(func(byte_num))
+                if result:
+                    return Result(func(byte_num))
+                return func(byte_num)
 
     def _core_clock(self, core_clock: str):
         if not core_clock or self._currency_sign in core_clock:
@@ -113,6 +127,32 @@ class Parser:
             if speed_type in core_clock:
                 clock_number = float(re.findall(self._float_string, core_clock)[0])
                 return Result(func(clock_number))
+
+    def _decibels(self, decibels: str):
+        if not decibels or self._currency_sign in decibels or decibels == "0 dB":
+            return Result(None)
+        nums = re.findall(self._float_string, decibels)
+        nums = [float(num) for num in nums]
+        if "-" in decibels:
+            if len(nums) == 2:
+                return Result(Decibels(nums[0], nums[1], None))
+        return Result(Decibels(None, None, nums[0]))
+
+    def _default(self, default_str: str):
+        return Result(default_str)
+
+    def _fan_rpm(self, rpm: str):
+        if rpm == "N/A" or rpm == "-":
+            return Result(None)
+        nums = re.findall(self._float_string, rpm)
+        nums = [int(num) for num in nums]
+        if "-" in rpm:
+            if len(nums) == 2:
+                return Result(RPM(nums[0], nums[1], None))
+            raise ValueError("Not a valid number of numeric values!")
+        if len(nums) == 1:
+            return Result(RPM(None, None, nums[0]))
+        raise ValueError("Not a valid number of numeric values!")
 
     def _network_speed(self, network_speed: str):
         compatible_speeds = [
@@ -134,10 +174,40 @@ class Parser:
             return Result((NetworkSpeed.from_Gbits(number), int(speed[1])), tuple=True)
         return Result(None, iterate=False)
 
+    def _hdd_cache(self, hdd_cache):
+        if not hdd_cache or self._currency_sign in hdd_cache:
+            return Result(None, iterate=False)
+        return Result(self._bytes(hdd_cache, result=False))
+
+    def _hdd_data(self, hdd_data: str):
+        if "RPM" in hdd_data:
+            hdd_type = "HDD"
+            rpm = int(re.findall(self._float_string, hdd_data)[0])
+            return Result((hdd_type, rpm), tuple=True)
+        else:
+            return Result((hdd_data, None), tuple=True)
+
+    def _hdd_series(self, hdd_series: str):
+        if hdd_series in self._hdd_form_factors:
+            return Result(None, iterate=False)
+        return Result(hdd_series)
+
     def _interface(self, interface: str):
         for inter in self._interface_types:
             if inter in interface:
                 return Result(interface)
+
+    def _memory_sizes(self, memory_size: str):
+        memory_data = memory_size.split("x")
+        num_modules = int(memory_data[0])
+        num_bytes = self._bytes(memory_data[1], result=False)
+        return Result((num_modules, num_bytes), tuple=True)
+
+    def _memory_type(self, type_data: str):
+        type_data = type_data.split("-")
+        module_type = type_data[0]
+        speed = ClockSpeed.from_MHz(int(type_data[1]))
+        return Result((module_type, speed), tuple=True)
 
     def _wireless_protocols(self, protocols: str):
         if [x for x in self._wireless_protocol_id if x in protocols]:
@@ -152,13 +222,15 @@ class Parser:
         try:
             return Result(int(string))
         except ValueError:
-            return None
+            if "N/A" in string or "-" in string:
+                return Result(None)
+            raise ValueError("Not a valid int string!")
 
-    def _psu_wattage(self, psu_string: str):
-        if not psu_string or self._currency_sign in psu_string:
+    def _wattage(self, watt_string: str):
+        if not watt_string or self._currency_sign in watt_string:
             return Result(None, iterate=False)
-        elif " W" in psu_string:
-            return Result(int(re.findall(self._float_string, psu_string)[0]))
+        elif " W" in watt_string:
+            return Result(int(re.findall(self._float_string, watt_string)[0]))
 
     def _psu_type(self, psu_type: str):
         if psu_type in self._psu_types:
