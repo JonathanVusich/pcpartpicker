@@ -117,7 +117,7 @@ class Parser:
                                            self._snr, self._sample_rate],
                             "wired-network-card": [self._interface, self._network_speed],
                             "wireless-network-card": [self._interface, self._wireless_protocols],
-                            "monitor": [self._resolution, self._monitor_size, self._response_time, self._boolean],
+                            "monitor": [self._resolution, self._monitor_size, self._response_time, self._ips],
                             "external-hard-drive": [self._external_hdd_series, self._default,
                                                     self._bytes, self._price],
                             "headphones": [self._default, self._boolean, self._boolean, self._frequency_response],
@@ -573,6 +573,22 @@ class Parser:
         elif not hdd_series[1] in self._hdd_form_factors:
             return Result(" ".join(hdd_series), iterate=2)
         return Result(hdd_series[0])
+
+    def _ips(self, ips: str):
+        """
+        Hidden function that retrieves an IPS value from the given raw string.
+
+        :param ips: str: Raw IPS string.
+        :return: Validated IPS string.
+        """
+
+        if not ips:
+            return Result(None)
+        try:
+            return self._boolean(ips)
+        except ValueError:
+            if self._currency_sign in ips:
+                return Result(None, iterate=0)
 
     def _interface(self, interface: str):
         """
