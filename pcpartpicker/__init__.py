@@ -1,4 +1,4 @@
-from .pcpartpicker import API
+from .api import API
 from .errors import UnsupportedRegion
 from .parts import *
 

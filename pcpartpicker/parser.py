@@ -3,7 +3,6 @@ import re
 import time
 from itertools import islice
 from .parts import *
-import rapidjson as json
 from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
 
 
@@ -46,8 +45,9 @@ class Parser:
     _watt_ratings = [" W", " kW", " mW", " nW"]
     _region = "us"
 
-    def __init__(self):
-        self._part_funcs = {"cpu":[self._core_clock, self._retrieve_int, self._wattage],
+    def __init__(self, region: str='us'):
+        self._part_funcs = {
+                            "cpu":[self._core_clock, self._retrieve_int, self._wattage],
                             "cpu-cooler":[self._fan_rpm, self._decibels],
                             "motherboard":[self._default, self._default, self._retrieve_int, self._bytes],
                             "memory": [self._memory_type, self._default, self._retrieve_int,
@@ -105,28 +105,25 @@ class Parser:
                                      }
 
         self._optional_funcs = {self._psu_series, self._hdd_series}
+        self._set_region(region)
 
-    def _update_region(self, region: str):
+    def _set_region(self, region: str):
         self._region = region
         self._currency_sign = self._currency_symbol_mappings[self._region]
 
-    def _parse(self, part: str, raw_html: str):
+    def _parse(self, parse_args: tuple):
+        part, raw_html = parse_args
         part_list = []
         if part in self._part_funcs:
-            html = json.loads(raw_html)['result']['html']
-            html = lxml.html.fromstring(html)
-            tags = html.xpath('.//*/text()')
-            tags = [
-                    tag
-                    for tag in tags
-                    if not tag.startswith(" (")
-                    ]
-            for token in Parser._retrieve_data(tags):
-                part_list.append(self._parse_token(part, token))
-        return part_list
+            html = [lxml.html.fromstring(html) for html in raw_html]
+            tags = [page.xpath('.//*/text()') for page in html]
+            tags = [[tag for tag in page if not tag.startswith(" (")] for page in tags]
+            for page in tags:
+                for token in self._retrieve_data(page):
+                    part_list.append(self._parse_token(part, token))
+        return part, part_list
 
-    @staticmethod
-    def _retrieve_data(tags: list):
+    def _retrieve_data(self, tags: list):
         start_index = 0
         while start_index < len(tags):
             it = None
@@ -495,8 +492,6 @@ class Parser:
         if " kVA" in va:
             num *= 1000
         return Result(int(num))
-
-
 
 
 class Result:
