@@ -12,14 +12,18 @@ class Parser:
     _float_string = r"(?<![a-zA-Z:])[-+]?\d*\.?\d+"
     _hdd_form_factors = {"1.8\"", "2.5\"", "3.5\"", "M.2-22110", "M.2-2242",
                          "M.2-2260", "M.2-2280", "mSATA", "PCI-E"}
-    _colors = {"Black", "Beige", "Beige / Gray", "Black / Beige", "Black / Blue", "Black / Gold",
-               "Black / Gray", "Black / Green", "Black / Purple", "Black / Red", "Black / Silver",
-               "Black / White", "Black / Yellow", "Blue", "Blue / Black", "Blue / White",
-               "Camo", "Dark Silver", "Gold / White", "Gray", "Gray / Black", "Green / Black",
-               "Green / White", "Gunmetal", "Multicolor", "Orange / White", "Pink", "Pink / White",
-               "Red", "Red / White", "Silver", "Silver / Black", "Silver / Gray", "Silver / White",
-               "White", "White / Black", "White / Blue", "White / Gray", "White / Pink", "White / Silver",
-               "Yellow"}
+    _colors = {"Black", "Beige", "Beige / Gray", "Beige / Black", "Black / Beige", "Black / Blue", "Black / Gold",
+               "Black / Gray", "Black / Green", "Black / Multicolor", "Black / Orange", "Black / Pink",
+               "Black / Purple", "Black / Red", "Black / Silver", "Black / White", "Black / Yellow", "Blue",
+               "Blue / Black", "Blue / Gray", "Blue / Pink", "Blue / Silver", "Blue / White", "Brown",
+               "Brown / Black", "Camo", "Gold", "Dark Silver", "Gold / White", "Gray", "Gray / Black", "Gray / Blue",
+               "Gray / Silver", "Gray / White", "Gray / White", "Gray / Yellow", "Green", "Green / Black",
+               "Green / Blue", "Green / Silver", "Green / White", "Gunmetal", "Multicolor", "Orange",
+               "Orange / Black", "Orange / White", "Pink", "Pink / Black", "Pink / White", "Purple", "Purple / Black",
+               "Red", "Red / White", "Red / Black", "Red / Blue", "Red / Silver", "Silver", "Silver / Black",
+               "Silver / Beige", "Silver / Black", "Silver / Blue", "Silver / Gray", "Silver / White",
+               "White", "White / Black", "White / Blue", "White / Gray", "White / Purple", "White / Red",
+               "White / Pink", "White / Silver", "White / Yellow", "Yellow / Black", "Yellow"}
     _backlight_types = {"No", "Yellow", "White", "Red/Blue", "Red/Amber", "Red", "Purple",
                         "Orange", "Multicolor", "Green", "Blue/Silver", "Blue"}
     _interface_types = ["PCI", "USB"]
@@ -39,6 +43,7 @@ class Parser:
     _currency_sign = "$"
     _clock_speed = {"GHz":ClockSpeed.from_GHz, "MHz":ClockSpeed.from_MHz}
     _tdp = [" W"]
+    _watt_ratings = [" W", " kW", " mW", " nW"]
     _region = "us"
 
     def __init__(self):
@@ -67,7 +72,10 @@ class Parser:
                             "external-hard-drive": [self._external_hdd_series, self._default,
                                                     self._bytes, self._price],
                             "headphones": [self._default, self._boolean, self._boolean, self._frequency_response],
-                            "keyboard": [self._default, self._color, self._kb_switches, self._kb_backlight]
+                            "keyboard": [self._default, self._color, self._kb_switches, self._kb_backlight],
+                            "mouse": [self._default, self._default, self._color],
+                            "speakers": [self._retrieve_num, self._wattage, self._frequency_response],
+                            "ups": [self._wattage, self._va]
                             }
         for func_list in self._part_funcs.values():
             func_list.append(self._price)
@@ -90,7 +98,10 @@ class Parser:
                                      "monitor": Monitor,
                                      "external-hard-drive": ExternalHDD,
                                      "headphones": Headphones,
-                                     "keyboard": Keyboard
+                                     "keyboard": Keyboard,
+                                     "mouse": Mouse,
+                                     "speakers": Speakers,
+                                     "ups": UPS
                                      }
 
         self._optional_funcs = {self._psu_series, self._hdd_series}
@@ -445,10 +456,28 @@ class Parser:
         return Result(int(re.findall(self._float_string, snr)[0]))
 
     def _wattage(self, watt_string: str):
-        if not watt_string or self._currency_sign in watt_string:
+        """
+            This function returns the number of watts that this string represents.
+
+            Note: This function coerces nW and mW to W. This is due to erroneous data
+            present on PCPartPicker.
+        """
+        if not watt_string or self._currency_sign in watt_string or " VA" in watt_string or " kVA" in watt_string:
             return Result(None, iterate=0)
-        elif " W" in watt_string or " mW":
-            return Result(int(re.findall(self._float_string, watt_string)[0]))
+        for watt in self._watt_ratings:
+            if watt in watt_string:
+                num_string = re.findall(self._float_string, watt_string)[0]
+                try:
+                    num = int(num_string)
+                    if watt == " kW":
+                        num *= 1000
+                    return Result(num)
+                except ValueError:
+                    num = float(num_string)
+                if watt == " kW":
+                    num *= 1000
+                    return Result(int(num))
+                return Result(num)
 
     def _wireless_protocols(self, protocols: str):
         if [x for x in self._wireless_protocol_id if x in protocols]:
@@ -458,6 +487,16 @@ class Parser:
         if [x for x in wr_speed if x == "-"]:
             return Result(None)
         return Result(wr_speed)
+
+    def _va(self, va):
+        if not va or self._currency_sign in va:
+            return Result(None, iterate=0)
+        num = float(re.findall(self._float_string, va)[0])
+        if " kVA" in va:
+            num *= 1000
+        return Result(int(num))
+
+
 
 
 class Result:

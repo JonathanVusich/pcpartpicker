@@ -545,7 +545,7 @@ def test_mouse_bad_init():
 
 
 def test_speakers_init():
-    args = ["Logitech", 5.1, 89, FrequencyResponse(96, 48000, 21000), Money("80", USD)]
+    args = ["Logitech", 5.1, 89.0, FrequencyResponse(96, 48000, 21000), Money("80", USD)]
     speakers = Speakers(*args)
     assert speakers.model == args[0]
     assert speakers.channel_configuration == args[1]

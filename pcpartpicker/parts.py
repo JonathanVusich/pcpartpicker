@@ -741,7 +741,7 @@ class Speakers:
     """str: The model of this set of computer speakers."""
     channel_configuration: float
     """float: The channel configuration of this set of computer speakers."""
-    wattage: int
+    wattage: (float, int)
     """int: The peak wattage of these speakers."""
     frequency_response: FrequencyResponse
     """FrequencyResponse: The frequency response of these speakers."""
@@ -751,7 +751,7 @@ class Speakers:
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.channel_configuration, (float, int))
-        check_typing(self.wattage, int)
+        check_typing(self.wattage, (float, int))
         check_typing(self.frequency_response, FrequencyResponse)
         check_typing(self.price, Money)
 
