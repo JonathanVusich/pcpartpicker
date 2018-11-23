@@ -410,7 +410,7 @@ def test_opticaldrive_bad_init():
 
 
 def test_soundcard_init():
-    args = ["SoundBlaster", "ATX", 5.1, 2048, 231, 96000, Money("60")]
+    args = ["SoundBlaster", "ATX", 5.1, 2048, 231, 96000.0, Money("60")]
     soundcard = SoundCard(*args)
     assert soundcard.model == args[0]
     assert soundcard.chipset == args[1]

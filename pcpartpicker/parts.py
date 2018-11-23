@@ -548,7 +548,7 @@ class SoundCard:
     """int: The bitrate of this sound card."""
     snr: int
     """int: The signal to noise ratio of this sound card in dB."""
-    sample_rate: int
+    sample_rate: float
     """int: The sample rate of this sound card in kHz."""
     price: Money
     """Money: The price of this sound card."""
@@ -559,7 +559,7 @@ class SoundCard:
         check_typing(self.channels, (float, int))
         check_typing(self.bitrate, int)
         check_typing(self.snr, int)
-        check_typing(self.sample_rate, int)
+        check_typing(self.sample_rate, float)
         check_typing(self.price, Money)
 
 
