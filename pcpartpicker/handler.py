@@ -33,6 +33,12 @@ class Handler:
         return self._region
 
     def _set_region(self, region: str):
+        """
+        Hidden method that changes the region for the parser and scraper objects contained in this instance.
+
+        :param region: str: New region
+        :return: None
+        """
         if region not in self._regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
         self._region = region
@@ -40,6 +46,14 @@ class Handler:
         self._parser._set_region(region)
 
     def _retrieve(self, *args, force_refresh=False):
+        """
+        Hidden function that is designed to retrieve and parse part data from PCPartPicker.
+
+        :param args: str: Variable number of arguments that must map to valid parts.
+        :param force_refresh: bool: This value determines whether or not to completely refresh the
+        entire API database, or to simply retrieve cached values.
+        :return: dict: A dictionary of the input part types with their mapped data object values.
+        """
         results = {}
 
         # Verify the validity of the parts
