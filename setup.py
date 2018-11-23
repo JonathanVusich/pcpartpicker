@@ -1,8 +1,27 @@
+import os
 from setuptools import setup, find_packages
 
-install_requires = [
-                    "aiohttp",
-                    "aiodns",
-                    "lxml",
-                    ]
-setup(name="pcpartpicker", packages = find_packages())
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+
+setup(
+    name="pcpartpicker",
+    version="0.1.0",
+    author="Jonathan Vusich",
+    author_email="jonathanvusich@gmail.com",
+    description="A fast, simple API for PCPartPicker.com.",
+    long_description=read("README.md"),
+    long_description_content_type="text/markdown",
+    license="GPL",
+    keywords="pcpartpicker api webscraper",
+    url="https://github.com/JonathanVusich/pcpartpicker",
+    packages=find_packages(exclude=["tests"]),
+    install_requires=read("requirements.txt"),
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Topic :: Utilities",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    ],
+)
