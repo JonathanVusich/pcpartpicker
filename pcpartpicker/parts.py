@@ -218,20 +218,20 @@ class CPU:
 
     model: str
     """str: The model of this CPU."""
+    clock_speed: ClockSpeed
+    """Clockspeed: The clock speed of this CPU (in GHz)."""
     cores: int
     """int: The number of cores that this CPU has (excludes hyperthreading + SMT)."""
     tdp: int
     """int: The TDP of this CPU."""
-    clock_speed: ClockSpeed
-    """Clockspeed: The clock speed of this CPU (in GHz)."""
     price: Money
     """Money: The price of the CPU."""
 
     def __post_init__(self):
         check_typing(self.model, str)
+        check_typing(self.clock_speed, ClockSpeed)
         check_typing(self.cores, int)
         check_typing(self.tdp, int)
-        check_typing(self.clock_speed, ClockSpeed)
         check_typing(self.price, Money)
 
 
@@ -337,6 +337,7 @@ class StorageDrive:
     """Bytes: The capacity of this storage device."""
     cache_amount: Bytes
     """Bytes: The cache amount found in this storage device."""
+    price_per_gb: Money
     price: Money
     """Money: The price of this storage device."""
 
@@ -348,6 +349,7 @@ class StorageDrive:
         check_typing(self.platter_rpm, int)
         check_typing(self.capacity, Bytes)
         check_typing(self.cache_amount, Bytes)
+        check_typing(self.price_per_gb, Money)
         check_typing(self.price, Money)
 
 
