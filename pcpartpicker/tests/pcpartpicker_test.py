@@ -77,11 +77,11 @@ def test_api_check_single_part_caching():
 def test_supported_parts_us():
     api = API()
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
 
@@ -89,11 +89,11 @@ def test_supported_parts_us():
 def test_supported_parts_australia():
     api = API("au")
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
 
@@ -101,11 +101,11 @@ def test_supported_parts_australia():
 def test_supported_parts_canada():
     api = API("ca")
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
 
@@ -113,11 +113,11 @@ def test_supported_parts_canada():
 def test_supported_parts_europe():
     api = API("be")
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
 
@@ -125,11 +125,11 @@ def test_supported_parts_europe():
 def test_supported_parts_sweden():
     api = API("se")
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
 
@@ -137,11 +137,11 @@ def test_supported_parts_sweden():
 def test_supported_parts_india():
     api = API("in")
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
 
@@ -149,11 +149,11 @@ def test_supported_parts_india():
 def test_supported_parts_new_zealand():
     api = API("nz")
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
 
@@ -161,10 +161,10 @@ def test_supported_parts_new_zealand():
 def test_supported_parts_uk():
     api = API("uk")
     results = []
-    current = "internal-hard-drive"
-    for part in api._parser._part_funcs:
+    current = ""
+    for part, part_class in api._parser._part_funcs.items():
         if not part == current:
             results.extend(api.retrieve(part))
-    failures = [result for result in results if not result]
+    failures = [result for result in results if not result if not isinstance(result, part_class)]
     if failures:
         raise AssertionError
