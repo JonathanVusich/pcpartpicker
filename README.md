@@ -7,7 +7,7 @@ This is an unofficial Python 3.7+ API for the website pcpartpicker.com.
 Written using async code and multiprocessing for efficient data retrieval. 
 This package is currently in beta.
 
-## Installation (when uploaded to PyPi):
+## Installation:
 ```buildoutcfg
 pip install pcpartpicker
 ```
