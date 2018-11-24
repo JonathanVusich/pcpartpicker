@@ -103,7 +103,9 @@ class Scraper:
         :param args: Various part types that are used to make the requests.
         :return: list: A list of lists of JSON page data.
         """
-        async with aiohttp.ClientSession(loop=loop) as session:
+
+        connector = aiohttp.TCPConnector(ttl_dns_cache=300)
+        async with aiohttp.ClientSession(loop=loop, connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             raw = await asyncio.gather(*tasks)
             return [[json.loads(page)['result']['html'] for page in part_data] for part_data in raw]
