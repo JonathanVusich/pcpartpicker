@@ -156,7 +156,7 @@ class Parser:
         part, raw_html = parse_args
         part_list = []
         if part in self._part_funcs:
-            html = [lxml.html.fromstring(html) for html in raw_html]
+            html = [lxml.html.fromstring(html['html']) for html in raw_html]
             tags = [page.xpath('.//*/text()') for page in html]
             tags = [[tag for tag in page if not tag.startswith(" (")] for page in tags]
             for page in tags:

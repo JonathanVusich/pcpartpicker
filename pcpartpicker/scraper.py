@@ -1,6 +1,5 @@
 import asyncio
 import aiohttp
-import rapidjson as json
 
 
 class Scraper:
@@ -66,7 +65,7 @@ class Scraper:
         """
 
         data = await self._retrieve_page_data(session, part)
-        num = json.loads(data)["result"]["paging_data"]["page_blocks"][-1]["page"]
+        num = data["paging_data"]["page_blocks"][-1]["page"]
         return [x for x in range(1, num+1)]
 
     async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int=1) -> str:
@@ -80,7 +79,8 @@ class Scraper:
         """
 
         page = await session.request('GET', self._generate_product_url(part, page_num))
-        return await page.text()
+        data = await page.json(content_type=None)
+        return data["result"]
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> list:
         """
@@ -107,5 +107,5 @@ class Scraper:
         connector = aiohttp.TCPConnector(limit_per_host=50, ttl_dns_cache=300)
         async with aiohttp.ClientSession(loop=loop, connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
-            raw = await asyncio.gather(*tasks)
-            return [[json.loads(page)['result']['html'] for page in part_data] for part_data in raw]
+            return await asyncio.gather(*tasks)
+
