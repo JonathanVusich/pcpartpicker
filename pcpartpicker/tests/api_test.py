@@ -71,7 +71,7 @@ def test_supported_parts_all_regions():
     api = API("us")
     regions = api.supported_regions
     for region in regions:
-        time.sleep(5)
+        time.sleep(10)
         api = API(region)
         results = api.retrieve_all()
         for part, part_class in api._handler._parser._part_class_mappings.items():
