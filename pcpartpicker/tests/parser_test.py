@@ -44,7 +44,8 @@ def test_parser_parse():
     parts = {"cpu": CPU, "case": Case, "headphones": Headphones}
     scraper = Scraper()
     parser = Parser()
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     results = loop.run_until_complete(scraper._retrieve(loop, *parts.keys()))
     loop.close()
     for args in zip(parts.keys(), results):
