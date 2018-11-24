@@ -2,13 +2,13 @@ import os
 from setuptools import setup, find_packages
 
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+def read(file_name: str):
+    return open(os.path.join(os.path.dirname(__file__), file_name)).read()
 
 
 setup(
     name="pcpartpicker",
-    version="0.1.1",
+    version="0.1.2",
     author="Jonathan Vusich",
     author_email="jonathanvusich@gmail.com",
     description="A fast, simple API for PCPartPicker.com.",
