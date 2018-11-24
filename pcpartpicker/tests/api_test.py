@@ -79,3 +79,4 @@ def test_supported_parts_all_regions():
             failures = [item for item in results[part] if not item]
             if failures:
                 raise AssertionError
+            print(f"Region {part} completed successfully!")
