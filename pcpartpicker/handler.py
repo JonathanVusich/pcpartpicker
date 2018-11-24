@@ -73,6 +73,7 @@ class Handler:
         parts_to_download = [part for part in args if not part in results]
 
         loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         html = loop.run_until_complete(self._scraper._retrieve(loop, *parts_to_download))
         loop.close()
 

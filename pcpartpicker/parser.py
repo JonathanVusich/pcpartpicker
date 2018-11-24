@@ -96,7 +96,7 @@ class Parser:
 
     def __init__(self, region: str='us'):
         self._part_funcs = {
-                            "cpu":[self._core_clock, self._retrieve_int, self._wattage],
+                            "cpu":[self._core_clock, self._core_count, self._wattage],
                             "cpu-cooler":[self._fan_rpm, self._decibels],
                             "motherboard":[self._default, self._default, self._retrieve_int, self._bytes],
                             "memory": [self._memory_type, self._default, self._retrieve_int,
@@ -156,7 +156,7 @@ class Parser:
         part, raw_html = parse_args
         part_list = []
         if part in self._part_funcs:
-            html = [lxml.html.fromstring(html) for html in raw_html]
+            html = [lxml.html.fromstring(html['html']) for html in raw_html]
             tags = [page.xpath('.//*/text()') for page in html]
             tags = [[tag for tag in page if not tag.startswith(" (")] for page in tags]
             for page in tags:
@@ -193,6 +193,8 @@ class Parser:
         :return: Object: Parsed data object.
         """
 
+        if self._currency_sign in data[0]:
+            return
         parsed_data = [data[0]]
         start_index = 1
         for x, func in enumerate(self._part_funcs[part]):
@@ -217,7 +219,7 @@ class Parser:
         try:
             return _class(*parsed_data)
         except (TypeError, ValueError) as _:
-            print('hi')
+            raise ValueError('Invalid input data for this part!')
 
     def _retrieve_int(self, string: str):
         """
@@ -226,7 +228,8 @@ class Parser:
         :param string: str: The raw int string.
         :return: Result: The value retrieved from the string.
         """
-
+        if not string:
+            return Result(None, iterate=0)
         try:
             return Result(int(string))
         except ValueError:
@@ -353,12 +356,25 @@ class Parser:
         :return: Result: A ClockSpeed data object generated from the string.
         """
 
-        if not core_clock or self._currency_sign in core_clock:
+        if not core_clock or self._currency_sign in core_clock \
+                or not [speed for speed in self._clock_speed.keys() if speed in core_clock]:
             return Result(None, iterate=0)
         for speed_type, func in self._clock_speed.items():
             if speed_type in core_clock:
                 clock_number = float(re.findall(self._float_string, core_clock)[0])
                 return Result(func(clock_number))
+
+    def _core_count(self, core_count: str):
+        """
+        Hidden function that retrieves core count from a raw string.
+
+        :param core_count: str: Raw core count data.
+        :return: Result: Core count
+        """
+
+        if not core_count or " W" in core_count or self._currency_sign in core_count:
+            return Result(None, iterate=False)
+        return self._retrieve_int(core_count)
 
     def _decibels(self, decibels: str):
         """
@@ -368,8 +384,8 @@ class Parser:
         :return: Result: Decibels data object generated from the raw string.
         """
 
-        if not decibels or self._currency_sign in decibels or decibels == "0 dB":
-            return Result(None)
+        if not decibels or self._currency_sign in decibels:
+            return Result(None, iterate=0)
         nums = re.findall(self._float_string, decibels)
         nums = [float(num) for num in nums]
         if "-" in decibels:
@@ -435,7 +451,7 @@ class Parser:
         :return: Result: Data object representing fan RPM.
         """
 
-        if rpm == "N/A" or rpm == "-":
+        if not rpm or rpm == "N/A" or rpm == "-":
             return Result(None)
         nums = re.findall(self._float_string, rpm)
         nums = [int(num) for num in nums]

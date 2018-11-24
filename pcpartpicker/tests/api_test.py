@@ -67,89 +67,16 @@ def test_api_cpu():
         assert isinstance(item, CPU)
 
 
-def test_supported_parts_us():
+def test_supported_parts_all_regions():
     api = API("us")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
-
-
-def test_supported_parts_australia():
-    api = API("au")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
-
-
-def test_supported_parts_canada():
-    api = API("ca")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
-
-
-def test_supported_parts_europe():
-    api = API("be")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
-
-
-def test_supported_parts_sweden():
-    api = API("se")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
-
-
-def test_supported_parts_india():
-    api = API("in")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
-
-
-def test_supported_parts_new_zealand():
-    api = API("nz")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
-
-
-def test_supported_parts_uk():
-    api = API("uk")
-    results = api.retrieve_all()
-    for part, part_class in api._handler._parser._part_class_mappings.items():
-        if part not in results:
-            raise AssertionError
-        failures = [item for item in results[part] if not item]
-        if failures:
-            raise AssertionError
+    regions = api.supported_regions
+    for region in regions:
+        api = API(region)
+        results = api.retrieve_all()
+        for part, part_class in api._handler._parser._part_class_mappings.items():
+            if part not in results:
+                raise AssertionError
+            failures = [item for item in results[part] if not item]
+            if failures:
+                raise AssertionError
+            print(f"Region {part} completed successfully!")
