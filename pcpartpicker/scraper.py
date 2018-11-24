@@ -104,7 +104,7 @@ class Scraper:
         :return: list: A list of lists of JSON page data.
         """
 
-        connector = aiohttp.TCPConnector(ttl_dns_cache=300, ssl=False)
+        connector = aiohttp.TCPConnector(limit_per_host=50, ttl_dns_cache=300)
         async with aiohttp.ClientSession(loop=loop, connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             raw = await asyncio.gather(*tasks)
