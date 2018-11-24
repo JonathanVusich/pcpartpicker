@@ -67,16 +67,37 @@ def test_api_cpu():
         assert isinstance(item, CPU)
 
 
-def test_supported_parts_all_regions():
-    api = API("us")
-    regions = api.supported_regions
-    for region in regions:
-        api = API(region)
-        results = api.retrieve_all()
-        for part, part_class in api._handler._parser._part_class_mappings.items():
-            if part not in results:
-                raise AssertionError
-            failures = [item for item in results[part] if not item]
-            if failures:
-                raise AssertionError
-            print(f"Region {part} completed successfully!")
+def test_retrieve_all_us():
+    api = API()
+    results = (api.retrieve_all())
+    for part, result in results.items():
+        part_type = api._handler._parser._part_class_mappings[part]
+        for item in result:
+            assert isinstance(item, part_type)
+
+
+def test_retrieve_all_se():
+    api = API('se')
+    results = (api.retrieve_all())
+    for part, result in results.items():
+        part_type = api._handler._parser._part_class_mappings[part]
+        for item in result:
+            assert isinstance(item, part_type)
+
+
+def test_retrieve_all_in():
+    api = API('in')
+    results = (api.retrieve_all())
+    for part, result in results.items():
+        part_type = api._handler._parser._part_class_mappings[part]
+        for item in result:
+            assert isinstance(item, part_type)
+
+
+def test_retrieve_all_be():
+    api = API('be')
+    results = (api.retrieve_all())
+    for part, result in results.items():
+        part_type = api._handler._parser._part_class_mappings[part]
+        for item in result:
+            assert isinstance(item, part_type)
