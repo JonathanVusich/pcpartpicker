@@ -78,7 +78,10 @@ class Scraper:
         :return: str: The raw page data for this request.
         """
 
-        page = await session.request('GET', self._generate_product_url(part, page_num))
+        while True:
+            page = await session.request('GET', self._generate_product_url(part, page_num))
+            if page.status == 200:
+                break
         data = await page.json(content_type=None)
         return data["result"]
 
@@ -104,7 +107,7 @@ class Scraper:
         :return: list: A list of lists of JSON page data.
         """
 
-        connector = aiohttp.TCPConnector(limit_per_host=50, ttl_dns_cache=300)
+        connector = aiohttp.TCPConnector(limit=75, ttl_dns_cache=300)
         async with aiohttp.ClientSession(loop=loop, connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             return await asyncio.gather(*tasks)

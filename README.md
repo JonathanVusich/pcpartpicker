@@ -8,14 +8,59 @@ Written using async code and multiprocessing for efficient data retrieval.
 This package is currently in beta.
 
 ## Installation:
-```buildoutcfg
+```
 pip install pcpartpicker
 ```
 
 ## Examples:
+Retrieving supported API regions:
+```
+from pcpartpicker import API
+
+api = API()
+print(api.supported_regions)
+>>> {'be', 'us', 'it', 'uk', 'ie', 'nz', 'de', 'ca', 'au', 'fr', 'se', 'es', 'in'}
+```
+
+Retrieving currently selected region (default is US):
+```
+from pcpartpicker import API
+
+api = API()
+print(api.region)
+>>> us
+```
+
+Creating an API object with a different default region:
+```
+from pcpartpicker import API
+
+api = API("de")
+print(api.region)
+>>> de
+```
+
+Changing the default region:
+```
+from pcpartpicker import API
+
+api = API()
+api.set_region("de")
+print(api.region)
+>>> de
+```
+
+Retrieving supported part list:
+```
+from pcpartpicker import API
+
+api = API()
+print(api.supported_parts)
+>>> {'wireless-network-card', 'case-fan', 'cpu', 'cpu-cooler', 'headphones', 'motherboard', 'monitor', 'internal-hard-drive', 'external-hard-drive', 'ups', 'fan-controller', 'case', 'keyboard', 'mouse', 'wired-network-card', 'sound-card', 'video-card', 'speakers', 'optical-drive', 'power-supply', 'thermal-paste', 'memory'}
+```
 
 Retrieving all part data:
-```buildoutcfg
+```
 from pcpartpicker import API
 
 api = API()
@@ -23,24 +68,9 @@ part_data = api.retrieve_all()
 ``` 
 
 Retrieving specific part data:
-```buildoutcfg
+```
 from pcpartpicker import API
 
 api = API()
 cpu_data = api.retrieve("cpu")
-```
-
-Changing the region:
-```buildoutcfg
-from pcpartpicker import API
-
-api = API("se")
-```
-
-Alternative method of changing the region:
-```buildoutcfg
-from pcpartpicker import API
-
-api = API()
-api.set_region("in")
 ```
