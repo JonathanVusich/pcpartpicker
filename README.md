@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/JonathanVusich/pcpartpicker.svg?branch=master)](https://travis-ci.org/JonathanVusich/pcpartpicker)
 [![Coverage Status](https://coveralls.io/repos/github/JonathanVusich/pcpartpicker/badge.svg)](https://coveralls.io/github/JonathanVusich/pcpartpicker)
+![](https://img.shields.io/pypi/dm/pcpartpicker.svg)
 
 This is an unofficial Python 3.7+ API for the website pcpartpicker.com.
 Written using async code and multiprocessing for efficient data retrieval. 
