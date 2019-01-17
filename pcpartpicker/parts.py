@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from moneyed import Money
+from typing import Union
 
 """
     Author: Jonathan Vusich
@@ -28,11 +29,11 @@ def parse_num(string: str):
 @dataclass(frozen=True)
 class Range:
     """Base dataclass for different types of data ranges."""
-    min: float
+    min: Union[float, int]
     """float: The minimum value for this range."""
-    max: float
+    max: Union[float, int]
     """float: The maximum value for this range."""
-    default: float
+    default: Union[float, int]
     """float: The default value for this range."""
 
     def __post_init__(self):
@@ -132,21 +133,65 @@ class Bytes:
 @dataclass(frozen=True)
 class RPM(Range):
     """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)
 class Decibels(Range):
-    """Dataclass that stores decibel data for computer parts."""
+    """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)
 class CFM(Range):
-    """Dataclass that stores airflow data for computer parts."""
+    """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)
 class FrequencyResponse(Range):
-    """Dataclass that stores frequency response data for computer parts."""
+    """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)

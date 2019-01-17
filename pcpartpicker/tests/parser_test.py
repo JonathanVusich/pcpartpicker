@@ -61,7 +61,7 @@ def test_parser_retrieve_data_well_formed():
     parser = Parser()
     raw_data = ["this", "is" "a" "test", "Add", "there", "should", "be", "two", "chunked",
                 "segments", "Add"]
-    chunked_data = list(parser._retrieve_data(raw_data))
+    chunked_data = list(parser.retrieve_data(raw_data))
     assert len(chunked_data) == 2
 
 
@@ -69,7 +69,7 @@ def test_parser_retrieve_data_poorly_formed():
     parser = Parser()
     raw_data = ["this", "is" "a" "test", "Add", "there", "should", "be", "two", "chunked",
                 "segments", "Add", "This", "should", "not", "be", "considered", "valid"]
-    chunked_data = list(parser._retrieve_data(raw_data))
+    chunked_data = list(parser.retrieve_data(raw_data))
     assert len(chunked_data) == 2
 
 
