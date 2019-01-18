@@ -1,15 +1,30 @@
 import pytest
-import asyncio
+import json
+from ...parse_utils import retrieve_data
+
 from pcpartpicker.parser import Parser, Result
-from pcpartpicker.scraper import Scraper
 from pcpartpicker.parts import *
-from moneyed import Money, USD
+from moneyed import Money, USD, INR, SEK, EUR, GBP
+
+
+@pytest.fixture
+def raw_html():
+    return ("cpu", [{"html": "<tr><td class=\"select\"><input type=\"checkbox\" class=\"px\" id=\"px_171631\"></td><td "
+                             "class=\"tdname\"><a href=\"/product/jLF48d/amd-ryzen-5-2600-34ghz-6-core-processor-yd2600"
+                             "bbafbox\">AMD Ryzen 5 2600</a></td><td style=\"text-align:right;\">3.4 GHz</td><td style="
+                             "\"text-align:center;\">6</td><td style=\"text-align:right;\">65 W</td><td class=\"inline-"
+                             "rating-sm\" data-ci=\"967\"><div class=\"rating\"><ul class=\"stars\"><li class=\"full-st"
+                             "ar\"></li><li class=\"full-star\"></li><li class=\"full-star\"></li><li class=\"full-star"
+                             "\"></li><li class=\"half-star\"></li></ul></div> (104)</td><td class=\"tdprice\">$164.99<"
+                             "/td><td class=\"viewadd\"><a href=\"#jLF48d\" class=\"btn-mds pp_add_part\">Add</a></td><"
+                             "/tr>"}])
 
 
 def test_parser_default_region():
     parser = Parser()
     assert parser._region == "us"
     assert parser._currency_sign == "$"
+    assert parser._currency == USD
 
 
 def test_parser_set_region_in():
@@ -17,6 +32,7 @@ def test_parser_set_region_in():
     parser._set_region("in")
     assert parser._region == "in"
     assert parser._currency_sign == "₹"
+    assert parser._currency == INR
 
 
 def test_parser_set_region_se():
@@ -24,6 +40,7 @@ def test_parser_set_region_se():
     parser._set_region("se")
     assert parser._region == "se"
     assert parser._currency_sign == "kr"
+    assert parser._currency == SEK
 
 
 def test_parser_set_region_be():
@@ -31,6 +48,7 @@ def test_parser_set_region_be():
     parser._set_region("be")
     assert parser._region == "be"
     assert parser._currency_sign == "€"
+    assert parser._currency == EUR
 
 
 def test_parser_set_region_uk():
@@ -38,39 +56,16 @@ def test_parser_set_region_uk():
     parser._set_region("uk")
     assert parser._region == "uk"
     assert parser._currency_sign == "£"
+    assert parser._currency == GBP
 
 
-def test_parser_parse():
-    parts = {"cpu": CPU, "case": Case, "headphones": Headphones}
-    scraper = Scraper()
+def test_parser_parse_function(raw_html):
     parser = Parser()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    results = loop.run_until_complete(scraper._retrieve(loop, *parts.keys()))
-    loop.close()
-    for args in zip(parts.keys(), results):
-        parsed_result = parser._parse(args)
-        returned_part, parsed_data = parsed_result
-        assert returned_part == args[0]
-        for item in parsed_data:
-            if not item or not isinstance(item, parts.get(args[0])):
-                raise AssertionError
-
-
-def test_parser_retrieve_data_well_formed():
-    parser = Parser()
-    raw_data = ["this", "is" "a" "test", "Add", "there", "should", "be", "two", "chunked",
-                "segments", "Add"]
-    chunked_data = list(parser.retrieve_data(raw_data))
-    assert len(chunked_data) == 2
-
-
-def test_parser_retrieve_data_poorly_formed():
-    parser = Parser()
-    raw_data = ["this", "is" "a" "test", "Add", "there", "should", "be", "two", "chunked",
-                "segments", "Add", "This", "should", "not", "be", "considered", "valid"]
-    chunked_data = list(parser.retrieve_data(raw_data))
-    assert len(chunked_data) == 2
+    parsed_result = parser._parse(raw_html)
+    returned_part, parsed_data = parsed_result
+    assert returned_part == raw_html[0]
+    assert len(parsed_data) == 1
+    assert isinstance(parsed_data[0], CPU)
 
 
 def test_parser_parse_token_no_information():
@@ -183,34 +178,3 @@ def test_parser_parse_token_cpu_cooler_only_model():
     assert not result.decibels
     assert result.price == Money("0.00", USD)
 
-
-def test_parser_retrieve_int_well_formed():
-    parser = Parser()
-    result = parser._retrieve_int("2")
-    assert isinstance(result, Result)
-    assert result.iterate == 1
-    assert not result.tuple
-    assert result.value == 2
-
-
-def test_parser_retrieve_int_poorly_formed():
-    parser = Parser()
-    with pytest.raises(ValueError) as excinfo:
-        result = parser._retrieve_int("2.3")
-        assert "Not a valid int string!" in excinfo.value
-    with pytest.raises(ValueError) as excinfo:
-        result = parser._retrieve_int(" 500 W")
-        assert "Not a valid int string!" in excinfo.value
-
-
-def test_parser_retrieve_int_none():
-    parser = Parser()
-    result = parser._retrieve_int(None)
-    assert isinstance(result, Result)
-    assert not result.value
-    assert result.iterate == 0
-    assert not result.tuple
-
-
-def test_parser_retrieve_float():
-    pass
