@@ -97,6 +97,7 @@ class Parser:
             for page in tags:
                 for token in retrieve_data(page):
                     part_list.append(self._parse_token(part, token))
+        part_list.sort(key=lambda x: x.model)
         return part, part_list
 
     def _parse_token(self, part: str, data: list):
