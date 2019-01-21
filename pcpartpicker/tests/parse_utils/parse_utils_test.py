@@ -47,12 +47,12 @@ def test_boolean_invalid():
 
 def test_core_clock_mhz():
     clock = "3.45 MHz"
-    assert core_clock(clock) == ClockSpeed.from_MHz(3.45)
+    assert core_clock(clock) == ClockSpeed.from_mhz(3.45)
 
 
 def test_core_clock_ghz():
     clock = "3.45 GHz"
-    assert core_clock(clock) == ClockSpeed.from_GHz(3.45)
+    assert core_clock(clock) == ClockSpeed.from_ghz(3.45)
 
 
 def test_core_clock_invalid():
@@ -141,42 +141,42 @@ def test_hdd_data_hybrid():
 
 def test_memory_sizes_two_modules_eight_gb():
     mem_info = "2x8 GB"
-    assert memory_sizes(mem_info) == (2, Bytes.from_GB(8))
+    assert memory_sizes(mem_info) == (2, Bytes.from_gb(8))
 
 
 def test_memory_sizes_one_module_eight_gb():
     mem_info = "1x8 GB"
-    assert memory_sizes(mem_info) == (1, Bytes.from_GB(8))
+    assert memory_sizes(mem_info) == (1, Bytes.from_gb(8))
 
 
 def test_memory_type_ddr4_3000():
     mem_info = "DDR4-3000"
-    assert memory_type(mem_info) == ("DDR4", ClockSpeed.from_MHz(3000))
+    assert memory_type(mem_info) == ("DDR4", ClockSpeed.from_mhz(3000))
 
 
 def test_memory_type_ddr3_2000():
     mem_info = "DDR3-2000"
-    assert memory_type(mem_info) == ("DDR3", ClockSpeed.from_MHz(2000))
+    assert memory_type(mem_info) == ("DDR3", ClockSpeed.from_mhz(2000))
 
 
 def test_network_speed_1000_mbits_1_port():
     net_info = "1000 Mbit/s"
-    assert network_speed(net_info) == (NetworkSpeed.from_Mbits(1000), 1)
+    assert network_speed(net_info) == (NetworkSpeed.from_mbits(1000), 1)
 
 
 def test_network_speed_2_gbits_1_port():
     net_info = "2 Gbit/s"
-    assert network_speed(net_info) == (NetworkSpeed.from_Gbits(2), 1)
+    assert network_speed(net_info) == (NetworkSpeed.from_gbits(2), 1)
 
 
 def test_network_speed_1000_mbits_2_ports():
     net_info = "1000 Mbit/s x 2"
-    assert network_speed(net_info) == (NetworkSpeed.from_Mbits(1000), 2)
+    assert network_speed(net_info) == (NetworkSpeed.from_mbits(1000), 2)
 
 
 def test_network_speed_2_gbits_4_ports():
     net_info = "2 Gbit/s x 4"
-    assert network_speed(net_info) == (NetworkSpeed.from_Gbits(2), 4)
+    assert network_speed(net_info) == (NetworkSpeed.from_gbits(2), 4)
 
 
 def test_price():
@@ -201,27 +201,27 @@ def test_retrieve_int():
 
 def test_to_bytes_kb():
     byte_info = "3.4 KB"
-    assert to_bytes(byte_info) == Bytes.from_KB(3.4)
+    assert to_bytes(byte_info) == Bytes.from_kb(3.4)
 
 
 def test_to_bytes_mb():
     byte_info = "3.4 MB"
-    assert to_bytes(byte_info) == Bytes.from_MB(3.4)
+    assert to_bytes(byte_info) == Bytes.from_mb(3.4)
 
 
 def test_to_bytes_gb():
     byte_info = "3.4 GB"
-    assert to_bytes(byte_info) == Bytes.from_GB(3.4)
+    assert to_bytes(byte_info) == Bytes.from_gb(3.4)
 
 
 def test_to_bytes_tb():
     byte_info = "3.4 TB"
-    assert to_bytes(byte_info) == Bytes.from_TB(3.4)
+    assert to_bytes(byte_info) == Bytes.from_tb(3.4)
 
 
 def test_to_bytes_pb():
     byte_info = "3.4 PB"
-    assert to_bytes(byte_info) == Bytes.from_PB(3.4)
+    assert to_bytes(byte_info) == Bytes.from_pb(3.4)
 
 
 def test_to_bytes_none():

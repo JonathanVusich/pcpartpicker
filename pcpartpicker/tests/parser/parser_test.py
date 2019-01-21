@@ -1,8 +1,8 @@
 import pytest
 import json
-from ...parse_utils import retrieve_data
+from ...parse_utils import tokenize
 
-from pcpartpicker.parser import Parser, Result
+from pcpartpicker.parser import Parser
 from pcpartpicker.parts import *
 from moneyed import Money, USD, INR, SEK, EUR, GBP
 
@@ -81,7 +81,7 @@ def test_parser_parse_token_cpu_well_formed():
     result = parser._parse_token("cpu", raw_data)
     assert isinstance(result, CPU)
     assert result.model == "Intel Core i7"
-    assert result.clock_speed == ClockSpeed.from_GHz(3.4)
+    assert result.clock_speed == ClockSpeed.from_ghz(3.4)
     assert result.cores == 8
     assert result.tdp == 220
     assert result.price == Money("99.00", USD)

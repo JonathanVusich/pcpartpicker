@@ -199,7 +199,7 @@ def memory_type(type_data: str) -> Tuple[str, ClockSpeed]:
     """
     type_data = type_data.split("-")
     module_type = type_data[0]
-    speed = ClockSpeed.from_MHz(int(type_data[1]))
+    speed = ClockSpeed.from_mhz(int(type_data[1]))
     return module_type, speed
 
 
@@ -215,14 +215,14 @@ def network_speed(data: str) -> Tuple[NetworkSpeed, int]:
     freq = int(speed_port_info[0])
     if "Mbit/s" in data:
         if len(speed_port_info) == 1:
-            return NetworkSpeed.from_Mbits(freq), 1
+            return NetworkSpeed.from_mbits(freq), 1
         else:
-            return NetworkSpeed.from_Mbits(freq), int(speed_port_info[1])
+            return NetworkSpeed.from_mbits(freq), int(speed_port_info[1])
     else:
         if len(speed_port_info) == 1:
-            return NetworkSpeed.from_Gbits(freq), 1
+            return NetworkSpeed.from_gbits(freq), 1
         else:
-            return NetworkSpeed.from_Gbits(freq), int(speed_port_info[1])
+            return NetworkSpeed.from_gbits(freq), int(speed_port_info[1])
 
 
 def price(data: str) -> str:

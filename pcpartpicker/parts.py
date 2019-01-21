@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from moneyed import Money
 from typing import Union
+from .parse_utils import num
 
 """
     Author: Jonathan Vusich
@@ -11,19 +12,10 @@ from typing import Union
 
 
 def check_typing(attribute, class_type):
+    """"""
     if attribute:
         if not isinstance(attribute, class_type):
             raise ValueError(f"'{attribute}' must be of type '{class_type}'!")
-
-
-def parse_num(string: str):
-    try:
-        return int(string)
-    except ValueError:
-        try:
-            return float(string)
-        except ValueError:
-            raise ValueError("Error! String argument must be a valid integer or float!")
 
 
 @dataclass(frozen=True)
@@ -65,65 +57,65 @@ class Bytes:
         check_typing(self.total, int)
 
     @property
-    def KB(self):
+    def kb(self):
         return self.total / 1000
 
     @property
-    def MB(self):
+    def mb(self):
         return self.total / 1000000
 
     @property
-    def GB(self):
+    def gb(self):
         return self.total / 1000000000
 
     @property
-    def TB(self):
+    def tb(self):
         return self.total / 1000000000000
 
     @property
-    def PB(self):
+    def pb(self):
         return self.total / 1000000000000000
 
     @classmethod
-    def from_KB(cls, num):
+    def from_kb(cls, num):
         if isinstance(num, str):
-            num = parse_num(num)
+            num = num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000)
         return cls(num_bytes)
 
     @classmethod
-    def from_MB(cls, num):
+    def from_mb(cls, num):
         if isinstance(num, str):
-            num = parse_num(num)
+            num = num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_GB(cls, num):
+    def from_gb(cls, num):
         if isinstance(num, str):
-            num = parse_num(num)
+            num = num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_TB(cls, num):
+    def from_tb(cls, num):
         if isinstance(num, str):
-            num = parse_num(num)
+            num = num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_PB(cls, num):
+    def from_pb(cls, num):
         if isinstance(num, str):
-            num = parse_num(num)
+            num = num(num)
         else:
             check_typing(num, (float, int))
         num_bytes = int(num * 1000000000000000)
@@ -204,25 +196,25 @@ class ClockSpeed:
         check_typing(self.cycles, int)
 
     @property
-    def MHz(self):
+    def mhz(self):
         return self.cycles / 1000000.0
 
     @property
-    def GHz(self):
+    def ghz(self):
         return self.cycles / 1000000000.0
 
     @classmethod
-    def from_GHz(cls, num):
+    def from_ghz(cls, num):
         if isinstance(num, str):
-            num = parse_num(num)
+            num = num(num)
         else:
             check_typing(num, (float, int))
         return cls(int(num * 1000000000))
 
     @classmethod
-    def from_MHz(cls, num):
+    def from_mhz(cls, num):
         if isinstance(num, str):
-            num = parse_num(num)
+            num = num(num)
         else:
             check_typing(num, (float, int))
         return cls(int(num * 1000000))
@@ -239,20 +231,20 @@ class NetworkSpeed:
         check_typing(self.bits_per_second, int)
 
     @property
-    def Mbits(self):
+    def mbits(self):
         return self.bits_per_second / 1000000.0
 
     @property
-    def Gbits(self):
+    def gbits(self):
         return self.bits_per_second / 1000000000.0
 
     @classmethod
-    def from_Gbits(cls, num: float):
+    def from_gbits(cls, num: float):
         check_typing(num, (float, int))
         return cls(int(num * 1000000000))
 
     @classmethod
-    def from_Mbits(cls, num: float):
+    def from_mbits(cls, num: float):
         check_typing(num, (float, int))
         return cls(int(num * 1000000))
 

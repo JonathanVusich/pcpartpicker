@@ -31,8 +31,8 @@ part_classes = {
     "ups": UPS
 }
 
-byte_classes = {"GB": Bytes.from_GB, "TB": Bytes.from_TB, "MB": Bytes.from_MB,
-                "KB": Bytes.from_KB, "PB": Bytes.from_PB}
+byte_classes = {"GB": Bytes.from_gb, "TB": Bytes.from_tb, "MB": Bytes.from_mb,
+                "KB": Bytes.from_kb, "PB": Bytes.from_pb}
 
 currency_symbols = {"us": "$", "au": "$", "ca": "$", "be": "€", "de": "€", "es": "€", "fr": "€",
                     "ie": "€", "it": "€", "nl": "€", "nz": "$", "se": "kr", "uk": "£", "in": "₹"}
@@ -40,6 +40,6 @@ currency_symbols = {"us": "$", "au": "$", "ca": "$", "be": "€", "de": "€", "
 currency_classes = {"us": USD, "au": AUD, "ca": CAD, "be": EUR, "de": EUR, "es": EUR, "fr": EUR,
                     "ie": EUR, "it": EUR, "nl": EUR, "nz": NZD, "se": SEK, "uk": GBP, "in": INR}
 
-clockspeeds = {"GHz": ClockSpeed.from_GHz, "MHz": ClockSpeed.from_MHz}
+clockspeeds = {"GHz": ClockSpeed.from_ghz, "MHz": ClockSpeed.from_mhz}
 
 none_symbols = {"-", "N/A", "None"}
