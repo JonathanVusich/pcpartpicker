@@ -4,10 +4,10 @@ from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
 import re
 from typing import List
 
-from .mappings import backlights, clockspeeds, currency_classes, currency_symbols, part_classes, \
-    num_pattern, watt_levels, none_symbols
+from .mappings import clockspeeds, currency_classes, currency_symbols, part_classes, \
+    num_pattern, none_symbols
 
-from .parse_utils import tokenize, part_funcs
+from .parse_utils import tokenize, part_funcs, price
 
 from .parts import *
 
@@ -78,6 +78,10 @@ class Parser:
                 parsed_data.append(None)
                 continue
             func = part_funcs[part][x]
+            # Check if this is a price function
+            if func.__name__ == "price":
+                parsed_data.append(self._price(token))
+                continue
             result = func(token)
             if isinstance(result, tuple):
                 parsed_data.extend(result)
