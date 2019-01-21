@@ -5,11 +5,10 @@ import re
 from typing import List
 
 from .mappings import clockspeeds, currency_classes, currency_symbols, part_classes, \
-    num_pattern, none_symbols
-
+    none_symbols
 from .parse_utils import tokenize, part_funcs, price
-
 from .parts import *
+from .utils import num_pattern
 
 
 class Parser:

@@ -4,8 +4,6 @@ from .parts import CPU, CPUCooler, Motherboard, Memory, EthernetCard, WirelessCa
     Monitor, ExternalHDD, Headphones, Keyboard, Mouse, Speakers, UPS, Bytes, ClockSpeed
 
 
-num_pattern = r"(?<![a-zA-Z:])[-+]?\d*\.?\d+"
-
 part_classes = {
     "cpu": CPU,
     "cpu-cooler": CPUCooler,

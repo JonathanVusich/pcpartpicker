@@ -1,11 +1,10 @@
-from itertools import islice
 import logging
 import re
 from typing import Generator, List, Optional, Tuple, Union
 
-from .mappings import byte_classes, clockspeeds, num_pattern
+from .mappings import byte_classes, clockspeeds
 from .parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
-
+from .utils import retrieve_float, retrieve_int, num_pattern
 
 logger = logging.getLogger(__name__)
 
@@ -246,26 +245,6 @@ def resolution(res_str: str) -> Resolution:
     return Resolution(int(width), int(height))
 
 
-def retrieve_float(data: str) -> float:
-    """
-    Function that returns a float from a random data string.
-    :param data:
-    :return:
-    """
-
-    return float(re.findall(num_pattern, data)[0])
-
-
-def retrieve_int(data: str) -> int:
-    """
-    Function that returns an int from a random data string.
-    :param data:
-    :return:
-    """
-
-    return int(re.findall(num_pattern, data)[0])
-
-
 def to_bytes(byte_string: str) -> Optional[Bytes]:
     """
     Hidden function that parses a string representing binary size to a Bytes data object.
@@ -306,15 +285,10 @@ def wattage(watt_string: str) -> Union[float, int]:
     """
 
     num_string = re.findall(num_pattern, watt_string)[0]
-    if "." not in watt_string:
-        number = int(num_string)
-        if " kW" in watt_string:
-            number *= 1000
-        return number
     number = float(num_string)
     if " kW" in watt_string:
         number *= 1000
-    return float(number)
+    return int(number)
 
 
 def va(va_data: str) -> float:

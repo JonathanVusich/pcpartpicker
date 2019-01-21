@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from moneyed import Money
 from typing import Union
-from .parse_utils import num
+from .utils import num
 
 """
     Author: Jonathan Vusich
@@ -87,25 +87,25 @@ class Bytes:
 
     @classmethod
     def from_mb(cls, number):
-        if isinstance(num, str):
+        if isinstance(number, str):
             number = num(number)
         else:
-            check_typing(num, (float, int))
+            check_typing(number, (float, int))
         num_bytes = int(number * 1000000)
         return cls(num_bytes)
 
     @classmethod
     def from_gb(cls, number):
-        if isinstance(num, str):
+        if isinstance(number, str):
             number = num(number)
         else:
-            check_typing(num, (float, int))
+            check_typing(number, (float, int))
         num_bytes = int(number * 1000000000)
         return cls(num_bytes)
 
     @classmethod
     def from_tb(cls, number):
-        if isinstance(num, str):
+        if isinstance(number, str):
             number = num(number)
         else:
             check_typing(number, (float, int))
@@ -205,7 +205,7 @@ class ClockSpeed:
 
     @classmethod
     def from_ghz(cls, number):
-        if isinstance(num, str):
+        if isinstance(number, str):
             number = num(number)
         else:
             check_typing(number, (float, int))
@@ -213,7 +213,7 @@ class ClockSpeed:
 
     @classmethod
     def from_mhz(cls, number):
-        if isinstance(num, str):
+        if isinstance(number, str):
             number = num(number)
         else:
             check_typing(number, (float, int))
@@ -809,5 +809,5 @@ class UPS:
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.watt_capacity, int)
-        check_typing(self.va_capacity, int)
+        check_typing(self.va_capacity, (float, int))
         check_typing(self.price, Money)
