@@ -3,8 +3,7 @@ import logging
 import re
 from typing import Generator, List, Optional, Tuple
 
-from .mappings import byte_classes, clockspeeds, hdd_form_factors, num_pattern, \
-    psu_form_factors, psu_modularity_options
+from .mappings import byte_classes, clockspeeds, num_pattern
 from .parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
 
 
@@ -34,10 +33,10 @@ def num(string: str):
     """
 
     try:
-        return int(string)
+        return retrieve_int(string)
     except ValueError:
         try:
-            return float(string)
+            return retrieve_float(string)
         except ValueError:
             raise ValueError("Not a valid numeric string!")
 
@@ -184,22 +183,6 @@ def hdd_data(data: str) -> Tuple[str, Optional[int]]:
         return data, None
 
 
-def hdd_series(hdd_data: list):
-    """
-    Hidden function that examines a list of strings and returns a valid HDD series string.
-
-    :param hdd_data: list: Raw HDD data
-    :return: Result: The HDD series.
-    """
-
-    if hdd_data[0] in hdd_form_factors:
-        if hdd_data[1] in hdd_form_factors:
-            return None
-    elif not hdd_data[1] in hdd_form_factors:
-        return " ".join(hdd_data)
-    return hdd_data[0]
-
-
 def memory_sizes(memory_size: str) -> Tuple[int, Bytes]:
     """
     Hidden function that parses memory size data.
@@ -249,43 +232,12 @@ def network_speed(data: str) -> Tuple[NetworkSpeed, int]:
             return NetworkSpeed.from_Gbits(freq), int(speed_port_info[1])
 
 
-def psu_type(psu_str: str) -> Optional[str]:
+def price(data: str) -> str:
     """
-    Hidden function that returns a validated PSU type string.
-
-    :param psu_str: str: Raw psu string.
-    :return: Result: Validated PSU type string.
+    Internal method that is designed to signal to the parser that this is a price string.
+    :param data:
+    :return:
     """
-
-    if psu_str in psu_form_factors:
-        return psu_str
-    return None
-
-
-def psu_modular(psu_modularity: str) -> Optional[str]:
-    """
-    Hidden function that returns a validated PSU modularity string.
-
-    :param psu_modularity: str: Raw PSU modularity data.
-    :return: Optional[str]: Validated PSU modularity string.
-    """
-
-    if psu_modularity in psu_modularity_options:
-        return psu_modularity
-    logger.debug(f"Could not find a valid PSU type for {psu_modularity}.")
-
-
-def psu_series(data: str) -> Optional[str]:
-    """
-    Hidden function that examines a list of raw strings and returns the string
-    that resembles the series of the given PSU.
-
-    :param data: str: The raw PSU data.
-    :return: Optional[str]: Validated PSU series string.
-    """
-
-    if psu_type(data):
-        return None
     return data
 
 
@@ -382,7 +334,7 @@ def va(va_data: str):
     """
 
     number = float(re.findall(num_pattern, va_data)[0])
-    if " kVA" in va:
+    if " kVA" in va_data:
         number *= 1000
     return int(number)
 
@@ -392,12 +344,12 @@ part_funcs = {
               "cpu-cooler": [fan_rpm, decibels],
               "motherboard": [default, default, int, to_bytes],
               "memory": [memory_type, default, int,
-                         memory_sizes, to_bytes],
+                         memory_sizes, to_bytes, price],
               "internal-hard-drive": [default, default, hdd_data,
-                                      to_bytes, to_bytes],
+                                      to_bytes, to_bytes, price],
               "video-card": [default, default, to_bytes, core_clock],
-              "power-supply": [psu_series, psu_type, default, wattage,
-                               psu_modular],
+              "power-supply": [default, default, default, wattage,
+                               default],
               "case": [default, int, int, wattage],
               "case-fan": [default, retrieve_int, fan_rpm, fan_cfm,
                            decibels],
@@ -406,12 +358,12 @@ part_funcs = {
               "optical-drive": [int, int, int, wr_speeds,
                                 wr_speeds, wr_speeds],
               "sound-card": [default, num, int,
-                             float, retrieve_float],
+                             retrieve_int, retrieve_float],
               "wired-network-card": [default, network_speed],
               "wireless-network-card": [default, default],
-              "monitor": [resolution, float, retrieve_int, boolean],
+              "monitor": [resolution, num, retrieve_int, boolean],
               "external-hard-drive": [default, default,
-                                      to_bytes],
+                                      to_bytes, price],
               "headphones": [default, boolean, boolean, frequency_response],
               "keyboard": [default, default, default, default],
               "mouse": [default, default, default],
