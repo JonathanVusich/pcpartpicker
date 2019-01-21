@@ -77,48 +77,48 @@ class Bytes:
         return self.total / 1000000000000000
 
     @classmethod
-    def from_kb(cls, num):
-        if isinstance(num, str):
-            num = num(num)
+    def from_kb(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000)
         return cls(num_bytes)
 
     @classmethod
-    def from_mb(cls, num):
+    def from_mb(cls, number):
         if isinstance(num, str):
-            num = num(num)
+            number = num(number)
         else:
             check_typing(num, (float, int))
-        num_bytes = int(num * 1000000)
+        num_bytes = int(number * 1000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_gb(cls, num):
+    def from_gb(cls, number):
         if isinstance(num, str):
-            num = num(num)
+            number = num(number)
         else:
             check_typing(num, (float, int))
-        num_bytes = int(num * 1000000000)
+        num_bytes = int(number * 1000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_tb(cls, num):
+    def from_tb(cls, number):
         if isinstance(num, str):
-            num = num(num)
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000000000000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_pb(cls, num):
-        if isinstance(num, str):
-            num = num(num)
+    def from_pb(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000000000000000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000000000000000)
         return cls(num_bytes)
 
 
@@ -204,20 +204,20 @@ class ClockSpeed:
         return self.cycles / 1000000000.0
 
     @classmethod
-    def from_ghz(cls, num):
+    def from_ghz(cls, number):
         if isinstance(num, str):
-            num = num(num)
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        return cls(int(num * 1000000000))
+            check_typing(number, (float, int))
+        return cls(int(number * 1000000000))
 
     @classmethod
-    def from_mhz(cls, num):
+    def from_mhz(cls, number):
         if isinstance(num, str):
-            num = num(num)
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        return cls(int(num * 1000000))
+            check_typing(number, (float, int))
+        return cls(int(number * 1000000))
 
 
 @dataclass(frozen=True)
@@ -239,14 +239,14 @@ class NetworkSpeed:
         return self.bits_per_second / 1000000000.0
 
     @classmethod
-    def from_gbits(cls, num: float):
-        check_typing(num, (float, int))
-        return cls(int(num * 1000000000))
+    def from_gbits(cls, number: float):
+        check_typing(number, (float, int))
+        return cls(int(number * 1000000000))
 
     @classmethod
-    def from_mbits(cls, num: float):
-        check_typing(num, (float, int))
-        return cls(int(num * 1000000))
+    def from_mbits(cls, number: float):
+        check_typing(number, (float, int))
+        return cls(int(number * 1000000))
 
 
 @dataclass(frozen=True)
