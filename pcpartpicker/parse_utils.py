@@ -1,7 +1,7 @@
 from itertools import islice
 import logging
 import re
-from typing import Generator, List, Optional, Tuple
+from typing import Generator, List, Optional, Tuple, Union
 
 from .mappings import byte_classes, clockspeeds, num_pattern
 from .parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
@@ -32,13 +32,9 @@ def num(string: str):
     :return: Result: The numeric value retrieved from the string.
     """
 
-    try:
+    if "." not in string:
         return retrieve_int(string)
-    except ValueError:
-        try:
-            return retrieve_float(string)
-        except ValueError:
-            raise ValueError("Not a valid numeric string!")
+    return retrieve_float(string)
 
 
 def boolean(bool_str: str) -> Optional[bool]:
@@ -66,9 +62,9 @@ def core_clock(clock_data: str):
 
     for speed_type, func in clockspeeds.items():
         if speed_type in clock_data:
-            clock_number = float(re.findall(num_pattern, clock_data)[0])
+            clock_number = retrieve_float(clock_data)
             return func(clock_number)
-    logger.warning(f"Could not find clock speed data for {clock_data}.")
+    logger.debug(f"Could not find clock speed data for {clock_data}.")
 
 
 def decibels(decibel_data: str) -> Decibels:
@@ -81,9 +77,8 @@ def decibels(decibel_data: str) -> Decibels:
 
     num_strings: List[str] = re.findall(num_pattern, decibel_data)
     nums: List[float] = [float(number) for number in num_strings]
-    if "-" in decibel_data:
-        if len(nums) == 2:
-            return Decibels(nums[0], nums[1], None)
+    if len(nums) == 2:
+        return Decibels(nums[0], nums[1], None)
     return Decibels(None, None, nums[0])
 
 
@@ -111,7 +106,7 @@ def fan_cfm(cfm: str) -> Optional[CFM]:
         return CFM(nums[0], nums[1], None)
     if len(nums) == 1:
         return CFM(None, None, nums[0])
-    logger.warning(f"No valid CFM data found in {cfm}.")
+    logger.debug(f"No valid CFM data found in {cfm}.")
 
 
 def fan_rpm(rpm: str) -> Optional[RPM]:
@@ -124,13 +119,11 @@ def fan_rpm(rpm: str) -> Optional[RPM]:
 
     nums = re.findall(num_pattern, rpm)
     nums = [int(number) for number in nums]
-    if "-" in rpm:
-        if len(nums) == 2:
-            return RPM(nums[0], nums[1], None)
-        raise ValueError("Not a valid number of numeric values!")
+    if len(nums) == 2:
+        return RPM(nums[0], nums[1], None)
     if len(nums) == 1:
         return RPM(None, None, nums[0])
-    raise ValueError("Not a valid number of numeric values!")
+    logger.debug(f"Could not find valid RPM data for {rpm}.")
 
 
 def frequency_response(response: str) -> FrequencyResponse:
@@ -177,7 +170,7 @@ def hdd_data(data: str) -> Tuple[str, Optional[int]]:
 
     if "RPM" in data:
         hdd_type = "HDD"
-        rpm = int(re.findall(num_pattern, data)[0])
+        rpm = retrieve_int(data)
         return hdd_type, rpm
     else:
         return data, None
@@ -285,7 +278,7 @@ def to_bytes(byte_string: str) -> Optional[Bytes]:
         if byte_type in byte_string:
             byte_num = float(re.findall(num_pattern, byte_string)[0])
             return func(byte_num)
-    logger.warning(f"Could not find a valid byte value in {byte_string}.")
+    logger.debug(f"Could not find a valid byte value in {byte_string}.")
 
 
 def wr_speeds(wr_speed: str) -> Optional[str]:
@@ -301,7 +294,7 @@ def wr_speeds(wr_speed: str) -> Optional[str]:
     return wr_speed
 
 
-def wattage(watt_string: str) -> int:
+def wattage(watt_string: str) -> Union[float, int]:
     """
     Hidden function that retrieves watt data from a given string.
 
@@ -313,19 +306,18 @@ def wattage(watt_string: str) -> int:
     """
 
     num_string = re.findall(num_pattern, watt_string)[0]
-    try:
+    if "." not in watt_string:
         number = int(num_string)
         if " kW" in watt_string:
             number *= 1000
         return number
-    except ValueError:
-        number = float(num_string)
-        if " kW" in watt_string:
-            number *= 1000
-        return int(number)
+    number = float(num_string)
+    if " kW" in watt_string:
+        number *= 1000
+    return float(number)
 
 
-def va(va_data: str):
+def va(va_data: str) -> float:
     """
     Hidden function that retrieve volt-ampere data from a raw string.
 
@@ -333,10 +325,10 @@ def va(va_data: str):
     :return: int: VA data.
     """
 
-    number = float(re.findall(num_pattern, va_data)[0])
+    number = retrieve_float(va_data)
     if " kVA" in va_data:
-        number *= 1000
-    return int(number)
+        number *= 1000.0
+    return number
 
 
 part_funcs = {
