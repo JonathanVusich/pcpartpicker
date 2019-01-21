@@ -64,7 +64,7 @@ class Scraper:
         :return: list: A list of numbers that represents the different page numbers of the given part type.
         """
 
-        data = await self._retrieve_page_data(session, part)
+        data: dict = await self._retrieve_page_data(session, part)
         num = data["paging_data"]["page_blocks"][-1]["page"]
         return [x for x in range(1, num+1)]
 

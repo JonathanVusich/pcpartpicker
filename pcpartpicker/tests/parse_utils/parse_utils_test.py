@@ -254,11 +254,6 @@ def test_wattage_float_kw():
     assert wattage(watt_info) == 1300
 
 
-def test_wattage_float_w():
-    watt_info = "13.45 W"
-    assert wattage(watt_info) == 13.45
-
-
 def test_va_va():
     va_info = "100 VA"
     assert va(va_info) == 100.0
