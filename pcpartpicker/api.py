@@ -57,4 +57,3 @@ class API:
         """
 
         return self._handler._retrieve(*self._handler._supported_parts, force_refresh=force_refresh)
-

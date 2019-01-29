@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from moneyed import Money
+from typing import Union
+from .utils import num
 
 """
     Author: Jonathan Vusich
@@ -10,29 +12,20 @@ from moneyed import Money
 
 
 def check_typing(attribute, class_type):
+    """"""
     if attribute:
         if not isinstance(attribute, class_type):
             raise ValueError(f"'{attribute}' must be of type '{class_type}'!")
 
 
-def parse_num(string: str):
-    try:
-        return int(string)
-    except ValueError:
-        try:
-            return float(string)
-        except ValueError:
-            raise ValueError("Error! String argument must be a valid integer or float!")
-
-
 @dataclass(frozen=True)
 class Range:
     """Base dataclass for different types of data ranges."""
-    min: float
+    min: Union[float, int]
     """float: The minimum value for this range."""
-    max: float
+    max: Union[float, int]
     """float: The maximum value for this range."""
-    default: float
+    default: Union[float, int]
     """float: The default value for this range."""
 
     def __post_init__(self):
@@ -64,89 +57,133 @@ class Bytes:
         check_typing(self.total, int)
 
     @property
-    def KB(self):
+    def kb(self):
         return self.total / 1000
 
     @property
-    def MB(self):
+    def mb(self):
         return self.total / 1000000
 
     @property
-    def GB(self):
+    def gb(self):
         return self.total / 1000000000
 
     @property
-    def TB(self):
+    def tb(self):
         return self.total / 1000000000000
 
     @property
-    def PB(self):
+    def pb(self):
         return self.total / 1000000000000000
 
     @classmethod
-    def from_KB(cls, num):
-        if isinstance(num, str):
-            num = parse_num(num)
+    def from_kb(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000)
         return cls(num_bytes)
 
     @classmethod
-    def from_MB(cls, num):
-        if isinstance(num, str):
-            num = parse_num(num)
+    def from_mb(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_GB(cls, num):
-        if isinstance(num, str):
-            num = parse_num(num)
+    def from_gb(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000000000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_TB(cls, num):
-        if isinstance(num, str):
-            num = parse_num(num)
+    def from_tb(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000000000000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000000000000)
         return cls(num_bytes)
 
     @classmethod
-    def from_PB(cls, num):
-        if isinstance(num, str):
-            num = parse_num(num)
+    def from_pb(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        num_bytes = int(num * 1000000000000000)
+            check_typing(number, (float, int))
+        num_bytes = int(number * 1000000000000000)
         return cls(num_bytes)
 
 
 @dataclass(frozen=True)
 class RPM(Range):
     """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)
 class Decibels(Range):
-    """Dataclass that stores decibel data for computer parts."""
+    """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)
 class CFM(Range):
-    """Dataclass that stores airflow data for computer parts."""
+    """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)
 class FrequencyResponse(Range):
-    """Dataclass that stores frequency response data for computer parts."""
+    """Dataclass that stores RPM data for computer parts."""
+    min: Union[float, int, None]
+    """float: The minimum value for this range."""
+    max: Union[float, int, None]
+    """float: The maximum value for this range."""
+    default: Union[float, int, None]
+    """float: The default value for this range."""
+
+    def __post_init__(self):
+        check_typing(self.min, (float, int))
+        check_typing(self.max, (float, int))
+        check_typing(self.default, (float, int))
 
 
 @dataclass(frozen=True)
@@ -159,28 +196,28 @@ class ClockSpeed:
         check_typing(self.cycles, int)
 
     @property
-    def MHz(self):
+    def mhz(self):
         return self.cycles / 1000000.0
 
     @property
-    def GHz(self):
+    def ghz(self):
         return self.cycles / 1000000000.0
 
     @classmethod
-    def from_GHz(cls, num):
-        if isinstance(num, str):
-            num = parse_num(num)
+    def from_ghz(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        return cls(int(num * 1000000000))
+            check_typing(number, (float, int))
+        return cls(int(number * 1000000000))
 
     @classmethod
-    def from_MHz(cls, num):
-        if isinstance(num, str):
-            num = parse_num(num)
+    def from_mhz(cls, number):
+        if isinstance(number, str):
+            number = num(number)
         else:
-            check_typing(num, (float, int))
-        return cls(int(num * 1000000))
+            check_typing(number, (float, int))
+        return cls(int(number * 1000000))
 
 
 @dataclass(frozen=True)
@@ -194,22 +231,22 @@ class NetworkSpeed:
         check_typing(self.bits_per_second, int)
 
     @property
-    def Mbits(self):
+    def mbits(self):
         return self.bits_per_second / 1000000.0
 
     @property
-    def Gbits(self):
+    def gbits(self):
         return self.bits_per_second / 1000000000.0
 
     @classmethod
-    def from_Gbits(cls, num: float):
-        check_typing(num, (float, int))
-        return cls(int(num * 1000000000))
+    def from_gbits(cls, number: float):
+        check_typing(number, (float, int))
+        return cls(int(number * 1000000000))
 
     @classmethod
-    def from_Mbits(cls, num: float):
-        check_typing(num, (float, int))
-        return cls(int(num * 1000000))
+    def from_mbits(cls, number: float):
+        check_typing(number, (float, int))
+        return cls(int(number * 1000000))
 
 
 @dataclass(frozen=True)
@@ -772,5 +809,5 @@ class UPS:
     def __post_init__(self):
         check_typing(self.model, str)
         check_typing(self.watt_capacity, int)
-        check_typing(self.va_capacity, int)
+        check_typing(self.va_capacity, (float, int))
         check_typing(self.price, Money)

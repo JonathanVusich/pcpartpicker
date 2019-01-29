@@ -3,6 +3,7 @@ import time
 from pcpartpicker import API
 from pcpartpicker.errors import UnsupportedRegion
 from pcpartpicker.parts import CPU
+from pcpartpicker.mappings import part_classes
 
 
 # Ensure that API is initialized with the correct data
@@ -71,7 +72,7 @@ def test_retrieve_all_us():
     api = API()
     results = (api.retrieve_all())
     for part, result in results.items():
-        part_type = api._handler._parser._part_class_mappings[part]
+        part_type = part_classes[part]
         for item in result:
             assert isinstance(item, part_type)
 
@@ -80,7 +81,7 @@ def test_retrieve_all_se():
     api = API('se')
     results = (api.retrieve_all())
     for part, result in results.items():
-        part_type = api._handler._parser._part_class_mappings[part]
+        part_type = part_classes[part]
         for item in result:
             assert isinstance(item, part_type)
 
@@ -89,7 +90,7 @@ def test_retrieve_all_in():
     api = API('in')
     results = (api.retrieve_all())
     for part, result in results.items():
-        part_type = api._handler._parser._part_class_mappings[part]
+        part_type = part_classes[part]
         for item in result:
             assert isinstance(item, part_type)
 
@@ -98,6 +99,6 @@ def test_retrieve_all_be():
     api = API('be')
     results = (api.retrieve_all())
     for part, result in results.items():
-        part_type = api._handler._parser._part_class_mappings[part]
+        part_type = part_classes[part]
         for item in result:
             assert isinstance(item, part_type)

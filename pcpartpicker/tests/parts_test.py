@@ -13,11 +13,11 @@ def test_check_typing():
 def test_bytes_init():
     size = Bytes(50)
     assert size.total == 50
-    assert size.KB == 0.05
-    assert size.MB == 0.00005
-    assert size.GB == 0.00000005
-    assert size.TB == 0.00000000005
-    assert size.PB == 0.00000000000005
+    assert size.kb == 0.05
+    assert size.mb == 0.00005
+    assert size.gb == 0.00000005
+    assert size.tb == 0.00000000005
+    assert size.pb == 0.00000000000005
 
 
 def test_bytes_bad_init():
@@ -26,53 +26,53 @@ def test_bytes_bad_init():
 
 
 def test_bytes_from_kb():
-    size = Bytes.from_KB(50)
+    size = Bytes.from_kb(50)
     assert size.total == 50000
-    assert size.KB == 50
-    assert size.MB == 0.05
-    assert size.GB == 0.00005
-    assert size.TB == 0.00000005
-    assert size.PB == 0.00000000005
+    assert size.kb == 50
+    assert size.mb == 0.05
+    assert size.gb == 0.00005
+    assert size.tb == 0.00000005
+    assert size.pb == 0.00000000005
 
 
 def test_bytes_from_mb():
-    size = Bytes.from_MB(50)
+    size = Bytes.from_mb(50)
     assert size.total == 50000000
-    assert size.KB == 50000
-    assert size.MB == 50
-    assert size.GB == 0.05
-    assert size.TB == 0.00005
-    assert size.PB == 0.00000005
+    assert size.kb == 50000
+    assert size.mb == 50
+    assert size.gb == 0.05
+    assert size.tb == 0.00005
+    assert size.pb == 0.00000005
 
 
 def test_bytes_from_gb():
-    size = Bytes.from_GB(50)
+    size = Bytes.from_gb(50)
     assert size.total == 50000000000
-    assert size.KB == 50000000
-    assert size.MB == 50000
-    assert size.GB == 50
-    assert size.TB == 0.05
-    assert size.PB == 0.00005
+    assert size.kb == 50000000
+    assert size.mb == 50000
+    assert size.gb == 50
+    assert size.tb == 0.05
+    assert size.pb == 0.00005
 
 
 def test_bytes_from_tb():
-    size = Bytes.from_TB(50)
+    size = Bytes.from_tb(50)
     assert size.total == 50000000000000
-    assert size.KB == 50000000000
-    assert size.MB == 50000000
-    assert size.GB == 50000
-    assert size.TB == 50
-    assert size.PB == 0.05
+    assert size.kb == 50000000000
+    assert size.mb == 50000000
+    assert size.gb == 50000
+    assert size.tb == 50
+    assert size.pb == 0.05
 
 
 def test_bytes_from_pb():
-    size = Bytes.from_PB(50)
+    size = Bytes.from_pb(50)
     assert size.total == 50000000000000000
-    assert size.KB == 50000000000000
-    assert size.MB == 50000000000
-    assert size.GB == 50000000
-    assert size.TB == 50000
-    assert size.PB == 50
+    assert size.kb == 50000000000000
+    assert size.mb == 50000000000
+    assert size.gb == 50000000
+    assert size.tb == 50000
+    assert size.pb == 50
 
 
 def test_resolution_init():
@@ -88,8 +88,8 @@ def test_resolution_bad_init():
 
 def test_clock_speed_init():
     clock_speed = ClockSpeed(3450000000)
-    assert clock_speed.MHz == 3450
-    assert clock_speed.GHz == 3.45
+    assert clock_speed.mhz == 3450
+    assert clock_speed.ghz == 3.45
 
 
 def test_clock_speed_bad_init():
@@ -98,40 +98,41 @@ def test_clock_speed_bad_init():
 
 
 def test_clock_speed_from_GHz_float():
-    clock_speed = ClockSpeed.from_GHz(3.45)
-    assert clock_speed.MHz == 3450
-    assert clock_speed.GHz == 3.45
+    clock_speed = ClockSpeed.from_ghz(3.45)
+    assert clock_speed.mhz == 3450
+    assert clock_speed.ghz == 3.45
     assert clock_speed.cycles == 3450000000
 
 
 def test_clock_speed_from_GHz_str():
-    clock_speed = ClockSpeed.from_GHz("3.45")
-    assert clock_speed.MHz == 3450
-    assert clock_speed.GHz == 3.45
+    clock_speed = ClockSpeed.from_ghz("3.45")
+    assert clock_speed.mhz == 3450
+    assert clock_speed.ghz == 3.45
     assert clock_speed.cycles == 3450000000
 
 
 def test_clock_speed_from_GHz_bad_str():
     with pytest.raises(ValueError):
-        _ = ClockSpeed.from_GHz("This is a test")
+        _ = ClockSpeed.from_ghz("This is a test")
+
 
 def test_clock_speed_from_MHz_float():
-    clock_speed = ClockSpeed.from_MHz(3450)
-    assert clock_speed.MHz == 3450
-    assert clock_speed.GHz == 3.45
+    clock_speed = ClockSpeed.from_mhz(3450)
+    assert clock_speed.mhz == 3450
+    assert clock_speed.ghz == 3.45
     assert clock_speed.cycles == 3450000000
 
 
 def test_clock_speed_from_MHz_str():
-    clock_speed = ClockSpeed.from_MHz("3450")
-    assert clock_speed.MHz == 3450
-    assert clock_speed.GHz == 3.45
+    clock_speed = ClockSpeed.from_mhz("3450")
+    assert clock_speed.mhz == 3450
+    assert clock_speed.ghz == 3.45
     assert clock_speed.cycles == 3450000000
 
 
 def test_clock_speed_from_MHz_bad_str():
     with pytest.raises(ValueError):
-        _ = ClockSpeed.from_MHz("this is a test")
+        _ = ClockSpeed.from_mhz("this is a test")
 
 
 def test_decibel_init():
@@ -182,23 +183,23 @@ def test_network_speed_init():
 
 def test_network_speed_bad_init():
     with pytest.raises(ValueError):
-        _ = NetworkSpeed.from_Gbits("2")
+        _ = NetworkSpeed.from_gbits("2")
 
 
 def test_network_speed_from_mbits():
-    network_speed = NetworkSpeed.from_Mbits(1000)
-    assert network_speed.Mbits == 1000
-    assert network_speed.Gbits == 1
+    network_speed = NetworkSpeed.from_mbits(1000)
+    assert network_speed.mbits == 1000
+    assert network_speed.gbits == 1
 
 
 def test_network_speed_from_gbits():
-    network_speed = NetworkSpeed.from_Gbits(2)
-    assert network_speed.Mbits == 2000
-    assert network_speed.Gbits == 2
+    network_speed = NetworkSpeed.from_gbits(2)
+    assert network_speed.mbits == 2000
+    assert network_speed.gbits == 2
 
 
 def test_cpu_init():
-    args = ["Intel Core i7-6700k", ClockSpeed.from_GHz(4.4), 4, 95, Money("230.00", USD)]
+    args = ["Intel Core i7-6700k", ClockSpeed.from_ghz(4.4), 4, 95, Money("230.00", USD)]
     cpu = CPU(*args)
     assert cpu.model == args[0]
     assert cpu.clock_speed == args[1]
@@ -208,7 +209,7 @@ def test_cpu_init():
 
 
 def test_cpu_bad_init():
-    args = [6700, ClockSpeed.from_GHz("4.4"), 4, 95, Money("230.00", USD)]
+    args = [6700, ClockSpeed.from_ghz("4.4"), 4, 95, Money("230.00", USD)]
     with pytest.raises(ValueError):
         _ = CPU(*args)
 
@@ -229,7 +230,7 @@ def test_cpu_cooler_bad_init():
 
 
 def test_motherboard_init():
-    args = ["MSI Z170", "Z170", "ATX", 2, Bytes.from_GB(8), Money("89.11", USD)]
+    args = ["MSI Z170", "Z170", "ATX", 2, Bytes.from_gb(8), Money("89.11", USD)]
     mobo = Motherboard(*args)
     assert mobo.model == args[0]
     assert mobo.socket == args[1]
@@ -240,14 +241,14 @@ def test_motherboard_init():
 
 
 def test_motherboard_bad_init():
-    args = ["MSI Z170", "Z170", "ATX", "2", Bytes.from_GB(8), Money("89.11", USD)]
+    args = ["MSI Z170", "Z170", "ATX", "2", Bytes.from_gb(8), Money("89.11", USD)]
     with pytest.raises(ValueError):
         _ = Motherboard(*args)
 
 
 def test_memory_init():
-    args = ["Corsair Vengeance", "DDR4", ClockSpeed.from_MHz("3000"), "288-pin DIMM", 15,
-            2, Bytes.from_GB(8), Bytes.from_GB(16), Money("0.22", USD), Money("122.45", USD)]
+    args = ["Corsair Vengeance", "DDR4", ClockSpeed.from_mhz("3000"), "288-pin DIMM", 15,
+            2, Bytes.from_gb(8), Bytes.from_gb(16), Money("0.22", USD), Money("122.45", USD)]
     memory = Memory(*args)
     assert memory.model == args[0]
     assert memory.module_type == args[1]
@@ -262,14 +263,14 @@ def test_memory_init():
 
 
 def test_memory_bad_init():
-    args = ["Corsair Vengeance", "DDR4", ClockSpeed.from_MHz("3000"), "288-pin DIMM", 15,
-            2, Bytes.from_GB(8), Bytes.from_GB(16), 0.22, Money("122.45", USD)]
+    args = ["Corsair Vengeance", "DDR4", ClockSpeed.from_mhz("3000"), "288-pin DIMM", 15,
+            2, Bytes.from_gb(8), Bytes.from_gb(16), 0.22, Money("122.45", USD)]
     with pytest.raises(ValueError):
         _ = Memory(*args)
 
 
 def test_storage_drive_init():
-    args = ["Seagate", "WD Black", "2.5 in", "HDD", None, Bytes.from_TB(4), Bytes.from_MB(256), Money("0.08", USD), Money("123.00", USD)]
+    args = ["Seagate", "WD Black", "2.5 in", "HDD", None, Bytes.from_tb(4), Bytes.from_mb(256), Money("0.08", USD), Money("123.00", USD)]
     hdd = StorageDrive(*args)
     assert hdd.model == args[0]
     assert hdd.model_line == args[1]
@@ -283,14 +284,14 @@ def test_storage_drive_init():
 
 
 def test_storage_drive_bad_init():
-    args = ["Seagate", "WD Black", "2.5 in", 7200, None, Bytes.from_TB(4), Bytes.from_MB(256), Money("0.08", USD),
+    args = ["Seagate", "WD Black", "2.5 in", 7200, None, Bytes.from_tb(4), Bytes.from_mb(256), Money("0.08", USD),
             Money("123.00", USD)]
     with pytest.raises(ValueError):
         _ = StorageDrive(*args)
 
 
 def test_gpu_init():
-    args = ["EVGA", "RTX 2080", "T104", Bytes.from_GB(8), ClockSpeed.from_GHz(2), Money("300.00", USD)]
+    args = ["EVGA", "RTX 2080", "T104", Bytes.from_gb(8), ClockSpeed.from_ghz(2), Money("300.00", USD)]
     gpu = GPU(*args)
     assert gpu.model == args[0]
     assert gpu.model_line == args[1]
@@ -301,7 +302,7 @@ def test_gpu_init():
 
 
 def test_gpu_bad_init():
-    args = ["EVGA", "RTX 2080", 104, Bytes.from_GB(8), ClockSpeed.from_GHz(2), Money("300.00", USD)]
+    args = ["EVGA", "RTX 2080", 104, Bytes.from_gb(8), ClockSpeed.from_ghz(2), Money("300.00", USD)]
     with pytest.raises(ValueError):
         _ = GPU(*args)
 
@@ -428,7 +429,7 @@ def test_soundcard_bad_init():
 
 
 def test_ethernet_card_init():
-    args = ["LG", "PCI-e x8", NetworkSpeed.from_Gbits(1000), 2, Money("60", USD)]
+    args = ["LG", "PCI-e x8", NetworkSpeed.from_gbits(1000), 2, Money("60", USD)]
     ethernet_card = EthernetCard(*args)
     assert ethernet_card.model == args[0]
     assert ethernet_card.interface == args[1]
@@ -438,7 +439,7 @@ def test_ethernet_card_init():
 
 
 def test_ethernet_card_bad_init():
-    args = ["LG", "PCI-e x8", NetworkSpeed.from_Gbits(1000), "2", Money("60", USD)]
+    args = ["LG", "PCI-e x8", NetworkSpeed.from_gbits(1000), "2", Money("60", USD)]
     with pytest.raises(ValueError):
         _ = EthernetCard(*args)
 
@@ -476,7 +477,7 @@ def test_monitor_bad_init():
 
 
 def test_externalhdd_init():
-    args = ["Seagate", "Barracuda", "2000", Bytes.from_TB(3), Money("0.09", USD), Money("80", USD)]
+    args = ["Seagate", "Barracuda", "2000", Bytes.from_tb(3), Money("0.09", USD), Money("80", USD)]
     hdd = ExternalHDD(*args)
     assert hdd.model == args[0]
     assert hdd.model_line == args[1]
@@ -487,7 +488,7 @@ def test_externalhdd_init():
 
 
 def test_externalhdd_bad_init():
-    args = ["Seagate", "Barracuda", 2000, Bytes.from_TB(3), Money("0.09", USD), Money("80", USD)]
+    args = ["Seagate", "Barracuda", 2000, Bytes.from_tb(3), Money("0.09", USD), Money("80", USD)]
     with pytest.raises(ValueError):
         _ = ExternalHDD(*args)
 

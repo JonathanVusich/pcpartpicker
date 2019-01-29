@@ -3,7 +3,7 @@ import time
 
 
 def main():
-    api = API()
+    api = API('se')
     start = time.perf_counter()
     part_data = api.retrieve_all()
     print(time.perf_counter()-start)

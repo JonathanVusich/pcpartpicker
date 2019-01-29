@@ -1,9 +1,12 @@
 import asyncio
 import time
 import multiprocessing
-from .scraper import Scraper
-from .parser import Parser
+
+
 from .errors import UnsupportedRegion, UnsupportedPart
+from .mappings import part_classes
+from .parser import Parser
+from .scraper import Scraper
 
 
 class Handler:
@@ -63,14 +66,14 @@ class Handler:
 
         # Determine whether or not a refresh of part data should occur
         for part in args:
-            if hasattr(self, self._parser._part_class_mappings[part].__name__.lower()):
+            if hasattr(self, f"{part_classes[part].__name__.lower()}_{self._region}"):
                 if time.time() - self._last_refresh < 600 and not force_refresh:
-                    results[part] = getattr(self, part)
+                    results[part] = getattr(self, f"{part_classes[part].__name__.lower()}_{self._region}")
 
         if len(results) == len(args):
             return results
 
-        parts_to_download = [part for part in args if not part in results]
+        parts_to_download = [part for part in args if part not in results]
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -82,6 +85,6 @@ class Handler:
         pool = multiprocessing.Pool()
         parsed_objects = pool.map(self._parser._parse, args)
         for part, data in parsed_objects:
-            setattr(self, part, data)
+            setattr(self, f"{part_classes[part].__name__.lower()}_{self._region}", data)
             results[part] = data
         return results
