@@ -1,9 +1,9 @@
 import pytest
 
-from ...parse_utils import tokenize, num, boolean, core_clock, decibels, default, fan_cfm, fan_rpm, \
+from pcpartpicker.parse_utils import tokenize, num, boolean, core_clock, decibels, default, fan_cfm, fan_rpm, \
     frequency_response, grams, hdd_data, memory_sizes, memory_type, network_speed, price, resolution, retrieve_float, \
     retrieve_int, to_bytes, wr_speeds, wattage, va
-from ...parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
+from pcpartpicker.parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
 
 
 def test_tokenize_cpu():

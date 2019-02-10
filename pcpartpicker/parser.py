@@ -1,8 +1,8 @@
-from itertools import islice
+
 import lxml.html
 from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
 import re
-from typing import List
+from typing import List, Tuple
 
 from .mappings import clockspeeds, currency_classes, currency_symbols, part_classes, \
     none_symbols
@@ -48,12 +48,8 @@ class Parser:
         second element is the list of parsed data objects.
         """
 
-        part, raw_html = parse_args
+        part, tags = html_to_tokens(parse_args)
         part_list = []
-        html = [lxml.html.fromstring(html['html']) for html in raw_html]
-        tags = [page.xpath('tr/td/a[not(text() = "Add")] | tr/td[not(a) and not(div) and not(input)]')
-                for page in html]
-        tags = [[tag.text for tag in page] for page in tags]
         for page in tags:
             for token in tokenize(part, page):
                 part_list.append(self._parse_token(part, token))
@@ -108,3 +104,10 @@ class Parser:
         elif [x for x in self._currency_sign if x in price]:
             return Money(re.findall(num_pattern, price)[0], self._currency)
 
+
+def html_to_tokens(parse_args: tuple) -> Tuple[str, List[List[str]]]:
+    part, raw_html = parse_args
+    html = [lxml.html.fromstring(html['html']) for html in raw_html]
+    tags = [page.xpath('tr/td/a[not(text() = "Add")] | tr/td[not(a) and not(div) and not(input)]')
+            for page in html]
+    return part, [[tag.text for tag in page] for page in tags]

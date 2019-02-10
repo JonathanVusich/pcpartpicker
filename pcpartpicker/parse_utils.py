@@ -48,7 +48,7 @@ def boolean(bool_str: str) -> Optional[bool]:
         return True
     elif bool_str == "No":
         return False
-    raise ValueError("Not a valid boolean!")
+    logger.error(f"{bool_str} is not a valid boolean!")
 
 
 def core_clock(clock_data: str):
