@@ -23,13 +23,14 @@ class Handler:
     _region = "us"
     _last_refresh = None
 
-    def __init__(self, region: str="us"):
+    def __init__(self, region: str = "us"):
         if region not in self._regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
         self._region = region
         self._scraper = Scraper(self.region)
         self._parser = Parser(self.region)
         self._last_refresh = time.time()
+        self._concurrent_connections = 25
 
     @property
     def region(self):
@@ -45,8 +46,18 @@ class Handler:
         if region not in self._regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
         self._region = region
-        self._scraper._set_region(region)
-        self._parser._set_region(region)
+        self._scraper.set_region(region)
+        self._parser.set_region(region)
+
+    def _set_concurrent_connections(self, number: int) -> None:
+        """
+        Function that allows the user to set how many concurrent connections should be opened
+        to PCPartPicker.com. Higher values are more prone to cause timeout failures, while low
+        values increase the time needed to collect results.
+        :param number:
+        :return:
+        """
+        self._concurrent_connections = number
 
     def _retrieve(self, *args, force_refresh=False):
         """
@@ -75,15 +86,14 @@ class Handler:
 
         parts_to_download = [part for part in args if part not in results]
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        html = loop.run_until_complete(self._scraper._retrieve(loop, *parts_to_download))
+        loop = asyncio.get_event_loop()
+        html = loop.run_until_complete(self._scraper.retrieve(self._concurrent_connections, *parts_to_download))
         loop.close()
 
         args = list(zip(parts_to_download, html))
 
         pool = multiprocessing.Pool()
-        parsed_objects = pool.map(self._parser._parse, args)
+        parsed_objects = pool.map(self._parser.parse, args)
         for part, data in parsed_objects:
             setattr(self, f"{part_classes[part].__name__.lower()}_{self._region}", data)
             results[part] = data
