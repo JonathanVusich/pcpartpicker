@@ -25,7 +25,7 @@ class Parser:
     _region = "us"
 
     def __init__(self, region: str='us'):
-        self._set_region(region)
+        self.set_region(region)
 
     def set_region(self, region: str):
         """

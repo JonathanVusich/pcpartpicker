@@ -7,6 +7,6 @@ before_install:
     - pip install -r requirements.txt
     - python setup.py install
 script:
-    - coverage run --source setup.py test
+    - coverage run test_runner.py
 after_success:
     - coveralls
