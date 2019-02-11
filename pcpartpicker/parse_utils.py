@@ -100,7 +100,7 @@ def fan_cfm(cfm: str) -> Optional[CFM]:
     :return: Result: Data object representing airflow data.
     """
 
-    nums = [float(number) for number in re.findall(num_pattern, cfm)]
+    nums: List[float] = [float(number) for number in re.findall(num_pattern, cfm)]
     if len(nums) == 2:
         return CFM(nums[0], nums[1], None)
     if len(nums) == 1:
@@ -327,7 +327,7 @@ part_funcs = {
                              retrieve_int, retrieve_float],
               "wired-network-card": [default, network_speed],
               "wireless-network-card": [default, default],
-              "monitor": [resolution, num, retrieve_int, boolean],
+              "monitor": [resolution, num, retrieve_int, default],
               "external-hard-drive": [default, default,
                                       to_bytes, price],
               "headphones": [default, boolean, boolean, frequency_response],

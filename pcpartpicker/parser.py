@@ -1,4 +1,4 @@
-
+import logging
 import lxml.html
 from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
 import re
@@ -10,6 +10,7 @@ from .parse_utils import tokenize, part_funcs, price
 from .parts import *
 from .utils import num_pattern
 
+logger = logging.getLogger(__name__)
 
 class Parser:
     """Parser:
@@ -26,7 +27,7 @@ class Parser:
     def __init__(self, region: str='us'):
         self._set_region(region)
 
-    def _set_region(self, region: str):
+    def set_region(self, region: str):
         """
         Hidden function that changes the currency parsing rules depending on the region.
 
@@ -38,7 +39,7 @@ class Parser:
         self._currency_sign = currency_symbols[self._region]
         self._currency = currency_classes[self._region]
 
-    def _parse(self, parse_args: tuple) -> tuple:
+    def parse(self, parse_args: tuple) -> tuple:
         """
         Hidden function that parses lists of raw html and returns useful data objects.
 
@@ -89,7 +90,7 @@ class Parser:
         try:
             return _class(*parsed_data)
         except (TypeError, ValueError) as _:
-            raise ValueError('Invalid input data for this part!')
+            logger.error(f"{token} is not valid input data for {_class}!")
 
     def _price(self, price: str):
         """
