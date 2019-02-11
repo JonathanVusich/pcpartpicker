@@ -19,9 +19,9 @@ class Scraper:
     _base_url = None
 
     def __init__(self, region: str = "us"):
-        self._set_region(region)
+        self.set_region(region)
 
-    def _set_region(self, region: str):
+    def set_region(self, region: str):
         """
         Hidden method that is used to handle region changes.
 
@@ -98,16 +98,16 @@ class Scraper:
         tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
         return await asyncio.gather(*tasks)
 
-    async def _retrieve(self, *args):
+    async def retrieve(self, concurrent_connections, *args):
         """
         Hidden method that returns a list of lists of JSON page data.
 
-        :param loop: The event loop that is used to make asynchronous requests.
+        :param concurrent_connections: The maximum number of concurrent requests.
         :param args: Various part types that are used to make the requests.
         :return: list: A list of lists of JSON page data.
         """
 
-        connector = aiohttp.TCPConnector(limit=25, ttl_dns_cache=300)
+        connector = aiohttp.TCPConnector(limit=concurrent_connections, ttl_dns_cache=300)
         async with aiohttp.ClientSession(connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             return await asyncio.gather(*tasks)
