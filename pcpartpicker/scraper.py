@@ -73,6 +73,7 @@ class Scraper:
             page = await session.request('GET', self._generate_product_url(part, page_num))
             if page.status == 200:
                 break
+            await asyncio.sleep(.5)
         data = await page.json(content_type=None)
         return data["result"]
 
