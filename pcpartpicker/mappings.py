@@ -1,8 +1,8 @@
 from moneyed import USD, AUD, CAD, EUR, NZD, SEK, GBP, INR
+
 from .parts import CPU, CPUCooler, Motherboard, Memory, EthernetCard, WirelessCard, Case, \
     PSU, GPU, StorageDrive, Fan, FanController, ThermalPaste, OpticalDrive, SoundCard, \
     Monitor, ExternalHDD, Headphones, Keyboard, Mouse, Speakers, UPS, Bytes, ClockSpeed
-
 
 part_classes = {
     "cpu": CPU,

@@ -1,14 +1,17 @@
-from itertools import islice
-import lxml.html
-from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
+import logging
 import re
-from typing import List
+from typing import List, Tuple
 
-from .mappings import clockspeeds, currency_classes, currency_symbols, part_classes, \
+import lxml.html
+from moneyed import USD
+
+from .mappings import currency_classes, currency_symbols, part_classes, \
     none_symbols
-from .parse_utils import tokenize, part_funcs, price
+from .parse_utils import tokenize, part_funcs
 from .parts import *
 from .utils import num_pattern
+
+logger = logging.getLogger(__name__)
 
 
 class Parser:
@@ -23,22 +26,12 @@ class Parser:
 
     _region = "us"
 
-    def __init__(self, region: str='us'):
-        self._set_region(region)
-
-    def _set_region(self, region: str):
-        """
-        Hidden function that changes the currency parsing rules depending on the region.
-
-        :param region: str: The new region to map the rules to.
-        :return: None
-        """
-
+    def __init__(self, region: str = 'us'):
         self._region = region
         self._currency_sign = currency_symbols[self._region]
         self._currency = currency_classes[self._region]
 
-    def _parse(self, parse_args: tuple) -> tuple:
+    def parse(self, parse_args: tuple) -> tuple:
         """
         Hidden function that parses lists of raw html and returns useful data objects.
 
@@ -48,12 +41,8 @@ class Parser:
         second element is the list of parsed data objects.
         """
 
-        part, raw_html = parse_args
+        part, tags = html_to_tokens(parse_args)
         part_list = []
-        html = [lxml.html.fromstring(html['html']) for html in raw_html]
-        tags = [page.xpath('tr/td/a[not(text() = "Add")] | tr/td[not(a) and not(div) and not(input)]')
-                for page in html]
-        tags = [[tag.text for tag in page] for page in tags]
         for page in tags:
             for token in tokenize(part, page):
                 part_list.append(self._parse_token(part, token))
@@ -93,7 +82,7 @@ class Parser:
         try:
             return _class(*parsed_data)
         except (TypeError, ValueError) as _:
-            raise ValueError('Invalid input data for this part!')
+            logger.error(f"{token} is not valid input data for {_class}!")
 
     def _price(self, price: str):
         """
@@ -108,3 +97,10 @@ class Parser:
         elif [x for x in self._currency_sign if x in price]:
             return Money(re.findall(num_pattern, price)[0], self._currency)
 
+
+def html_to_tokens(parse_args: tuple) -> Tuple[str, List[List[str]]]:
+    part, raw_html = parse_args
+    html = [lxml.html.fromstring(html['html']) for html in raw_html]
+    tags = [page.xpath('tr/td/a[not(text() = "Add")] | tr/td[not(a) and not(div) and not(input)]')
+            for page in html]
+    return part, [[tag.text for tag in page] for page in tags]

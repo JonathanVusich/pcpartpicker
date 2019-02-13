@@ -1,4 +1,5 @@
 import asyncio
+
 import aiohttp
 
 
@@ -18,17 +19,7 @@ class Scraper:
     _region = "us"
     _base_url = None
 
-    def __init__(self, region: str="us"):
-        self._set_region(region)
-
-    def _set_region(self, region: str):
-        """
-        Hidden method that is used to handle region changes.
-
-        :param region: str: Represents the new region that the scraper will pull data from.
-        :return: None
-        """
-
+    def __init__(self, region: str = "us"):
         self._region = region
         self._base_url = self._generate_base_url()
 
@@ -43,7 +34,7 @@ class Scraper:
             return "https://{}.pcpartpicker.com/products/".format(self._region)
         return "https://pcpartpicker.com/products/"
 
-    def _generate_product_url(self, part: str, page_num: int=1) -> str:
+    def _generate_product_url(self, part: str, page_num: int = 1) -> str:
         """
         Hidden method that is used to generate specific URLs for products.
         Relies on the base URL for generation.
@@ -66,9 +57,9 @@ class Scraper:
 
         data: dict = await self._retrieve_page_data(session, part)
         num = data["paging_data"]["page_blocks"][-1]["page"]
-        return [x for x in range(1, num+1)]
+        return [x for x in range(1, num + 1)]
 
-    async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int=1) -> str:
+    async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int = 1) -> str:
         """
         Hidden method that retrieves page data for a given part type and page number.
 
@@ -82,6 +73,7 @@ class Scraper:
             page = await session.request('GET', self._generate_product_url(part, page_num))
             if page.status == 200:
                 break
+            await asyncio.sleep(.5)
         data = await page.json(content_type=None)
         return data["result"]
 
@@ -98,17 +90,16 @@ class Scraper:
         tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
         return await asyncio.gather(*tasks)
 
-    async def _retrieve(self, loop, *args):
+    async def retrieve(self, concurrent_connections, *args):
         """
         Hidden method that returns a list of lists of JSON page data.
 
-        :param loop: The event loop that is used to make asynchronous requests.
+        :param concurrent_connections: The maximum number of concurrent requests.
         :param args: Various part types that are used to make the requests.
         :return: list: A list of lists of JSON page data.
         """
 
-        connector = aiohttp.TCPConnector(limit=75, ttl_dns_cache=300)
-        async with aiohttp.ClientSession(loop=loop, connector=connector) as session:
+        connector = aiohttp.TCPConnector(limit=concurrent_connections, ttl_dns_cache=300)
+        async with aiohttp.ClientSession(connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             return await asyncio.gather(*tasks)
-

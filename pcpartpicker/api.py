@@ -8,7 +8,7 @@ class API:
     the internals and the externally available functions.
     """
 
-    def __init__(self, region: str="us"):
+    def __init__(self, region: str = "us"):
         self._handler = Handler(region)
 
     @property
@@ -32,6 +32,16 @@ class API:
         """
 
         self._handler._set_region(region)
+
+    def set_concurrent_connections(self, connections: int) -> None:
+        """
+        Public function that allows the user to change the number of concurrent connections to open
+        to PCPartpicker. Higher values typically mean shorter scraping times, but also typically means
+        a higher chance of the connection getting timed out. This value should most always be lowered.
+        :param connections:
+        :return:
+        """
+        self._handler._set_concurrent_connections(connections)
 
     def retrieve(self, *args, force_refresh=False):
         """

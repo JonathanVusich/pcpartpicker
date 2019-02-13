@@ -3,9 +3,9 @@ import time
 
 
 def main():
-    api = API('se')
+    api = API()
     start = time.perf_counter()
-    part_data = api.retrieve_all()
+    part_data = api.retrieve("case")
     print(time.perf_counter()-start)
 
 
