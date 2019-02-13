@@ -1,16 +1,18 @@
 import logging
-import lxml.html
-from moneyed import Money, USD, EUR, GBP, SEK, INR, AUD, CAD, NZD
 import re
 from typing import List, Tuple
 
-from .mappings import clockspeeds, currency_classes, currency_symbols, part_classes, \
+import lxml.html
+from moneyed import USD
+
+from .mappings import currency_classes, currency_symbols, part_classes, \
     none_symbols
-from .parse_utils import tokenize, part_funcs, price
+from .parse_utils import tokenize, part_funcs
 from .parts import *
 from .utils import num_pattern
 
 logger = logging.getLogger(__name__)
+
 
 class Parser:
     """Parser:
@@ -24,17 +26,7 @@ class Parser:
 
     _region = "us"
 
-    def __init__(self, region: str='us'):
-        self.set_region(region)
-
-    def set_region(self, region: str):
-        """
-        Hidden function that changes the currency parsing rules depending on the region.
-
-        :param region: str: The new region to map the rules to.
-        :return: None
-        """
-
+    def __init__(self, region: str = 'us'):
         self._region = region
         self._currency_sign = currency_symbols[self._region]
         self._currency = currency_classes[self._region]

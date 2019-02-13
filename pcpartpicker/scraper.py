@@ -1,4 +1,5 @@
 import asyncio
+
 import aiohttp
 
 
@@ -19,16 +20,6 @@ class Scraper:
     _base_url = None
 
     def __init__(self, region: str = "us"):
-        self.set_region(region)
-
-    def set_region(self, region: str):
-        """
-        Hidden method that is used to handle region changes.
-
-        :param region: str: Represents the new region that the scraper will pull data from.
-        :return: None
-        """
-
         self._region = region
         self._base_url = self._generate_base_url()
 
@@ -66,7 +57,7 @@ class Scraper:
 
         data: dict = await self._retrieve_page_data(session, part)
         num = data["paging_data"]["page_blocks"][-1]["page"]
-        return [x for x in range(1, num+1)]
+        return [x for x in range(1, num + 1)]
 
     async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int = 1) -> str:
         """
@@ -111,4 +102,3 @@ class Scraper:
         async with aiohttp.ClientSession(connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             return await asyncio.gather(*tasks)
-

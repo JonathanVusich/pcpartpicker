@@ -8,7 +8,7 @@ class API:
     the internals and the externally available functions.
     """
 
-    def __init__(self, region: str="us"):
+    def __init__(self, region: str = "us"):
         self._handler = Handler(region)
 
     @property

@@ -1,7 +1,6 @@
 import asyncio
-import time
 import multiprocessing
-
+import time
 
 from .errors import UnsupportedRegion, UnsupportedPart
 from .mappings import part_classes
@@ -10,7 +9,6 @@ from .scraper import Scraper
 
 
 class Handler:
-
     _supported_parts = {"cpu", "cpu-cooler", "motherboard", "memory", "internal-hard-drive",
                         "video-card", "power-supply", "case", "case-fan", "fan-controller",
                         "thermal-paste", "optical-drive", "sound-card", "wired-network-card",
@@ -46,8 +44,8 @@ class Handler:
         if region not in self._regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
         self._region = region
-        self._scraper.set_region(region)
-        self._parser.set_region(region)
+        self._scraper = Scraper(region)
+        self._parser = Parser(region)
 
     def _set_concurrent_connections(self, number: int) -> None:
         """

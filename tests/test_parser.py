@@ -14,18 +14,16 @@ class ParserTest(unittest.TestCase):
         cls.test_data = {}
 
         handler = Handler()
-        scraper = Scraper()
         loop = asyncio.get_event_loop()
         for region in handler._regions:
-            scraper.set_region(region)
+            scraper = Scraper(region)
             results = loop.run_until_complete(scraper.retrieve(25, *handler._supported_parts))
             region_data = dict((x, (x, y)) for x, y in zip(handler._supported_parts, results))
             cls.test_data.update({region: region_data})
 
     def test_us_tokens(self):
-        parser = Parser()
+        parser = Parser("us")
         data = self.test_data["us"]
-        parser.set_region("us")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -35,9 +33,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_uk_tokens(self):
-        parser = Parser()
+        parser = Parser("uk")
         data = self.test_data["uk"]
-        parser.set_region("uk")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -47,9 +44,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_nz_tokens(self):
-        parser = Parser()
+        parser = Parser("nz")
         data = self.test_data["nz"]
-        parser.set_region("nz")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -59,9 +55,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_it_tokens(self):
-        parser = Parser()
+        parser = Parser("it")
         data = self.test_data["it"]
-        parser.set_region("it")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -71,9 +66,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_ie_tokens(self):
-        parser = Parser()
+        parser = Parser("ie")
         data = self.test_data["ie"]
-        parser.set_region("ie")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -83,9 +77,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_in_tokens(self):
-        parser = Parser()
+        parser = Parser("in")
         data = self.test_data["in"]
-        parser.set_region("in")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -95,9 +88,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_se_tokens(self):
-        parser = Parser()
+        parser = Parser("se")
         data = self.test_data["se"]
-        parser.set_region("se")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -107,9 +99,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_fr_tokens(self):
-        parser = Parser()
+        parser = Parser("fr")
         data = self.test_data["fr"]
-        parser.set_region("fr")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -119,9 +110,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_es_tokens(self):
-        parser = Parser()
+        parser = Parser("es")
         data = self.test_data["es"]
-        parser.set_region("es")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -131,9 +121,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_de_tokens(self):
-        parser = Parser()
+        parser = Parser("de")
         data = self.test_data["de"]
-        parser.set_region("de")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -143,9 +132,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_ca_tokens(self):
-        parser = Parser()
+        parser = Parser("ca")
         data = self.test_data["ca"]
-        parser.set_region("ca")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -155,9 +143,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_be_tokens(self):
-        parser = Parser()
+        parser = Parser("be")
         data = self.test_data["be"]
-        parser.set_region("be")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:
@@ -167,9 +154,8 @@ class ParserTest(unittest.TestCase):
                         self.assertIsInstance(product, part_classes[part])
 
     def test_au_tokens(self):
-        parser = Parser()
+        parser = Parser("au")
         data = self.test_data["au"]
-        parser.set_region("au")
         for part in data.keys():
             part_id, tags = html_to_tokens(data[part])
             for page in tags:

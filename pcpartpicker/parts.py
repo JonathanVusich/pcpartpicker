@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from moneyed import Money
 from typing import Union
+
+from moneyed import Money
+
 from .utils import num
 
 """
