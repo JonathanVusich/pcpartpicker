@@ -10,3 +10,9 @@ script:
     - coverage run test_runner.py
 after_success:
     - coveralls
+notifications:
+  email:
+    recipients:
+      - jonathanvusich@gmail.com
+    on_success: never
+    on_failure: always
