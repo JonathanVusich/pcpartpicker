@@ -414,7 +414,7 @@ class PartTest(unittest.TestCase):
         self.assertEqual(monitor.size, args[2])
         self.assertEqual(monitor.response_time, args[3])
         self.assertEqual(monitor.panel_type, args[4])
-        self.assertEqual(monitor.price, args[5])
+        self.assertNotEqual(monitor.price, args[5])
 
     def test_monitor_bad_init(self):
         args = ["MSI Optix", Resolution(1920, 1080), 27, 4, 1, Money("300", USD)]
