@@ -69,13 +69,9 @@ class Scraper:
         :return: str: The raw page data for this request.
         """
 
-        while True:
-            page = await session.request('GET', self._generate_product_url(part, page_num))
-            if page.status == 200:
-                break
-            await asyncio.sleep(.5)
-        data = await page.json(content_type=None)
-        return data["result"]
+        async with session.get(self._generate_product_url(part, page_num)) as page:
+            data = await page.json(content_type=None)
+            return data['result']
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> list:
         """
