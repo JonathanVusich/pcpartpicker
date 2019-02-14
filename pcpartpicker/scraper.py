@@ -19,8 +19,9 @@ class Scraper:
     _region = "us"
     _base_url = None
 
-    def __init__(self, region: str = "us"):
+    def __init__(self, region: str = "us", concurrent_connections=25):
         self._region = region
+        self._concurrent_connections = concurrent_connections
         self._base_url = self._generate_base_url()
 
     def _generate_base_url(self) -> str:
@@ -90,7 +91,7 @@ class Scraper:
         tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
         return await asyncio.gather(*tasks)
 
-    async def retrieve(self, concurrent_connections, *args):
+    async def retrieve(self, *args):
         """
         Hidden method that returns a list of lists of JSON page data.
 
@@ -99,7 +100,7 @@ class Scraper:
         :return: list: A list of lists of JSON page data.
         """
 
-        connector = aiohttp.TCPConnector(limit=concurrent_connections, ttl_dns_cache=300)
+        connector = aiohttp.TCPConnector(limit=self._concurrent_connections, ttl_dns_cache=300)
         async with aiohttp.ClientSession(connector=connector) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             return await asyncio.gather(*tasks)
