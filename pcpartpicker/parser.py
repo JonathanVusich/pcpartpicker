@@ -100,7 +100,7 @@ class Parser:
 
 def html_to_tokens(parse_args: tuple) -> Tuple[str, List[List[str]]]:
     part, raw_html = parse_args
-    html = [lxml.html.fromstring(html['html']) for html in raw_html]
+    html = [lxml.html.fromstring(html['result']['html']) for html in raw_html]
     tags = [page.xpath('tr/td/a[not(text() = "Add")] | tr/td[not(a) and not(div) and not(input)]')
             for page in html]
     return part, [[tag.text for tag in page] for page in tags]

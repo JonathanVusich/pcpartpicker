@@ -56,7 +56,7 @@ class Scraper:
         """
 
         data: dict = await self._retrieve_page_data(session, part)
-        num = data["paging_data"]["page_blocks"][-1]["page"]
+        num = data["result"]["paging_data"]["page_blocks"][-1]["page"]
         return [x for x in range(1, num + 1)]
 
     async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int = 1) -> str:
@@ -70,8 +70,7 @@ class Scraper:
         """
 
         async with session.get(self._generate_product_url(part, page_num)) as page:
-            data = await page.json(content_type=None)
-            return data['result']
+            return await page.json(content_type=None)
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> list:
         """
