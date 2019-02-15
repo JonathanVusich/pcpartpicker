@@ -7,6 +7,8 @@ from .mappings import part_classes
 from .parser import Parser
 from .scraper import Scraper
 
+from typing import List, Dict, Tuple
+
 
 class Handler:
     _supported_parts = {"cpu", "cpu-cooler", "motherboard", "memory", "internal-hard-drive",
@@ -28,7 +30,6 @@ class Handler:
         self._scraper = Scraper(self.region)
         self._parser = Parser(self.region)
         self._last_refresh = time.time()
-        self._concurrent_connections = 25
 
     @property
     def region(self):
@@ -55,7 +56,7 @@ class Handler:
         :param number:
         :return:
         """
-        self._concurrent_connections = number
+        self._scraper = Scraper(self.region, number)
 
     def _retrieve(self, *args, force_refresh=False):
         """
@@ -82,16 +83,13 @@ class Handler:
         if len(results) == len(args):
             return results
 
-        parts_to_download = [part for part in args if part not in results]
+        parts_to_download: List[str] = [part for part in args if part not in results]
 
         loop = asyncio.get_event_loop()
-        html = loop.run_until_complete(self._scraper.retrieve(self._concurrent_connections, *parts_to_download))
-        loop.close()
-
-        args = list(zip(parts_to_download, html))
+        html: List[Tuple[str, List[str]]] = loop.run_until_complete(self._scraper.retrieve(parts_to_download))
 
         pool = multiprocessing.Pool()
-        parsed_objects = pool.map(self._parser.parse, args)
+        parsed_objects = pool.map(self._parser.parse, html)
         for part, data in parsed_objects:
             setattr(self, f"{part_classes[part].__name__.lower()}_{self._region}", data)
             results[part] = data

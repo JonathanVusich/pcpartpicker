@@ -1,6 +1,10 @@
 import asyncio
+from typing import List, Tuple, Iterable
+import logging
 
 import aiohttp
+
+logger = logging.getLogger(__name__)
 
 
 class Scraper:
@@ -19,8 +23,9 @@ class Scraper:
     _region = "us"
     _base_url = None
 
-    def __init__(self, region: str = "us"):
+    def __init__(self, region: str = "us", concurrent_connections=25):
         self._region = region
+        self._concurrent_connections = concurrent_connections
         self._base_url = self._generate_base_url()
 
     def _generate_base_url(self) -> str:
@@ -85,7 +90,7 @@ class Scraper:
         tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
         return await asyncio.gather(*tasks)
 
-    async def retrieve(self, concurrent_connections, *args):
+    async def retrieve(self, args: Iterable[str]) -> List[Tuple[str, List[str]]]:
         """
         Hidden method that returns a list of lists of JSON page data.
 
@@ -94,7 +99,25 @@ class Scraper:
         :return: list: A list of lists of JSON page data.
         """
 
-        connector = aiohttp.TCPConnector(limit=concurrent_connections, ttl_dns_cache=300)
-        async with aiohttp.ClientSession(connector=connector) as session:
+        parts = [arg for arg in args]
+        timeout = aiohttp.ClientTimeout(total=20)
+        connector = aiohttp.TCPConnector(limit=self._concurrent_connections, ttl_dns_cache=300)
+        async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
-            return await asyncio.gather(*tasks)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            retry_parts = []
+            for part, result in zip(parts, results):
+                if isinstance(result, asyncio.TimeoutError):
+                    logger.error(f"{part} timed out! Retrying...")
+                    retry_parts.append(part)
+                elif isinstance(result, Exception):
+                    raise result
+            if retry_parts:
+                results.append(await self.retrieve(retry_parts))
+
+            part_data: List[Tuple[str, List[str]]] = []
+            for part, result in zip(parts, results):
+                html_data = [page["html"] for page in result]
+                part_data.append((part, html_data))
+            return part_data
+
