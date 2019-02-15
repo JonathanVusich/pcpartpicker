@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Generator
 
 import lxml.html
 from moneyed import USD
@@ -31,7 +31,7 @@ class Parser:
         self._currency_sign = currency_symbols[self._region]
         self._currency = currency_classes[self._region]
 
-    def parse(self, parse_args: tuple) -> tuple:
+    def parse(self, parse_args: Tuple[str, List[str]]) -> tuple:
         """
         Hidden function that parses lists of raw html and returns useful data objects.
 
@@ -82,7 +82,7 @@ class Parser:
         try:
             return _class(*parsed_data)
         except (TypeError, ValueError) as _:
-            logger.error(f"{token} is not valid input data for {_class}!")
+            logger.error(f"{parsed_data} is not valid input data for {_class}!")
 
     def _price(self, price: str):
         """
@@ -98,9 +98,9 @@ class Parser:
             return Money(re.findall(num_pattern, price)[0], self._currency)
 
 
-def html_to_tokens(parse_args: tuple) -> Tuple[str, List[List[str]]]:
+def html_to_tokens(parse_args: Tuple[str, List[str]]) -> Tuple[str, Generator[List[str], None, None]]:
     part, raw_html = parse_args
-    html = [lxml.html.fromstring(html['html']) for html in raw_html]
+    html = [lxml.html.fromstring(html) for html in raw_html]
     tags = [page.xpath('tr/td/a[not(text() = "Add")] | tr/td[not(a) and not(div) and not(input)]')
             for page in html]
-    return part, [[tag.text for tag in page] for page in tags]
+    return part, ([tag.text for tag in page] for page in tags)
