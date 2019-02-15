@@ -117,7 +117,7 @@ class Scraper:
 
             part_data: List[Tuple[str, List[str]]] = []
             for part, result in zip(parts, results):
-                html_data = [page["html"] for page in result]
+                html_data = [page["result"]["html"] for page in result]
                 part_data.append((part, html_data))
             return part_data
 
