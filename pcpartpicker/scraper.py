@@ -113,7 +113,7 @@ class Scraper:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             retry_parts = []
             for part, result in zip(parts, results):
-                if isinstance(result, aiohttp.ClientTimeout):
+                if isinstance(result, asyncio.TimeoutError):
                     logger.error(f"{part} timed out! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):
