@@ -61,7 +61,7 @@ class Scraper:
         """
 
         data: dict = await self._retrieve_page_data(session, part)
-        num = data["paging_data"]["page_blocks"][-1]["page"]
+        num = data["result"]["paging_data"]["page_blocks"][-1]["page"]
         return [x for x in range(1, num + 1)]
 
     async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int = 1) -> str:
@@ -74,14 +74,8 @@ class Scraper:
         :return: str: The raw page data for this request.
         """
 
-        while True:
-            url = self._generate_product_url(part, page_num)
-            page = await session.get(url)
-            if page.status == 200:
-                break
-            await asyncio.sleep(.5)
-        data = await page.json(content_type=None)
-        return data["result"]
+        async with session.get(self._generate_product_url(part, page_num)) as page:
+            return await page.json(content_type=None)
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> list:
         """
@@ -123,7 +117,7 @@ class Scraper:
 
             part_data: List[Tuple[str, List[str]]] = []
             for part, result in zip(parts, results):
-                html_data = [page["html"] for page in result]
+                html_data = [page["result"]["html"] for page in result]
                 part_data.append((part, html_data))
             return part_data
 
