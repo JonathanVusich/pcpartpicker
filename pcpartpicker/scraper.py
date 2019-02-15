@@ -1,5 +1,5 @@
 import asyncio
-from typing import List, Dict, Tuple
+from typing import List, Tuple, Iterable
 import logging
 
 import aiohttp
@@ -96,7 +96,7 @@ class Scraper:
         tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
         return await asyncio.gather(*tasks)
 
-    async def retrieve(self, args) -> List[Tuple[str, List[str]]]:
+    async def retrieve(self, args: Iterable[str]) -> List[Tuple[str, List[str]]]:
         """
         Hidden method that returns a list of lists of JSON page data.
 
@@ -105,7 +105,7 @@ class Scraper:
         :return: list: A list of lists of JSON page data.
         """
 
-        parts = args[:]
+        parts = [arg for arg in args]
         timeout = aiohttp.ClientTimeout(total=20)
         connector = aiohttp.TCPConnector(limit=self._concurrent_connections, ttl_dns_cache=300)
         async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
@@ -113,7 +113,7 @@ class Scraper:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             retry_parts = []
             for part, result in zip(parts, results):
-                if isinstance(result, asyncio.TimeoutError):
+                if isinstance(result, aiohttp.ClientTimeout):
                     logger.error(f"{part} timed out! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):

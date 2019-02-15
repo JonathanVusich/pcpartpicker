@@ -17,7 +17,7 @@ class ParserTest(unittest.TestCase):
         loop = asyncio.get_event_loop()
         for region in handler._regions:
             scraper = Scraper(region)
-            results = loop.run_until_complete(scraper.retrieve(25, *handler._supported_parts))
+            results = loop.run_until_complete(scraper.retrieve(handler._supported_parts))
             region_data = dict((x, (x, y)) for x, y in zip(handler._supported_parts, results))
             cls.test_data.update({region: region_data})
 
