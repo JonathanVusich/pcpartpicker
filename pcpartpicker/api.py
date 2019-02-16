@@ -12,6 +12,10 @@ class API:
         self._handler = Handler(region)
 
     @property
+    def concurrent_connections(self):
+        return self._handler._scraper._concurrent_connections
+
+    @property
     def supported_regions(self):
         return self._handler._regions
 

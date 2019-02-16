@@ -51,6 +51,16 @@ print(api.region)
 >>> de
 ```
 
+Changing the maximum number of allowed concurrent requests:
+```
+from pcpartpicker import API
+
+api = API()
+api.set_concurrent_connections(100)
+print(api.concurrent_connections)
+>>> 100 
+```
+
 Retrieving supported part list:
 ```
 from pcpartpicker import API

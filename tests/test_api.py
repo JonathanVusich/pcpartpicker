@@ -45,3 +45,10 @@ class APITest(unittest.TestCase):
             api = API()
             api.set_region('oc')
         assert 'Region \'oc\' is not supported for this API!' in str(excinfo.exception)
+
+    def test_api_modify_concurrent_connections(self):
+        api = API()
+        self.assertEqual(api._handler._scraper._concurrent_connections, 25)
+        api = API()
+        api.set_concurrent_connections(100)
+        self.assertEqual(api._handler._scraper._concurrent_connections, 100)
