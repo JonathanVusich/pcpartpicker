@@ -2,7 +2,7 @@ import unittest
 
 from pcpartpicker.parse_utils import tokenize, num, boolean, core_clock, decibels, default, fan_cfm, fan_rpm, \
     frequency_response, grams, hdd_data, memory_sizes, memory_type, network_speed, price, resolution, retrieve_float, \
-    retrieve_int, to_bytes, wr_speeds, wattage, va
+    retrieve_int, to_bytes, wr_speeds, wattage, va, retrieve_brand_info
 from pcpartpicker.parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
 
 
@@ -35,6 +35,22 @@ class ParseUtilsTest(unittest.TestCase):
     def test_boolean_no(self):
         data = "No"
         self.assertFalse(boolean(data))
+
+    def test_retrieve_brand_info_typical(self):
+        data = "Intel Core i7-8700K"
+        brand_model = retrieve_brand_info(data)
+        self.assertEqual(brand_model[0], "Intel")
+        self.assertEqual(brand_model[1], "Core i7-8700K")
+        data = "DLAND ZELOTES"
+        brand_model = retrieve_brand_info(data)
+        self.assertEqual(brand_model[0], "DLAND")
+        self.assertEqual(brand_model[1], "ZELOTES")
+
+    def test_retrieve_brand_info_atypical(self):
+        data = "Intel"
+        brand_model = retrieve_brand_info(data)
+        self.assertEqual(brand_model[0], "Intel")
+        self.assertEqual(brand_model[1], "")
 
     def test_core_clock_mhz(self):
         clock = "3.45 MHz"

@@ -52,12 +52,11 @@ def boolean(bool_str: str) -> Optional[bool]:
     logger.error(f"{bool_str} is not a valid boolean!")
 
 
-def retrieve_brand_info(model_string: str) -> List[str, str]:
-    for x, token in range(len(model_string)):
+def retrieve_brand_info(model_string: str) -> List[str]:
+    for x in range(len(model_string) + 1):
         if model_string[:x] in brands:
-            return [model_string[:x], model_string[x:]]
-    raise ValueError
-
+            return [model_string[:x].strip().lstrip(), model_string[x:].strip().lstrip()]
+    raise ValueError(f"Could not find brand and model in '{model_string}'")
 
 
 def core_clock(clock_data: str):
