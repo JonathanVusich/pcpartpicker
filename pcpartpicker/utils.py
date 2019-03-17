@@ -1,4 +1,5 @@
 import re
+from typing import Union
 
 num_pattern = r"(?<![a-zA-Z:])[-+]?\d*\.?\d+"
 
@@ -29,7 +30,7 @@ def retrieve_int(data: str) -> int:
         raise ValueError
 
 
-def num(string: str):
+def num(string: str) -> Union[float, int]:
     """
     Hidden function that attempts to retrieve a numeric value from a string.
 

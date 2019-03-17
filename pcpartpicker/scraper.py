@@ -20,10 +20,11 @@ class Scraper:
 
     """
 
-    _region = "us"
-    _base_url = None
+    _region: str = "us"
+    _base_url: str = None
+    _concurrent_connections: int = None
 
-    def __init__(self, region: str = "us", concurrent_connections=25):
+    def __init__(self, region: str = "us", concurrent_connections: int = 25) -> None:
         self._region = region
         self._concurrent_connections = concurrent_connections
         self._base_url = self._generate_base_url()
@@ -51,7 +52,7 @@ class Scraper:
 
         return "{}{}/fetch?page={}".format(self._base_url, part, page_num)
 
-    async def _retrieve_page_numbers(self, session: aiohttp.ClientSession, part: str) -> list:
+    async def _retrieve_page_numbers(self, session: aiohttp.ClientSession, part: str) -> List[int]:
         """
         Hidden method that retrieves a list of page numbers for a given part type.
 
@@ -77,7 +78,7 @@ class Scraper:
         async with session.get(self._generate_product_url(part, page_num)) as page:
             return await page.json(content_type=None)
 
-    async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> list:
+    async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> List[List[str]]:
         """
         Hidden method that returns a list of raw page data for a given part.
 
@@ -94,7 +95,6 @@ class Scraper:
         """
         Hidden method that returns a list of lists of JSON page data.
 
-        :param concurrent_connections: The maximum number of concurrent requests.
         :param args: Various part types that are used to make the requests.
         :return: list: A list of lists of JSON page data.
         """
