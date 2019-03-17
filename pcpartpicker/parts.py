@@ -3,7 +3,7 @@ from typing import Union
 
 from moneyed import Money
 
-from .utils import num
+from pcpartpicker.utils import num
 
 """
     Author: Jonathan Vusich

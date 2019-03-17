@@ -3,7 +3,7 @@ from typing import Deque, Optional
 
 from sortedcontainers import SortedSet
 
-from .errors import DifferentModel
+from pcpartpicker.errors import DifferentModel
 
 
 class ModelTrie:
@@ -93,3 +93,19 @@ class Node:
 
     def __repr__(self):
         return f"Node(value={self.value}, children={str(self.children)})"
+
+
+def get_brands(part_list: dict) -> SortedSet:
+    brands = BrandTrie()
+    for part_list in part_list.values():
+        model_trie = ModelTrie()
+        for part in part_list:
+            try:
+                model_trie.add(part)
+            except DifferentModel:
+                brand = model_trie.retrieve_model()
+                brands.add(brand)
+                model_trie = ModelTrie()
+                model_trie.part_list = []
+                model_trie.add(part)
+    return brands.get_all_brands()

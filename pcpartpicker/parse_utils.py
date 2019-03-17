@@ -2,9 +2,10 @@ import logging
 import re
 from typing import Generator, List, Optional, Tuple, Union
 
-from .mappings import byte_classes, clockspeeds
-from .parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
-from .utils import retrieve_float, retrieve_int, num_pattern
+from pcpartpicker.mappings import byte_classes, clockspeeds
+from pcpartpicker.parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
+from pcpartpicker.utils import retrieve_float, retrieve_int, num_pattern
+from pcpartpicker.brands import brands
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,14 @@ def boolean(bool_str: str) -> Optional[bool]:
     elif bool_str == "No":
         return False
     logger.error(f"{bool_str} is not a valid boolean!")
+
+
+def retrieve_brand_info(model_string: str) -> List[str, str]:
+    for x, token in range(len(model_string)):
+        if model_string[:x] in brands:
+            return [model_string[:x], model_string[x:]]
+    raise ValueError
+
 
 
 def core_clock(clock_data: str):

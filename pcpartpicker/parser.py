@@ -7,9 +7,9 @@ from moneyed import USD
 
 from .mappings import currency_classes, currency_symbols, part_classes, \
     none_symbols
-from .parse_utils import tokenize, part_funcs
+from .parse_utils import tokenize, part_funcs, retrieve_brand_info
 from .parts import *
-from .utils import num_pattern
+from pcpartpicker.utils import num_pattern
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ class Parser:
         :return: Object: Parsed data object.
         """
 
-        parsed_data = [data.pop(0)]
+        parsed_data = retrieve_brand_info(data.pop(0))
         price = self._price(data.pop(-1))
 
         for x, token in enumerate(data):
