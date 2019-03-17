@@ -1,16 +1,16 @@
 import asyncio
-import time
 import multiprocessing
-
+import time
 
 from .errors import UnsupportedRegion, UnsupportedPart
 from .mappings import part_classes
 from .parser import Parser
 from .scraper import Scraper
 
+from typing import List, Dict, Tuple
+
 
 class Handler:
-
     _supported_parts = {"cpu", "cpu-cooler", "motherboard", "memory", "internal-hard-drive",
                         "video-card", "power-supply", "case", "case-fan", "fan-controller",
                         "thermal-paste", "optical-drive", "sound-card", "wired-network-card",
@@ -23,7 +23,7 @@ class Handler:
     _region = "us"
     _last_refresh = None
 
-    def __init__(self, region: str="us"):
+    def __init__(self, region: str = "us"):
         if region not in self._regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
         self._region = region
@@ -45,8 +45,18 @@ class Handler:
         if region not in self._regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
         self._region = region
-        self._scraper._set_region(region)
-        self._parser._set_region(region)
+        self._scraper = Scraper(region)
+        self._parser = Parser(region)
+
+    def _set_concurrent_connections(self, number: int) -> None:
+        """
+        Function that allows the user to set how many concurrent connections should be opened
+        to PCPartPicker.com. Higher values are more prone to cause timeout failures, while low
+        values increase the time needed to collect results.
+        :param number:
+        :return:
+        """
+        self._scraper = Scraper(self.region, number)
 
     def _retrieve(self, *args, force_refresh=False):
         """
@@ -73,17 +83,13 @@ class Handler:
         if len(results) == len(args):
             return results
 
-        parts_to_download = [part for part in args if part not in results]
+        parts_to_download: List[str] = [part for part in args if part not in results]
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        html = loop.run_until_complete(self._scraper._retrieve(loop, *parts_to_download))
-        loop.close()
-
-        args = list(zip(parts_to_download, html))
+        loop = asyncio.get_event_loop()
+        html: List[Tuple[str, List[str]]] = loop.run_until_complete(self._scraper.retrieve(parts_to_download))
 
         pool = multiprocessing.Pool()
-        parsed_objects = pool.map(self._parser._parse, args)
+        parsed_objects = pool.map(self._parser.parse, html)
         for part, data in parsed_objects:
             setattr(self, f"{part_classes[part].__name__.lower()}_{self._region}", data)
             results[part] = data

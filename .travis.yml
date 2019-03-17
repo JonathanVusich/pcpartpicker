@@ -3,11 +3,15 @@ python: 3.7
 dist: xenial
 sudo: true
 before_install:
-    - pip install pytest pytest-cov
     - pip install coveralls
-    - pip install -r requirements.txt
     - python setup.py install
 script:
-    - py.test --cov pcpartpicker
+    - coverage run --source=pcpartpicker -m unittest discover
 after_success:
     - coveralls
+notifications:
+  email:
+    recipients:
+      - jonathanvusich@gmail.com
+    on_success: never
+    on_failure: always

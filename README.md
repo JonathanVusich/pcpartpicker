@@ -1,7 +1,7 @@
 # pcpartpicker
 
 [![Build Status](https://travis-ci.org/JonathanVusich/pcpartpicker.svg?branch=master)](https://travis-ci.org/JonathanVusich/pcpartpicker)
-[![Coverage Status](https://coveralls.io/repos/github/JonathanVusich/pcpartpicker/badge.svg)](https://coveralls.io/github/JonathanVusich/pcpartpicker)
+[![Coverage Status](https://coveralls.io/repos/github/JonathanVusich/pcpartpicker/badge.svg?branch=master&kill_cache=1)](https://coveralls.io/github/JonathanVusich/pcpartpicker?branch=master&kill_cache=1)
 ![](https://img.shields.io/pypi/dm/pcpartpicker.svg)
 
 This is an unofficial Python 3.7+ API for the website pcpartpicker.com.
@@ -49,6 +49,16 @@ api = API()
 api.set_region("de")
 print(api.region)
 >>> de
+```
+
+Changing the maximum number of allowed concurrent requests:
+```
+from pcpartpicker import API
+
+api = API()
+api.set_concurrent_connections(100)
+print(api.concurrent_connections)
+>>> 100 
 ```
 
 Retrieving supported part list:
