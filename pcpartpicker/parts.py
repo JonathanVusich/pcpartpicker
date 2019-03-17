@@ -255,6 +255,8 @@ class NetworkSpeed:
 class CPU:
     """CPU dataclass."""
 
+    brand: str
+    """str: The brand of this CPU."""
     model: str
     """str: The model of this CPU."""
     clock_speed: ClockSpeed
@@ -278,6 +280,8 @@ class CPU:
 class CPUCooler:
     """CPU Cooler dataclass."""
 
+    brand: str
+    """str: The brand of this CPU cooler."""
     model: str
     """str: The model of this CPU cooler."""
     fan_rpm: RPM
@@ -298,6 +302,8 @@ class CPUCooler:
 class Motherboard:
     """Motherboard dataclass."""
 
+    brand: str
+    """str: The brand of this motherboard."""
     model: str
     """str: The model of this motherboard."""
     socket: str
@@ -324,6 +330,8 @@ class Motherboard:
 class Memory:
     """Memory dataclass."""
 
+    brand: str
+    """str: The brand of this memory module."""
     model: str
     """str: The model of this memory module."""
     module_type: str
@@ -362,6 +370,8 @@ class Memory:
 class StorageDrive:
     """Dataclass for storage devices."""
 
+    brand: str
+    """str: The brand of this storage device."""
     model: str
     """str: The model of this storage device."""
     model_line: str
@@ -395,6 +405,9 @@ class StorageDrive:
 @dataclass(frozen=True)
 class GPU:
     """GPU dataclass."""
+
+    brand: str
+    """str: The brand of this GPU."""
     model: str
     """str: The model of this GPU."""
     model_line: str
@@ -420,6 +433,9 @@ class GPU:
 @dataclass(frozen=True)
 class PSU:
     """PSU dataclass."""
+
+    brand: str
+    """str: The brand of this PSU."""
     model: str
     """str: The model of this PSU."""
     model_line: str
@@ -449,6 +465,8 @@ class PSU:
 class Case:
     """PC case dataclass."""
 
+    brand: str
+    """str: The brand of this case."""
     model: str
     """str: The model of this case."""
     form_factor: str
@@ -476,6 +494,8 @@ class Case:
 class Fan:
     """CPU and case fan dataclass."""
 
+    brand: str
+    """str: The brand of this fan."""
     model: str
     """str: The model of this fan."""
     color: str
@@ -505,6 +525,8 @@ class Fan:
 class FanController:
     """Fan controller dataclass."""
 
+    brand: str
+    """str: The brand of this fan controller."""
     model: str
     """str: The model of this fan controller."""
     form_factor: str
@@ -528,6 +550,8 @@ class FanController:
 class ThermalPaste:
     """Thermal paste dataclass."""
 
+    brand: str
+    """str: The brand of this thermal paste."""
     model: str
     """str: The model of this thermal paste."""
     amount: float
@@ -545,6 +569,8 @@ class ThermalPaste:
 class OpticalDrive:
     """Optical drive dataclass."""
 
+    brand: str
+    """str: The brand of this optical drive."""
     model: str
     """str: The model of this optical drive."""
     bluray_read_speed: int
@@ -577,6 +603,8 @@ class OpticalDrive:
 class SoundCard:
     """Sound card dataclass."""
 
+    brand: str
+    """str: The brand of this sound card."""
     model: str
     """str: The model of this sound card."""
     chipset: str
@@ -606,6 +634,8 @@ class SoundCard:
 class EthernetCard:
     """Ethernet card dataclass."""
 
+    brand: str
+    """str: The brand of this Ethernet card."""
     model: str
     """str: The model of this Ethernet card."""
     interface: str
@@ -629,6 +659,8 @@ class EthernetCard:
 class WirelessCard:
     """Wireless card dataclass."""
 
+    brand: str
+    """str: The brand of this wireless card."""
     model: str
     """str: The model of this wireless card."""
     interface: str
@@ -649,6 +681,8 @@ class WirelessCard:
 class Monitor:
     """Monitor dataclass."""
 
+    brand: str
+    """str: The brand of this monitor."""
     model: str
     """str: The model of this monitor."""
     resolution: Resolution
@@ -675,6 +709,8 @@ class Monitor:
 class ExternalHDD:
     """External HDD dataclass."""
 
+    brand: str
+    """str: The brand of this external HDD."""
     model: str
     """str: The model of this external HDD."""
     model_line: str
@@ -701,6 +737,8 @@ class ExternalHDD:
 class Headphones:
     """Headphones dataclass."""
 
+    brand: str
+    """str: The brand of this set of headphones."""
     model: str
     """str: The model of this set of headphones."""
     type: str
@@ -727,6 +765,8 @@ class Headphones:
 class Keyboard:
     """Keyboard dataclass."""
 
+    brand: str
+    """str: The brand of this keyboard."""
     model: str
     """str: The model of this keyboard."""
     style: str
@@ -753,6 +793,8 @@ class Keyboard:
 class Mouse:
     """Computer mouse dataclass."""
 
+    brand: str
+    """str: The brand of this mouse."""
     model: str
     """str: The model of this mouse."""
     type: str
@@ -776,6 +818,8 @@ class Mouse:
 class Speakers:
     """Computer speakers dataclass."""
 
+    brand: str
+    """str: The brand of this set of computer speakers."""
     model: str
     """str: The model of this set of computer speakers."""
     channel_configuration: float
@@ -799,6 +843,8 @@ class Speakers:
 class UPS:
     """UPS dataclass."""
 
+    brand: str
+    """str: The brand of this UPS."""
     model: str
     """str: The model of this UPS."""
     watt_capacity: int
