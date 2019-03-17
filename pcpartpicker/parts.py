@@ -269,6 +269,7 @@ class CPU:
     """Money: The price of the CPU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.clock_speed, ClockSpeed)
         check_typing(self.cores, int)
@@ -292,6 +293,7 @@ class CPUCooler:
     """Money: The price of the CPU cooler."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.fan_rpm, RPM)
         check_typing(self.decibels, Decibels)
@@ -318,6 +320,7 @@ class Motherboard:
     """Money: The price of this motherboard."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.socket, str)
         check_typing(self.form_factor, str)
@@ -354,6 +357,7 @@ class Memory:
     """Money: The price of this memory module."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.module_type, str)
         check_typing(self.speed, ClockSpeed)
@@ -391,6 +395,7 @@ class StorageDrive:
     """Money: The price of this storage device."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.model_line, str)
         check_typing(self.form_factor, str)
@@ -422,6 +427,7 @@ class GPU:
     """Money: The price of this GPU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.model_line, str)
         check_typing(self.chipset, str)
@@ -452,6 +458,7 @@ class PSU:
     """Money: The price of this PSU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.model_line, str)
         check_typing(self.form_factor, str)
@@ -482,6 +489,7 @@ class Case:
     """Money: The price of this GPU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.form_factor, str)
         check_typing(self.external_bays, int)
@@ -512,6 +520,7 @@ class Fan:
     """Money: The price of this fan."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.color, str)
         check_typing(self.size, int)
@@ -539,6 +548,7 @@ class FanController:
     """Money: The price of this fan controller."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.form_factor, str)
         check_typing(self.channels, int)
@@ -560,6 +570,7 @@ class ThermalPaste:
     """Money: The price of this thermal paste."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.amount, (float, int))
         check_typing(self.price, Money)
@@ -589,6 +600,7 @@ class OpticalDrive:
     """Money: The price of this optical drive."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.bluray_read_speed, int)
         check_typing(self.dvd_read_speed, int)
@@ -621,6 +633,7 @@ class SoundCard:
     """Money: The price of this sound card."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.chipset, str)
         check_typing(self.channels, (float, int))
@@ -648,6 +661,7 @@ class EthernetCard:
     """Money: The price of this Ethernet card."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.interface, str)
         check_typing(self.port_speed, NetworkSpeed)
@@ -671,6 +685,7 @@ class WirelessCard:
     """Money: The price of this wireless card."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.interface, str)
         check_typing(self.supported_protocols, str)
@@ -697,6 +712,7 @@ class Monitor:
     """Money: The price of this monitor."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.resolution, Resolution)
         check_typing(self.size, (float, int))
@@ -725,6 +741,7 @@ class ExternalHDD:
     """Money: The price of this external HDD."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.model_line, str)
         check_typing(self.type, str)
@@ -753,6 +770,7 @@ class Headphones:
     """Money: The price of these headphones."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.type, str)
         check_typing(self.has_microphone, bool)
@@ -781,6 +799,7 @@ class Keyboard:
     """Money: The price of this keyboard."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.style, str)
         check_typing(self.color, str)
@@ -807,6 +826,7 @@ class Mouse:
     """Money: The price of this mouse."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.type, str)
         check_typing(self.connection, str)
@@ -832,6 +852,7 @@ class Speakers:
     """Money: The price of these speakers."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.channel_configuration, (float, int))
         check_typing(self.wattage, (float, int))
@@ -855,6 +876,7 @@ class UPS:
     """Money: The price of this UPS."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.watt_capacity, int)
         check_typing(self.va_capacity, (float, int))
