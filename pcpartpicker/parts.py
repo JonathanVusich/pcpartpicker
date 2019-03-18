@@ -3,7 +3,7 @@ from typing import Union
 
 from moneyed import Money
 
-from pcpartpicker.utils import num
+from .utils import num
 
 """
     Author: Jonathan Vusich
@@ -729,8 +729,6 @@ class ExternalHDD:
     """str: The brand of this external HDD."""
     model: str
     """str: The model of this external HDD."""
-    model_line: str
-    """str: The model line of this external HDD."""
     type: str
     """str: The type of this external HDD."""
     capacity: Bytes
@@ -743,7 +741,6 @@ class ExternalHDD:
     def __post_init__(self):
         check_typing(self.brand, str)
         check_typing(self.model, str)
-        check_typing(self.model_line, str)
         check_typing(self.type, str)
         check_typing(self.capacity, Bytes)
         check_typing(self.price_per_gb, Money)
