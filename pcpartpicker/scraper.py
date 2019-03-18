@@ -1,10 +1,12 @@
 import asyncio
 from typing import List, Tuple, Iterable
 import logging
+import concurrent.futures
 
 import aiohttp
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARN)
 
 
 class Scraper:
@@ -100,14 +102,14 @@ class Scraper:
         """
 
         parts = [arg for arg in args]
-        timeout = aiohttp.ClientTimeout(total=20)
+        timeout = aiohttp.ClientTimeout(total=30)
         connector = aiohttp.TCPConnector(limit=self._concurrent_connections, ttl_dns_cache=300)
         async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             results = await asyncio.gather(*tasks, return_exceptions=True)
             retry_parts = []
             for part, result in zip(parts, results):
-                if isinstance(result, TimeoutError):
+                if isinstance(result, concurrent.futures.TimeoutError):
                     logger.error(f"{part} timed out! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):
