@@ -122,4 +122,3 @@ class Scraper:
                 html_data = [page["result"]["html"] for page in result]
                 part_data.append((part, html_data))
             return part_data
-

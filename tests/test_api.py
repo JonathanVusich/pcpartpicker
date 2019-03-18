@@ -31,7 +31,7 @@ class APITest(unittest.TestCase):
     # Ensure that API throws the correct error if an incorrect region is input
     def test_api_init_exception(self):
         with self.assertRaises(UnsupportedRegion) as excinfo:
-            api = API('oc')
+            _ = API('oc')
         assert 'Region \'oc\' is not supported for this API!' in str(excinfo.exception)
 
     # Check that API.set_region works correctly
@@ -83,5 +83,3 @@ class APITest(unittest.TestCase):
         api.set_multithreading(True)
         self.assertTrue(api.multithreading)
         self.assertTrue(api._handler._multithreading)
-
-
