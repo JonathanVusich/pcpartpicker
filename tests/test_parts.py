@@ -441,18 +441,17 @@ class PartTest(unittest.TestCase):
             _ = Monitor(*args)
 
     def test_externalhdd_init(self):
-        args = ["Seagate", "Barracuda", "Ultra", "2000", Bytes.from_tb(3), Money("0.09", USD), Money("80", USD)]
+        args = ["Seagate", "Barracuda", "2000", Bytes.from_tb(3), Money("0.09", USD), Money("80", USD)]
         hdd = ExternalHDD(*args)
         self.assertEqual(hdd.brand, args[0])
         self.assertEqual(hdd.model, args[1])
-        self.assertEqual(hdd.model_line, args[2])
-        self.assertEqual(hdd.type, args[3])
-        self.assertEqual(hdd.capacity, args[4])
-        self.assertEqual(hdd.price_per_gb, args[5])
-        self.assertEqual(hdd.price, args[6])
+        self.assertEqual(hdd.type, args[2])
+        self.assertEqual(hdd.capacity, args[3])
+        self.assertEqual(hdd.price_per_gb, args[4])
+        self.assertEqual(hdd.price, args[5])
 
     def test_externalhdd_bad_init(self):
-        args = ["Seagate", "Barracuda", "Ultra", 2000, Bytes.from_tb(3), Money("0.09", USD), Money("80", USD)]
+        args = ["Seagate", "Barracuda", 2000, Bytes.from_tb(3), Money("0.09", USD), Money("80", USD)]
         with self.assertRaises(ValueError):
             _ = ExternalHDD(*args)
 
