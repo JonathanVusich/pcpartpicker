@@ -1,12 +1,13 @@
 from pcpartpicker import API
 import time
+from utils.tries import get_brands
 
 
 def main():
     api = API()
-    start = time.perf_counter()
     part_data = api.retrieve_all()
-    print(time.perf_counter()-start)
+    brands = get_brands(part_data)
+    print(brands)
 
 
 if __name__ == "__main__":

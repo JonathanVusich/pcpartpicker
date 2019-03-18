@@ -7,11 +7,12 @@ from moneyed import USD
 
 from .mappings import currency_classes, currency_symbols, part_classes, \
     none_symbols
-from .parse_utils import tokenize, part_funcs
+from .parse_utils import tokenize, part_funcs, retrieve_brand_info
 from .parts import *
 from .utils import num_pattern
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARN)
 
 
 class Parser:
@@ -20,18 +21,18 @@ class Parser:
     This class is designed to parse raw html from PCPartPicker and to transform it into useful data objects.
     """
 
-    _currency_sign = "$"
+    _currency_sign: str = "$"
 
     _currency = USD
 
-    _region = "us"
+    _region: str = "us"
 
-    def __init__(self, region: str = 'us'):
+    def __init__(self, region: str = 'us') -> None:
         self._region = region
         self._currency_sign = currency_symbols[self._region]
         self._currency = currency_classes[self._region]
 
-    def parse(self, parse_args: Tuple[str, List[str]]) -> tuple:
+    def parse(self, parse_args: Tuple[str, List[str]]) -> Tuple[str, List]:
         """
         Hidden function that parses lists of raw html and returns useful data objects.
 
@@ -46,7 +47,7 @@ class Parser:
         for page in tags:
             for token in tokenize(part, page):
                 part_list.append(self._parse_token(part, token))
-        part_list.sort(key=lambda x: x.model)
+        part_list.sort(key=lambda x: (x.brand, x.model if isinstance(x.model, str) else ""))
         return part, part_list
 
     def _parse_token(self, part: str, data: list):
@@ -58,7 +59,11 @@ class Parser:
         :return: Object: Parsed data object.
         """
 
-        parsed_data = [data.pop(0)]
+        brand, model = retrieve_brand_info(data.pop(0))
+        if part == "external-hard-drive":
+            parsed_data = [brand]
+        else:
+            parsed_data = [brand, model]
         price = self._price(data.pop(-1))
 
         for x, token in enumerate(data):
@@ -84,7 +89,7 @@ class Parser:
         except (TypeError, ValueError) as _:
             logger.error(f"{parsed_data} is not valid input data for {_class}!")
 
-    def _price(self, price: str):
+    def _price(self, price: str) -> Money:
         """
         Hidden function that retrieves the price from a raw string.
 

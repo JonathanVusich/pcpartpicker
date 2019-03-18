@@ -4,3 +4,7 @@ class UnsupportedRegion(Exception):
 
 class UnsupportedPart(Exception):
     pass
+
+
+class DifferentModel(Exception):
+    pass

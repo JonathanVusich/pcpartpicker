@@ -5,19 +5,40 @@
 ![](https://img.shields.io/pypi/dm/pcpartpicker.svg)
 
 This is an unofficial Python 3.7+ API for the website pcpartpicker.com.
-Written using async code and multiprocessing for efficient data retrieval. 
-This package is currently in beta.
+It is written using asynchronous code and multiprocessing for efficient data retrieval. 
+This package is currently in a stable beta.
 
 ## Installation:
+Package retrieval and installation can be easily accomplished through pip.
 ```
 pip install pcpartpicker
 ```
 
 ## Examples:
-Retrieving supported API regions:
+In order to use the API, simply import API from the pcpartpicker package.
 ```
 from pcpartpicker import API
+```
+You can then instantiate the API class and use it to make requests.
+```
+api = API()
+cpu_data = api.retrieve("cpu")
+all_data = api.retrieve_all()
+```
 
+A list of supported parts can be obtained in the following manner:
+```
+api = API()
+print(api.supported_parts)
+>>> {'wireless-network-card', 'case-fan', 'cpu', 'cpu-cooler', 'headphones', 'motherboard', 'monitor', 'internal-hard-drive', 'external-hard-drive', 'ups', 'fan-controller', 'case', 'keyboard', 'mouse', 'wired-network-card', 'sound-card', 'video-card', 'speakers', 'optical-drive', 'power-supply', 'thermal-paste', 'memory'}
+```
+
+There are also a number of methods that can be used in order to customize the API behavior.
+For example, you can change the region, determine the number of concurrent, asynchronous connections
+that can be made, and can also set whether or not the API can use multiple threads.
+
+Retrieving supported API regions:
+```
 api = API()
 print(api.supported_regions)
 >>> {'be', 'us', 'it', 'uk', 'ie', 'nz', 'de', 'ca', 'au', 'fr', 'se', 'es', 'in'}
@@ -25,8 +46,6 @@ print(api.supported_regions)
 
 Retrieving currently selected region (default is US):
 ```
-from pcpartpicker import API
-
 api = API()
 print(api.region)
 >>> us
@@ -34,8 +53,6 @@ print(api.region)
 
 Creating an API object with a different default region:
 ```
-from pcpartpicker import API
-
 api = API("de")
 print(api.region)
 >>> de
@@ -43,8 +60,6 @@ print(api.region)
 
 Changing the default region:
 ```
-from pcpartpicker import API
-
 api = API()
 api.set_region("de")
 print(api.region)
@@ -53,35 +68,27 @@ print(api.region)
 
 Changing the maximum number of allowed concurrent requests:
 ```
-from pcpartpicker import API
-
 api = API()
 api.set_concurrent_connections(100)
 print(api.concurrent_connections)
 >>> 100 
 ```
-
-Retrieving supported part list:
+Or you can use the concurrent_connections keyword argument for API():
 ```
-from pcpartpicker import API
-
+api = API(concurrent_connections=100)
+print(api.concurrent_connections)
+>>> 100
+```
+You can also configure whether or not the API is allowed to use multiple threads or not (default is True):
+```
 api = API()
-print(api.supported_parts)
->>> {'wireless-network-card', 'case-fan', 'cpu', 'cpu-cooler', 'headphones', 'motherboard', 'monitor', 'internal-hard-drive', 'external-hard-drive', 'ups', 'fan-controller', 'case', 'keyboard', 'mouse', 'wired-network-card', 'sound-card', 'video-card', 'speakers', 'optical-drive', 'power-supply', 'thermal-paste', 'memory'}
+api.set_multithreading(False)
+print(api.multithreading)
+>>> False
 ```
-
-Retrieving all part data:
+You can also use a keyword argument to configure this behavior:
 ```
-from pcpartpicker import API
-
-api = API()
-part_data = api.retrieve_all()
-``` 
-
-Retrieving specific part data:
-```
-from pcpartpicker import API
-
-api = API()
-cpu_data = api.retrieve("cpu")
+api = API(multithreading=False)
+print(api.multithreading)
+>>> False
 ```

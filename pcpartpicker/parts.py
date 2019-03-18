@@ -255,6 +255,8 @@ class NetworkSpeed:
 class CPU:
     """CPU dataclass."""
 
+    brand: str
+    """str: The brand of this CPU."""
     model: str
     """str: The model of this CPU."""
     clock_speed: ClockSpeed
@@ -267,6 +269,7 @@ class CPU:
     """Money: The price of the CPU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.clock_speed, ClockSpeed)
         check_typing(self.cores, int)
@@ -278,6 +281,8 @@ class CPU:
 class CPUCooler:
     """CPU Cooler dataclass."""
 
+    brand: str
+    """str: The brand of this CPU cooler."""
     model: str
     """str: The model of this CPU cooler."""
     fan_rpm: RPM
@@ -288,6 +293,7 @@ class CPUCooler:
     """Money: The price of the CPU cooler."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.fan_rpm, RPM)
         check_typing(self.decibels, Decibels)
@@ -298,6 +304,8 @@ class CPUCooler:
 class Motherboard:
     """Motherboard dataclass."""
 
+    brand: str
+    """str: The brand of this motherboard."""
     model: str
     """str: The model of this motherboard."""
     socket: str
@@ -312,6 +320,7 @@ class Motherboard:
     """Money: The price of this motherboard."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.socket, str)
         check_typing(self.form_factor, str)
@@ -324,6 +333,8 @@ class Motherboard:
 class Memory:
     """Memory dataclass."""
 
+    brand: str
+    """str: The brand of this memory module."""
     model: str
     """str: The model of this memory module."""
     module_type: str
@@ -346,6 +357,7 @@ class Memory:
     """Money: The price of this memory module."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.module_type, str)
         check_typing(self.speed, ClockSpeed)
@@ -362,6 +374,8 @@ class Memory:
 class StorageDrive:
     """Dataclass for storage devices."""
 
+    brand: str
+    """str: The brand of this storage device."""
     model: str
     """str: The model of this storage device."""
     model_line: str
@@ -381,6 +395,7 @@ class StorageDrive:
     """Money: The price of this storage device."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.model_line, str)
         check_typing(self.form_factor, str)
@@ -395,6 +410,9 @@ class StorageDrive:
 @dataclass(frozen=True)
 class GPU:
     """GPU dataclass."""
+
+    brand: str
+    """str: The brand of this GPU."""
     model: str
     """str: The model of this GPU."""
     model_line: str
@@ -409,6 +427,7 @@ class GPU:
     """Money: The price of this GPU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.model_line, str)
         check_typing(self.chipset, str)
@@ -420,6 +439,9 @@ class GPU:
 @dataclass(frozen=True)
 class PSU:
     """PSU dataclass."""
+
+    brand: str
+    """str: The brand of this PSU."""
     model: str
     """str: The model of this PSU."""
     model_line: str
@@ -436,6 +458,7 @@ class PSU:
     """Money: The price of this PSU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.model_line, str)
         check_typing(self.form_factor, str)
@@ -449,6 +472,8 @@ class PSU:
 class Case:
     """PC case dataclass."""
 
+    brand: str
+    """str: The brand of this case."""
     model: str
     """str: The model of this case."""
     form_factor: str
@@ -464,6 +489,7 @@ class Case:
     """Money: The price of this GPU."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.form_factor, str)
         check_typing(self.external_bays, int)
@@ -476,6 +502,8 @@ class Case:
 class Fan:
     """CPU and case fan dataclass."""
 
+    brand: str
+    """str: The brand of this fan."""
     model: str
     """str: The model of this fan."""
     color: str
@@ -492,6 +520,7 @@ class Fan:
     """Money: The price of this fan."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.color, str)
         check_typing(self.size, int)
@@ -505,6 +534,8 @@ class Fan:
 class FanController:
     """Fan controller dataclass."""
 
+    brand: str
+    """str: The brand of this fan controller."""
     model: str
     """str: The model of this fan controller."""
     form_factor: str
@@ -517,6 +548,7 @@ class FanController:
     """Money: The price of this fan controller."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.form_factor, str)
         check_typing(self.channels, int)
@@ -528,6 +560,8 @@ class FanController:
 class ThermalPaste:
     """Thermal paste dataclass."""
 
+    brand: str
+    """str: The brand of this thermal paste."""
     model: str
     """str: The model of this thermal paste."""
     amount: float
@@ -536,6 +570,7 @@ class ThermalPaste:
     """Money: The price of this thermal paste."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.amount, (float, int))
         check_typing(self.price, Money)
@@ -545,6 +580,8 @@ class ThermalPaste:
 class OpticalDrive:
     """Optical drive dataclass."""
 
+    brand: str
+    """str: The brand of this optical drive."""
     model: str
     """str: The model of this optical drive."""
     bluray_read_speed: int
@@ -563,6 +600,7 @@ class OpticalDrive:
     """Money: The price of this optical drive."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.bluray_read_speed, int)
         check_typing(self.dvd_read_speed, int)
@@ -577,6 +615,8 @@ class OpticalDrive:
 class SoundCard:
     """Sound card dataclass."""
 
+    brand: str
+    """str: The brand of this sound card."""
     model: str
     """str: The model of this sound card."""
     chipset: str
@@ -593,6 +633,7 @@ class SoundCard:
     """Money: The price of this sound card."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.chipset, str)
         check_typing(self.channels, (float, int))
@@ -606,6 +647,8 @@ class SoundCard:
 class EthernetCard:
     """Ethernet card dataclass."""
 
+    brand: str
+    """str: The brand of this Ethernet card."""
     model: str
     """str: The model of this Ethernet card."""
     interface: str
@@ -618,6 +661,7 @@ class EthernetCard:
     """Money: The price of this Ethernet card."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.interface, str)
         check_typing(self.port_speed, NetworkSpeed)
@@ -629,6 +673,8 @@ class EthernetCard:
 class WirelessCard:
     """Wireless card dataclass."""
 
+    brand: str
+    """str: The brand of this wireless card."""
     model: str
     """str: The model of this wireless card."""
     interface: str
@@ -639,6 +685,7 @@ class WirelessCard:
     """Money: The price of this wireless card."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.interface, str)
         check_typing(self.supported_protocols, str)
@@ -649,6 +696,8 @@ class WirelessCard:
 class Monitor:
     """Monitor dataclass."""
 
+    brand: str
+    """str: The brand of this monitor."""
     model: str
     """str: The model of this monitor."""
     resolution: Resolution
@@ -663,6 +712,7 @@ class Monitor:
     """Money: The price of this monitor."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.resolution, Resolution)
         check_typing(self.size, (float, int))
@@ -675,10 +725,10 @@ class Monitor:
 class ExternalHDD:
     """External HDD dataclass."""
 
+    brand: str
+    """str: The brand of this external HDD."""
     model: str
     """str: The model of this external HDD."""
-    model_line: str
-    """str: The model line of this external HDD."""
     type: str
     """str: The type of this external HDD."""
     capacity: Bytes
@@ -689,8 +739,8 @@ class ExternalHDD:
     """Money: The price of this external HDD."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
-        check_typing(self.model_line, str)
         check_typing(self.type, str)
         check_typing(self.capacity, Bytes)
         check_typing(self.price_per_gb, Money)
@@ -701,6 +751,8 @@ class ExternalHDD:
 class Headphones:
     """Headphones dataclass."""
 
+    brand: str
+    """str: The brand of this set of headphones."""
     model: str
     """str: The model of this set of headphones."""
     type: str
@@ -715,6 +767,7 @@ class Headphones:
     """Money: The price of these headphones."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.type, str)
         check_typing(self.has_microphone, bool)
@@ -727,6 +780,8 @@ class Headphones:
 class Keyboard:
     """Keyboard dataclass."""
 
+    brand: str
+    """str: The brand of this keyboard."""
     model: str
     """str: The model of this keyboard."""
     style: str
@@ -741,6 +796,7 @@ class Keyboard:
     """Money: The price of this keyboard."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.style, str)
         check_typing(self.color, str)
@@ -753,6 +809,8 @@ class Keyboard:
 class Mouse:
     """Computer mouse dataclass."""
 
+    brand: str
+    """str: The brand of this mouse."""
     model: str
     """str: The model of this mouse."""
     type: str
@@ -765,6 +823,7 @@ class Mouse:
     """Money: The price of this mouse."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.type, str)
         check_typing(self.connection, str)
@@ -776,6 +835,8 @@ class Mouse:
 class Speakers:
     """Computer speakers dataclass."""
 
+    brand: str
+    """str: The brand of this set of computer speakers."""
     model: str
     """str: The model of this set of computer speakers."""
     channel_configuration: float
@@ -788,6 +849,7 @@ class Speakers:
     """Money: The price of these speakers."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.channel_configuration, (float, int))
         check_typing(self.wattage, (float, int))
@@ -799,6 +861,8 @@ class Speakers:
 class UPS:
     """UPS dataclass."""
 
+    brand: str
+    """str: The brand of this UPS."""
     model: str
     """str: The model of this UPS."""
     watt_capacity: int
@@ -809,6 +873,7 @@ class UPS:
     """Money: The price of this UPS."""
 
     def __post_init__(self):
+        check_typing(self.brand, str)
         check_typing(self.model, str)
         check_typing(self.watt_capacity, int)
         check_typing(self.va_capacity, (float, int))
