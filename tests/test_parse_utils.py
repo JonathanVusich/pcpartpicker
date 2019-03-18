@@ -50,7 +50,11 @@ class ParseUtilsTest(unittest.TestCase):
         data = "Intel"
         brand_model = retrieve_brand_info(data)
         self.assertEqual(brand_model[0], "Intel")
-        self.assertEqual(brand_model[1], "")
+        self.assertEqual(brand_model[1], None)
+        data = "Supermicro AOC"
+        brand_model = retrieve_brand_info(data)
+        self.assertEqual(brand_model[0], "Supermicro")
+        self.assertEqual(brand_model[1], "AOC")
 
     def test_core_clock_mhz(self):
         clock = "3.45 MHz"
