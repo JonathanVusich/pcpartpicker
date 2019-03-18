@@ -1,16 +1,17 @@
 import logging
 import re
-from typing import Generator, List, Optional, Tuple, Union
+from typing import Generator, List, Optional, Tuple, Union, Dict, Callable
 
-from pcpartpicker.mappings import byte_classes, clockspeeds
-from pcpartpicker.parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
-from pcpartpicker.utils import retrieve_float, retrieve_int, num_pattern
-from pcpartpicker.brands import brands
+from .brands import brands
+from .mappings import byte_classes, clockspeeds
+from .parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
+from .utils import retrieve_float, retrieve_int, num_pattern
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARN)
 
 
-def tokenize(part: str, tags: list) -> Generator:
+def tokenize(part: str, tags: list) -> Generator[List[str], None, None]:
     """
     Hidden generator that yields up chunks of part data.
 
@@ -24,7 +25,7 @@ def tokenize(part: str, tags: list) -> Generator:
         yield tags[i:i + chunk_length]
 
 
-def num(string: str):
+def num(string: str) -> Optional[Union[float, int]]:
     """
     Hidden function that attempts to retrieve a numeric value from a string.
 
@@ -52,14 +53,25 @@ def boolean(bool_str: str) -> Optional[bool]:
     logger.error(f"{bool_str} is not a valid boolean!")
 
 
-def retrieve_brand_info(model_string: str) -> List[str]:
+def retrieve_brand_info(model_string: str) -> Tuple[str, Optional[str]]:
     for x in range(len(model_string) + 1):
         if model_string[:x] in brands:
-            return [model_string[:x].strip().lstrip(), model_string[x:].strip().lstrip()]
+            try:
+                next_char = model_string[x]
+                if not next_char == " ":
+                    continue
+                raise IndexError
+            except IndexError:
+                brand = model_string[:x].strip().lstrip()
+                model = model_string[x:].strip().lstrip()
+                if not model:
+                    return brand, None
+                else:
+                    return brand, model
     raise ValueError(f"Could not find brand and model in '{model_string}'")
 
 
-def core_clock(clock_data: str):
+def core_clock(clock_data: str) -> Optional[ClockSpeed]:
     """
     Hidden function that extracts core clock data from a raw string.
 
@@ -313,7 +325,7 @@ def va(va_data: str) -> float:
     return number
 
 
-part_funcs = {
+part_funcs: Dict[str, List[Callable]] = {
     "cpu": [core_clock, int, wattage],
     "cpu-cooler": [fan_rpm, decibels],
     "motherboard": [default, default, int, to_bytes],
