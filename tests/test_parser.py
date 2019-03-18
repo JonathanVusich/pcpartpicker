@@ -21,7 +21,7 @@ class ParserTest(unittest.TestCase):
             cls.test_data.update({region: results})
 
     def test_us_tokens(self):
-        parser = Parser("us")
+        parser = Parser()
         data = self.test_data["us"]
         for part in data:
             part_id, tags = html_to_tokens(part)
