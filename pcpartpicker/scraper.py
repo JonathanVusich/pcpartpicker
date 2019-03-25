@@ -103,7 +103,7 @@ class Scraper:
             retry_parts = []
             for part, result in zip(parts, results):
                 if isinstance(result, asyncio.TimeoutError):
-                    logger.warning(f"Fetching data for {part} timed out! Retrying...")
+                    logger.debug(f"Fetching data for {part} timed out! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):
                     raise result
