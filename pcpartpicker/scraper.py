@@ -108,12 +108,17 @@ class Scraper:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             retry_parts = []
             for part, result in zip(parts, results):
-                errors = [page for page in result if isinstance(page, TimeoutError)]
-                if errors:
+                if isinstance(result, TimeoutError):
                     logger.warning(f"{part} timed out! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):
                     raise result
+                else:
+                    errors = [page for page in result if isinstance(page, TimeoutError)]
+                    if errors:
+                        logger.warning(f"{part} timed out! Retrying...")
+                        retry_parts.append(part)
+
             if retry_parts:
                 results.append(await self.retrieve(retry_parts))
 
