@@ -1,7 +1,6 @@
 import asyncio
 from typing import List, Tuple, Iterable
 import logging
-import concurrent.futures
 
 import aiohttp
 
@@ -109,8 +108,9 @@ class Scraper:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             retry_parts = []
             for part, result in zip(parts, results):
-                if isinstance(result, concurrent.futures.TimeoutError):
-                    logger.error(f"{part} timed out! Retrying...")
+                errors = [page for page in result if isinstance(page, TimeoutError)]
+                if errors:
+                    logger.warning(f"{part} timed out! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):
                     raise result
