@@ -3,6 +3,8 @@ from pcpartpicker.api import API
 
 def main():
     api = API()
+    api.set_concurrent_connections(1)
+    api.set_multithreading(False)
     part_data = api.retrieve_all()
     for data in part_data.values():
         for part in data:

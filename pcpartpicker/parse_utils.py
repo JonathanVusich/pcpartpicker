@@ -53,7 +53,7 @@ def boolean(bool_str: str) -> Optional[bool]:
     logger.error(f"{bool_str} is not a valid boolean!")
 
 
-def retrieve_brand_info(model_string: str) -> Tuple[str, Optional[str]]:
+def retrieve_brand_info(model_string: str) -> Tuple[Optional[str], Optional[str]]:
     for x in range(len(model_string) + 1):
         if model_string[:x] in brands:
             try:
@@ -68,7 +68,8 @@ def retrieve_brand_info(model_string: str) -> Tuple[str, Optional[str]]:
                     return brand, None
                 else:
                     return brand, model
-    raise ValueError(f"Could not find brand and model in '{model_string}'")
+    logger.warning(f"Could not find brand in {model_string}!")
+    return None, model_string
 
 
 def core_clock(clock_data: str) -> Optional[ClockSpeed]:

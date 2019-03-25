@@ -1,7 +1,6 @@
 import asyncio
-from typing import List, Tuple, Iterable
+from typing import List, Tuple, Iterable, Dict
 import logging
-import concurrent.futures
 
 import aiohttp
 
@@ -93,6 +92,28 @@ class Scraper:
         tasks = [self._retrieve_page_data(session, part, num) for num in page_numbers]
         return await asyncio.gather(*tasks)
 
+    async def _retrieve_all_part_data(self, args: Iterable[str]) -> Dict[str, List[dict]]:
+        parts = [arg for arg in args]
+        timeout = aiohttp.ClientTimeout(total=30)
+        connector = aiohttp.TCPConnector(limit=self._concurrent_connections, ttl_dns_cache=300)
+        final_results = {}
+        async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
+            tasks = [self._retrieve_part_data(session, part) for part in args]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            retry_parts = []
+            for part, result in zip(parts, results):
+                if isinstance(result, asyncio.TimeoutError):
+                    logger.debug(f"Fetching data for {part} timed out! Retrying...")
+                    retry_parts.append(part)
+                elif isinstance(result, Exception):
+                    raise result
+                else:
+                    final_results.update({part: result})
+
+            if retry_parts:
+                final_results.update(await self._retrieve_all_part_data(retry_parts))
+        return final_results
+
     async def retrieve(self, args: Iterable[str]) -> List[Tuple[str, List[str]]]:
         """
         Hidden method that returns a list of lists of JSON page data.
@@ -101,24 +122,9 @@ class Scraper:
         :return: list: A list of lists of JSON page data.
         """
 
-        parts = [arg for arg in args]
-        timeout = aiohttp.ClientTimeout(total=30)
-        connector = aiohttp.TCPConnector(limit=self._concurrent_connections, ttl_dns_cache=300)
-        async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
-            tasks = [self._retrieve_part_data(session, part) for part in args]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            retry_parts = []
-            for part, result in zip(parts, results):
-                if isinstance(result, concurrent.futures.TimeoutError):
-                    logger.error(f"{part} timed out! Retrying...")
-                    retry_parts.append(part)
-                elif isinstance(result, Exception):
-                    raise result
-            if retry_parts:
-                results.append(await self.retrieve(retry_parts))
-
-            part_data: List[Tuple[str, List[str]]] = []
-            for part, result in zip(parts, results):
-                html_data = [page["result"]["html"] for page in result]
-                part_data.append((part, html_data))
-            return part_data
+        results = await self._retrieve_all_part_data(args)
+        part_data: List[Tuple[str, List[str]]] = []
+        for part, result in results.items():
+            html_data = [page["result"]["html"] for page in result]
+            part_data.append((part, html_data))
+        return part_data
