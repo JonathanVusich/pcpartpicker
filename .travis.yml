@@ -14,6 +14,8 @@ matrix:
         - python3 -m pip install virtualenv
         - virtualenv venv -p python3
         - source venv/bin/activate
+        - python3 -m pip install coveralls
+        - python3 setup.py install
     - os: windows
       language: sh
       python: "3.7"
@@ -21,6 +23,8 @@ matrix:
         - choco install python3
         - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
         - python -m pip install --upgrade pip wheel
+        - python -m pip install coveralls
+        - python setup.py install
 before_install:
     - pip install coveralls
     - python setup.py install
