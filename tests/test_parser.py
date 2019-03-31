@@ -30,6 +30,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_uk_tokens(self):
         parser = Parser("uk")
@@ -41,6 +42,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_nz_tokens(self):
         parser = Parser("nz")
@@ -52,6 +54,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_it_tokens(self):
         parser = Parser("it")
@@ -63,6 +66,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_ie_tokens(self):
         parser = Parser("ie")
@@ -74,6 +78,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_in_tokens(self):
         parser = Parser("in")
@@ -85,6 +90,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_se_tokens(self):
         parser = Parser("se")
@@ -96,6 +102,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_fr_tokens(self):
         parser = Parser("fr")
@@ -107,6 +114,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_es_tokens(self):
         parser = Parser("es")
@@ -118,6 +126,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_de_tokens(self):
         parser = Parser("de")
@@ -129,6 +138,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_ca_tokens(self):
         parser = Parser("ca")
@@ -140,6 +150,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_be_tokens(self):
         parser = Parser("be")
@@ -151,6 +162,7 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
 
     def test_au_tokens(self):
         parser = Parser("au")
@@ -162,3 +174,4 @@ class ParserTest(unittest.TestCase):
                     with self.subTest(part_id=part_id, token=token):
                         product = parser._parse_token(part_id, token)
                         self.assertIsInstance(product, part_classes[part_id])
+                        self.assertIsNotNone(product.brand)
