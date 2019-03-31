@@ -50,7 +50,7 @@ class Parser:
         part_list.sort(key=lambda x: (x.brand, x.model if isinstance(x.model, str) else ""))
         return part, part_list
 
-    def _parse_token(self, part: str, data: list):
+    def _parse_token(self, part: str, data: list) -> object:
         """
         Hidden function that parses a list of data depending on the part type.
 
