@@ -4,6 +4,13 @@ dist: xenial
 sudo: true
 matrix:
   include:
+    - os: linux
+      dist: xenial
+      python: 3.7
+      sudo: true
+      before_install:
+        - pip install coveralls
+        - python setup.py install
     - os: osx
       language: sh
       python: "3.7"
@@ -22,12 +29,8 @@ matrix:
       before_install:
         - choco install python3
         - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
-        - python -m pip install --upgrade pip wheel
         - python -m pip install coveralls
         - python setup.py install
-before_install:
-    - pip install coveralls
-    - python setup.py install
 script:
     - coverage run --source=pcpartpicker -m unittest discover
 after_success:
