@@ -106,6 +106,7 @@ class Parser:
 def html_to_tokens(parse_args: Tuple[str, List[str]]) -> Tuple[str, Generator[List[str], None, None]]:
     part, raw_html = parse_args
     html = [lxml.html.fromstring(html) for html in raw_html]
-    tags = [page.xpath('tr/td/a[not(text() = "Add")] | tr/td[not(a) and not(div) and not(input)]')
-            for page in html]
+    tags = [page.xpath(
+        'tr/td/a/p | tr/td[not(@class="td__checkbox") and not(@class="td__name") and not(contains(@class, "td__rating")) and not(button)]')
+        for page in html]
     return part, ([tag.text for tag in page] for page in tags)
