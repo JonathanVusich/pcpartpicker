@@ -708,6 +708,8 @@ class Monitor:
     """int: The response time of this display (in milliseconds)."""
     panel_type: str
     """bool: Returns True if the panel is an IPS display."""
+    refresh_rate: int
+    """int: The refresh rate of this display (Hz)."""
     price: Money
     """Money: The price of this monitor."""
 
@@ -718,6 +720,7 @@ class Monitor:
         check_typing(self.size, (float, int))
         check_typing(self.response_time, int)
         check_typing(self.panel_type, str)
+        check_typing(self.refresh_rate, int)
         check_typing(self.price, Money)
 
 

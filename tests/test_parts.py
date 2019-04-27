@@ -425,7 +425,7 @@ class PartTest(unittest.TestCase):
             _ = WirelessCard(*args)
 
     def test_monitor_init(self):
-        args = ["MSI Optix", "Lores", Resolution(1920, 1080), 27, 4, "IPS", Money("300", USD)]
+        args = ["MSI Optix", "Lores", Resolution(1920, 1080), 27, 4, "IPS", 144, Money("300", USD)]
         monitor = Monitor(*args)
         self.assertEqual(monitor.brand, args[0])
         self.assertEqual(monitor.model, args[1])
@@ -433,10 +433,11 @@ class PartTest(unittest.TestCase):
         self.assertEqual(monitor.size, args[3])
         self.assertEqual(monitor.response_time, args[4])
         self.assertEqual(monitor.panel_type, args[5])
-        self.assertEqual(monitor.price, args[6])
+        self.assertEqual(monitor.refresh_rate, args[6])
+        self.assertEqual(monitor.price, args[7])
 
     def test_monitor_bad_init(self):
-        args = ["MSI Optix", "Lores", Resolution(1920, 1080), 27, 4, 1, Money("300", USD)]
+        args = ["MSI Optix", "Lores", Resolution(1920, 1080), 27, 4, 1, 144, Money("300", USD)]
         with self.assertRaises(ValueError):
             _ = Monitor(*args)
 

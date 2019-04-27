@@ -348,7 +348,7 @@ part_funcs: Dict[str, List[Callable]] = {
                    retrieve_int, retrieve_float],
     "wired-network-card": [default, network_speed],
     "wireless-network-card": [default, default],
-    "monitor": [resolution, num, retrieve_int, default],
+    "monitor": [resolution, num, retrieve_int, default, retrieve_int],
     "external-hard-drive": [default, default,
                             to_bytes, price],
     "headphones": [default, boolean, boolean, frequency_response],
