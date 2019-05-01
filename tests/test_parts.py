@@ -221,7 +221,7 @@ class PartTest(unittest.TestCase):
 
     def test_memory_init(self):
         args = ["Corsair", "Vengeance", "DDR4", ClockSpeed.from_mhz("3000"), "288-pin DIMM", 15,
-                2, Bytes.from_gb(8), Bytes.from_gb(16), Money("0.22", USD), Money("122.45", USD)]
+                2, Bytes.from_gb(8), Money("0.22", USD), Money("122.45", USD)]
         memory = Memory(*args)
         self.assertEqual(memory.brand, args[0])
         self.assertEqual(memory.model, args[1])
@@ -231,13 +231,13 @@ class PartTest(unittest.TestCase):
         self.assertEqual(memory.cas_timing, args[5])
         self.assertEqual(memory.number_of_modules, args[6])
         self.assertEqual(memory.module_size, args[7])
-        self.assertEqual(memory.total_size, args[8])
-        self.assertEqual(memory.price_per_gb, args[9])
-        self.assertEqual(memory.price, args[10])
+        self.assertEqual(memory.total_size, Bytes.from_gb(16))
+        self.assertEqual(memory.price_per_gb, args[8])
+        self.assertEqual(memory.price, args[9])
 
     def test_memory_bad_init(self):
         args = ["Corsair", "Vengeance", "DDR4", ClockSpeed.from_mhz("3000"), "288-pin DIMM", 15,
-                2, Bytes.from_gb(8), Bytes.from_gb(16), 0.22, Money("122.45", USD)]
+                2, Bytes.from_gb(8), 0.22, Money("122.45", USD)]
         with self.assertRaises(ValueError):
             _ = Memory(*args)
 
