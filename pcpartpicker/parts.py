@@ -349,8 +349,6 @@ class Memory:
     """int: The number of modules in this memory configuration."""
     module_size: Bytes
     """Bytes: The size of the modules that come with this memory configuration"""
-    total_size: Bytes
-    """Bytes: The total size of the modules combined."""
     price_per_gb: Money
     """float: The price per GB for this memory configuration"""
     price: Money
@@ -365,9 +363,12 @@ class Memory:
         check_typing(self.cas_timing, int)
         check_typing(self.number_of_modules, int)
         check_typing(self.module_size, Bytes)
-        check_typing(self.total_size, Bytes)
         check_typing(self.price_per_gb, Money)
         check_typing(self.price, Money)
+
+    @property
+    def total_size(self):
+        return Bytes(self.number_of_modules * self.module_size.total)
 
 
 @dataclass(frozen=True)
