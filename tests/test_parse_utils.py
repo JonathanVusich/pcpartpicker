@@ -9,16 +9,14 @@ from pcpartpicker.parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyRespon
 class ParseUtilsTest(unittest.TestCase):
 
     def test_tokenize_cpu(self):
-        raw_data = ["AMD Ryzen 2600", "3.4 GHz", "6", "65 W", "$164.99", "Intel Core i7-8700K", "3.7 GHz", "6", "95 W",
-                    "$369.99"]
-        cpu1 = ["AMD Ryzen 2600", "3.4 GHz", "6", "65 W", "$164.99"]
-        cpu2 = ["Intel Core i7-8700K", "3.7 GHz", "6", "95 W", "$369.99"]
+        raw_data = ["AMD Ryzen 5 2600", "6", "3.4 GHz", "3.9 GHz", "65 W", "None", "Yes", "$164.39",
+                    "AMD Ryzen 7 2700X", "8", "3.7 GHz", "4.3 GHz", "105 W", "None", "Yes", "$289.99"]
+        cpu1 = ["AMD Ryzen 5 2600", "6", "3.4 GHz", "3.9 GHz", "65 W", "None", "Yes", "$164.39"]
+        cpu2 = ["AMD Ryzen 7 2700X", "8", "3.7 GHz", "4.3 GHz", "105 W", "None", "Yes", "$289.99"]
         data_chunks = list(tokenize("cpu", raw_data))
         self.assertEqual(len(data_chunks), 2)
         self.assertEqual(data_chunks[0], cpu1)
-        self.assertEqual(len(data_chunks[0]), 5)
         self.assertEqual(data_chunks[1], cpu2)
-        self.assertEqual(len(data_chunks[1]), 5)
 
     def test_num_int(self):
         data = "$34"
@@ -130,6 +128,10 @@ class ParseUtilsTest(unittest.TestCase):
     def test_hdd_data_hybrid(self):
         hdd_info = "Hybrid"
         self.assertEqual(hdd_data(hdd_info), ("Hybrid", None))
+
+    def test_hdd_data_none(self):
+        hdd_info = None
+        self.assertEqual(hdd_data(hdd_info), (None, None))
 
     def test_memory_sizes_two_modules_eight_gb(self):
         mem_info = "2x8 GB"

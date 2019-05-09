@@ -50,7 +50,7 @@ def boolean(bool_str: str) -> Optional[bool]:
         return True
     elif bool_str == "No":
         return False
-    logger.error(f"{bool_str} is not a valid boolean!")
+    logger.debug(f"{bool_str} is not a valid boolean!")
 
 
 def retrieve_brand_info(model_string: str) -> Tuple[Optional[str], Optional[str]]:
@@ -180,7 +180,7 @@ def grams(data: str) -> float:
     return retrieve_float(data)
 
 
-def hdd_data(data: str) -> Tuple[str, Optional[int]]:
+def hdd_data(data: str) -> Tuple[Optional[str], Optional[int]]:
     """
     Hidden function that determines the type of the HDD and the platter RPM from a given string.
 
@@ -188,12 +188,15 @@ def hdd_data(data: str) -> Tuple[str, Optional[int]]:
     :return: Result: (HDD type, platter RPM)
     """
 
-    if "RPM" in data:
+    if data is None:
+        return None, None
+    elif data == "SSD" or data == "Hybrid":
+        return data, None
+    elif "RPM" in data:
         hdd_type = "HDD"
         rpm = retrieve_int(data)
         return hdd_type, rpm
-    else:
-        return data, None
+    logger.debug(f"Could not find HDD type and RPM in {data}!")
 
 
 def memory_sizes(memory_size: str) -> Tuple[int, Bytes]:
@@ -327,33 +330,27 @@ def va(va_data: str) -> float:
 
 
 part_funcs: Dict[str, List[Callable]] = {
-    "cpu": [core_clock, int, wattage],
-    "cpu-cooler": [fan_rpm, decibels],
-    "motherboard": [default, default, int, to_bytes],
-    "memory": [memory_type, default, int,
-               memory_sizes, price],
-    "internal-hard-drive": [default, default, hdd_data,
-                            to_bytes, to_bytes, price],
-    "video-card": [default, default, to_bytes, core_clock],
-    "power-supply": [default, default, default, wattage,
-                     default],
-    "case": [default, int, int, wattage],
-    "case-fan": [default, retrieve_int, fan_rpm, fan_cfm,
-                 decibels],
-    "fan-controller": [default, int, wattage],
+    "cpu": [int, core_clock, core_clock, wattage, default, boolean],
+    "cpu-cooler": [fan_rpm, decibels, default, retrieve_int],
+    "motherboard": [default, default, int, to_bytes, default],
+    "memory": [memory_type, default, memory_sizes, price, default, int],
+    "internal-hard-drive": [to_bytes, price, hdd_data, to_bytes, default, default],
+    "video-card": [default, to_bytes, core_clock, core_clock, default, default],
+    "power-supply": [default, default, wattage, default, default],
+    "case": [default, default, wattage, boolean, int, int],
+    "case-fan": [retrieve_int, default, fan_rpm, fan_cfm, decibels, boolean],
+    "fan-controller": [int, wattage, boolean, default, default],
     "thermal-paste": [grams],
     "optical-drive": [int, int, int, wr_speeds,
                       wr_speeds, wr_speeds],
-    "sound-card": [default, num, int,
-                   retrieve_int, retrieve_float],
-    "wired-network-card": [default, network_speed],
-    "wireless-network-card": [default, default],
-    "monitor": [resolution, num, retrieve_int, default, retrieve_int],
-    "external-hard-drive": [default, default,
-                            to_bytes, price],
-    "headphones": [default, boolean, boolean, frequency_response],
-    "keyboard": [default, default, default, default],
-    "mouse": [default, default, default],
-    "speakers": [num, wattage, frequency_response],
+    "sound-card": [retrieve_float, num, retrieve_int, retrieve_float, default, default],
+    "wired-network-card": [default, network_speed, default],
+    "wireless-network-card": [default, default, default],
+    "monitor": [num, resolution, retrieve_int, retrieve_int, default, default],
+    "external-hard-drive": [default, default, to_bytes, price, default, hdd_data],
+    "headphones": [default, frequency_response, boolean, boolean, default, default],
+    "keyboard": [default, default, default, boolean, default, default],
+    "mouse": [default, default, int, default, default],
+    "speakers": [retrieve_float, wattage, frequency_response, default],
     "ups": [wattage, va]
 }
