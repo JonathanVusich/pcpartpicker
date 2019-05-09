@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import List, Tuple, Generator
+from typing import List, Tuple, Optional
 
 import lxml.html
 from moneyed import USD
@@ -45,7 +45,8 @@ class Parser:
         part, tags = html_to_tokens(parse_args)
         part_list = []
         for page in tags:
-            for token in tokenize(part, page):
+            tokens = list(tokenize(part, page))
+            for token in tokens:
                 part_list.append(self._parse_token(part, token))
         part_list.sort(key=lambda x: (x.brand, x.model if isinstance(x.model, str) else ""))
         return part, part_list
@@ -59,22 +60,23 @@ class Parser:
         :return: Object: Parsed data object.
         """
 
-        brand, model = retrieve_brand_info(data.pop(0))
-        if part == "external-hard-drive":
-            parsed_data = [brand]
-        else:
-            parsed_data = [brand, model]
-        price = self._price(data.pop(-1))
+        brand, model = retrieve_brand_info(data[0])
+        parsed_data = [brand, model]
+        price = self._price(data[-1])
+        tokens = data[1:-1]
 
-        for x, token in enumerate(data):
-            if not token or token in none_symbols:
-                parsed_data.append(None)
-                continue
+        for x, token in enumerate(tokens):
             func = part_funcs[part][x]
-            # Check if this is a price function
-            if func.__name__ == "price":
+            if func.__name__ == "hdd_data":  # Handle special case of hdd_data input being None
+                parsed_data.extend(func(token))
+                continue
+            elif func.__name__ == "price":  # Handle special case of price data being None
                 parsed_data.append(self._price(token))
                 continue
+            else:
+                if not token or token in none_symbols:
+                    parsed_data.append(None)
+                    continue
             result = func(token)
             if isinstance(result, tuple):
                 parsed_data.extend(result)
@@ -103,10 +105,24 @@ class Parser:
             return Money(re.findall(num_pattern, price)[0], self._currency)
 
 
-def html_to_tokens(parse_args: Tuple[str, List[str]]) -> Tuple[str, Generator[List[str], None, None]]:
+def html_to_tokens(parse_args: Tuple[str, List[str]]) -> Tuple[str, List[List[str]]]:
     part, raw_html = parse_args
     html = [lxml.html.fromstring(html) for html in raw_html]
     tags = [page.xpath(
-        'tr/td/a/p | tr/td[not(@class="td__checkbox") and not(@class="td__name") and not(contains(@class, "td__rating")) and not(button)]')
+        'tr/td/a/p | tr/td[contains(@class, "td__spec")] | tr/td[@class="td__price"]')
         for page in html]
-    return part, ([tag.text for tag in page] for page in tags)
+    return part, [parse_elements(elements) for elements in tags]
+
+
+def parse_elements(elements: list) -> List[Optional[str]]:
+    text_elements = []
+    for element in elements:
+        text = element.xpath("text()")
+        if len(text) == 0:
+            text_elements.append(None)
+        elif len(text) == 1:
+            text_elements.extend(text)
+        else:
+            element_string = " ".join(text)
+            text_elements.append(element_string)
+    return text_elements
