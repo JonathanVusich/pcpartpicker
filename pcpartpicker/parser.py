@@ -109,7 +109,7 @@ def html_to_tokens(parse_args: Tuple[str, List[str]]) -> Tuple[str, List[List[st
     part, raw_html = parse_args
     html = [lxml.html.fromstring(html) for html in raw_html]
     tags = [page.xpath(
-        'tr/td/a/p | tr/td[contains(@class, "td__spec")] | tr/td[@class="td__price"]')
+        'tr/td/a/div[@class="td__nameWrapper"]/p | tr/td[contains(@class, "td__spec")] | tr/td[@class="td__price"]')
         for page in html]
     return part, [parse_elements(elements) for elements in tags]
 
