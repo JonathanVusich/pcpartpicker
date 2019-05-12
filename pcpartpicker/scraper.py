@@ -1,6 +1,7 @@
 import asyncio
 from typing import List, Tuple, Iterable, Dict
 import logging
+import lxml.html
 
 import aiohttp
 
@@ -63,10 +64,12 @@ class Scraper:
         """
 
         data: dict = await self._retrieve_page_data(session, part)
-        num = data["result"]["paging_data"]["page_blocks"][-1]["page"]
-        return [x for x in range(1, num + 1)]
+        num_data = data["result"]["paging_row"]
+        html_tags = lxml.html.fromstring(num_data)
+        tags = html_tags.xpath('section/ul/li')
+        return [x for x in range(1, len(tags) + 1)]
 
-    async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int = 1) -> str:
+    async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int = 1) -> dict:
         """
         Hidden method that retrieves page data for a given part type and page number.
 
