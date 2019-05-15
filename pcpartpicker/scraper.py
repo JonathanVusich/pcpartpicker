@@ -1,14 +1,13 @@
 import asyncio
-from typing import List, Tuple, Iterable, Dict
+import json
 import logging
-import lxml.html
+from typing import List, Tuple, Iterable, Dict
 
 import aiohttp
-from json.decoder import JSONDecodeError
-import json
+import lxml.html
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARN)
+logger.setLevel(logging.DEBUG)
 
 
 class Scraper:
@@ -81,16 +80,13 @@ class Scraper:
         :return: str: The raw page data for this request.
         """
 
-        async with session.get(self._generate_product_url(part, page_num)) as page:
-            if not page.status == 200:
-                logger.warning(f"{self._generate_product_url(part, page_num)} was not able to be retrieved!")
-                raise asyncio.TimeoutError
-            try:
-                return await page.json(content_type=None)
-            except json.JSONDecodeError:
-                text = await page.text()
-                logger.warning(f"{text}")
-                raise asyncio.TimeoutError
+        while True:
+            async with session.get(self._generate_product_url(part, page_num)) as page:
+                try:
+                    return await page.json(content_type=None)
+                except json.JSONDecodeError:
+                    logger.debug("PCPartPicker server was overloaded! Sleeping...")
+                    await asyncio.sleep(.5)
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> List[List[str]]:
         """
