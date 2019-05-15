@@ -641,8 +641,6 @@ class ExternalHDD:
     capacity: Bytes
     price_per_gb: Money
     color: str
-    storage_type: str
-    platter_rpm: int
     price: Money
 
     def __post_init__(self):
@@ -653,8 +651,6 @@ class ExternalHDD:
         check_typing(self.capacity, Bytes)
         check_typing(self.price_per_gb, Money)
         check_typing(self.color, str)
-        check_typing(self.storage_type, str)
-        check_typing(self.platter_rpm, int)
         check_typing(self.price, Money)
 
 
