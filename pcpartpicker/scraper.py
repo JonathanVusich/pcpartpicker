@@ -112,7 +112,7 @@ class Scraper:
                     logger.debug(f"Fetching data for {part} timed out! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, JSONDecodeError):
-                    logger.debug(f"Fetching data for {part} resulted in a JSON error! Retrying...")
+                    logger.warning(f"Fetching data for {part} resulted in a JSON error! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):
                     raise result
