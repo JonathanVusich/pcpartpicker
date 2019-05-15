@@ -83,6 +83,7 @@ class Scraper:
 
         async with session.get(self._generate_product_url(part, page_num)) as page:
             if not page.status == 200:
+                logger.warning(f"{self._generate_product_url(part, page_num)} was not able to be retrieved!")
                 raise asyncio.TimeoutError
             return await page.json(content_type=None)
 
