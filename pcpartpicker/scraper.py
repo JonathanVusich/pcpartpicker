@@ -85,11 +85,12 @@ class Scraper:
             if not page.status == 200:
                 logger.warning(f"{self._generate_product_url(part, page_num)} was not able to be retrieved!")
                 raise asyncio.TimeoutError
-            text = await page.text()
-            if text == "":
-                logger.warning(f"No text content in the page was found!")
+            try:
+                return await page.json(content_type=None)
+            except json.JSONDecodeError:
+                text = await page.text()
+                logger.warning(f"{text}")
                 raise asyncio.TimeoutError
-            return await page.json(content_type=None)
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> List[List[str]]:
         """
