@@ -82,9 +82,9 @@ class Scraper:
         """
 
         async with session.get(self._generate_product_url(part, page_num)) as page:
-            html = await page.text()
-            data = json.loads(html, encoding='utf8')
-            return data
+            if not page.status == 200:
+                raise asyncio.TimeoutError
+            return await page.json()
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> List[List[str]]:
         """
