@@ -81,14 +81,11 @@ class Scraper:
         :return: str: The raw page data for this request.
         """
 
-        for x in range(3):
-            async with session.get(self._generate_product_url(part, page_num)) as page:
-                try:
-                    return await page.json(content_type=None)
-                except json.JSONDecodeError:
-                    logger.warning("PCPartPicker server was overloaded! Retrying in 1 second...")
-                    await asyncio.sleep(1)
-        raise asyncio.TimeoutError
+        async with session.get(self._generate_product_url(part, page_num)) as page:
+            try:
+                return await page.json(content_type=None)
+            except json.JSONDecodeError:
+                raise asyncio.TimeoutError
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> List[List[str]]:
         """
