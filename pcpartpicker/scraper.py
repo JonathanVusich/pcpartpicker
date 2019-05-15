@@ -7,7 +7,7 @@ import aiohttp
 import lxml.html
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARN)
 
 
 class Scraper:
@@ -67,8 +67,9 @@ class Scraper:
         data: dict = await self._retrieve_page_data(session, part)
         num_data = data["result"]["paging_row"]
         html_tags = lxml.html.fromstring(num_data)
-        tags = html_tags.xpath('section/ul/li')
-        return [x for x in range(1, len(tags) + 1)]
+        tags = html_tags.xpath('section/ul/li/a/text()')
+        last_element = int(tags[-1])
+        return [x for x in range(1, last_element + 1)]
 
     async def _retrieve_page_data(self, session: aiohttp.ClientSession, part: str, page_num: int = 1) -> dict:
         """
