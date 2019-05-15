@@ -86,7 +86,7 @@ class Scraper:
                 try:
                     return await page.json(content_type=None)
                 except json.JSONDecodeError:
-                    logger.debug("PCPartPicker server was overloaded! Sleeping...")
+                    logger.warn("PCPartPicker server was overloaded! Sleeping...")
                     await asyncio.sleep(.5)
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> List[List[str]]:
