@@ -48,7 +48,8 @@ class Parser:
             tokens = list(tokenize(part, page))
             for token in tokens:
                 part_list.append(self._parse_token(part, token))
-        part_list.sort(key=lambda x: (x.brand, x.model if isinstance(x.model, str) else ""))
+        part_list.sort(
+            key=lambda x: (x.brand if x.brand is not None else "", x.model if isinstance(x.model, str) else ""))
         return part, part_list
 
     def _parse_token(self, part: str, data: list) -> object:
