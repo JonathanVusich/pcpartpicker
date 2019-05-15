@@ -100,7 +100,9 @@ class Scraper:
         timeout = aiohttp.ClientTimeout(total=30)
         connector = aiohttp.TCPConnector(limit=self._concurrent_connections, ttl_dns_cache=300)
         final_results = {}
-        async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
+        async with aiohttp.ClientSession(connector=connector, timeout=timeout, headers={
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/39.0.2171.95 Safari/537.36'}) as session:
             tasks = [self._retrieve_part_data(session, part) for part in args]
             results = await asyncio.gather(*tasks, return_exceptions=True)
             retry_parts = []
