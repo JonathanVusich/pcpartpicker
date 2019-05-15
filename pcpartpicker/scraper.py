@@ -84,7 +84,7 @@ class Scraper:
         async with session.get(self._generate_product_url(part, page_num)) as page:
             if not page.status == 200:
                 raise asyncio.TimeoutError
-            return await page.json()
+            return await page.json(content_type=None)
 
     async def _retrieve_part_data(self, session: aiohttp.ClientSession, part: str) -> List[List[str]]:
         """
