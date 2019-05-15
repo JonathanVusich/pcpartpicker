@@ -68,7 +68,7 @@ def retrieve_brand_info(model_string: str) -> Tuple[Optional[str], Optional[str]
                     return brand, None
                 else:
                     return brand, model
-    logger.warning(f"Could not find brand in {model_string}!")
+    logger.debug(f"Could not find brand in {model_string}!")
     return None, model_string
 
 
