@@ -4,6 +4,7 @@ import logging
 import lxml.html
 
 import aiohttp
+from json.decoder import JSONDecodeError
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARN)
@@ -109,6 +110,9 @@ class Scraper:
             for part, result in zip(parts, results):
                 if isinstance(result, asyncio.TimeoutError):
                     logger.debug(f"Fetching data for {part} timed out! Retrying...")
+                    retry_parts.append(part)
+                elif isinstance(result, JSONDecodeError):
+                    logger.debug(f"Fetching data for {part} resulted in a JSON error! Retrying...")
                     retry_parts.append(part)
                 elif isinstance(result, Exception):
                     raise result
