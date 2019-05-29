@@ -20,7 +20,7 @@ matrix:
         - pip install -r requirements-dev.txt
         - python setup.py install
 script:
-    - pytest --cov=pcpartpicker
+    - pytest --cov-config=.coveragerc --cov=pcpartpicker tests/
 after_success:
     - coveralls
 notifications:
