@@ -1,5 +1,4 @@
 from .api import API
-from .parts import *
 
 __name__ = ["pcpartpicker"]
 __version__ = '1.2.3'
