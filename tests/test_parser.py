@@ -1,4 +1,4 @@
-from pcpartpicker.handler import Handler
+from pcpartpicker import API
 from pcpartpicker.scraper import Scraper
 from pcpartpicker.parse_utils import parse
 from pcpartpicker.mappings import part_classes
@@ -10,130 +10,100 @@ import unittest
 class ParserTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def parserTest(cls):
+        base_api = API()
         cls.test_data = {}
-
-        handler = Handler()
-        loop = asyncio.get_event_loop()
-        for region in handler._supported_regions:
-            scraper = Scraper(region)
-            results = loop.run_until_complete(scraper.retrieve(handler._supported_parts))
-            cls.test_data.update({region: results})
+        for region in base_api.supported_regions:
+            api = API(region)
+            cls.test_data.update({region: api.retrieve_all()})
 
     def test_us_tokens(self):
-        data = self.test_data["us"]
-        results = parse(data)
+        results = API("us").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
-
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_uk_tokens(self):
-        data = self.test_data["uk"]
-        results = parse(data)
+        results = API("uk").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_nz_tokens(self):
-        data = self.test_data["nz"]
-        results = parse(data)
+        results = API("nz").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_it_tokens(self):
-        data = self.test_data["it"]
-        results = parse(data)
+        results = API("it").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_ie_tokens(self):
-        data = self.test_data["ie"]
-        results = parse(data)
+        results = API("ie").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_in_tokens(self):
-        data = self.test_data["in"]
-        results = parse(data)
+        results = API("in").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_se_tokens(self):
-        data = self.test_data["se"]
-        results = parse(data)
+        results = API("se").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_fr_tokens(self):
-        data = self.test_data["fr"]
-        results = parse(data)
+        results = API("fr").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_es_tokens(self):
-        data = self.test_data["es"]
-        results = parse(data)
+        results = API("es").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_de_tokens(self):
-        data = self.test_data["de"]
-        results = parse(data)
+        results = API("de").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_ca_tokens(self):
-        data = self.test_data["ca"]
-        results = parse(data)
+        results = API("ca").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_be_tokens(self):
-        data = self.test_data["be"]
-        results = parse(data)
+        results = API("be").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
 
     def test_au_tokens(self):
-        data = self.test_data["au"]
-        results = parse(data)
+        results = API("au").retrieve_all()
         for part, part_data in results.items():
             for p in part_data:
-                with self.subTest():
-                    self.assertIsInstance(p, part_classes[part])
-                    self.assertIsNotNone(p.brand)
+                self.assertIsInstance(p, part_classes[part])
+                self.assertIsNotNone(p.brand)
