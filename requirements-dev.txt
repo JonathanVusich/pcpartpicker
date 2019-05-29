@@ -1,0 +1,5 @@
+pytest
+pytest-asyncio
+pytest-timeout
+pytest-cov
+coveralls
