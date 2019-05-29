@@ -9,7 +9,7 @@ matrix:
       python: 3.7
       sudo: true
       before_install:
-        - pip install coveralls
+        - pip install -r requirements-dev.txt
         - python setup.py install
     - os: windows
       language: sh
@@ -17,10 +17,10 @@ matrix:
       before_install:
         - choco install python3
         - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
-        - python -m pip install coveralls
+        - pip install -r requirements-dev.txt
         - python setup.py install
 script:
-    - coverage run --source=pcpartpicker -m unittest discover
+    - pytest --cov=pcpartpicker
 after_success:
     - coveralls
 notifications:

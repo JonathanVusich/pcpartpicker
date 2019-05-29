@@ -1,12 +1,11 @@
 import asyncio
 import logging
-import multiprocessing
 import time
-from typing import List, Tuple, Set, Dict
+from typing import List, Set, Dict
 
 from .errors import UnsupportedRegion, UnsupportedPart
 from .mappings import part_classes
-from .parser import Parser
+from .parse_utils import parse
 from .scraper import Scraper
 
 logger = logging.getLogger(__name__)
@@ -23,22 +22,13 @@ class Handler:
     _supported_regions: Set[str] = {"au", "be", "ca", "de", "es", "fr", "se",
                                     "in", "ie", "it", "nz", "uk", "us"}
 
-    _region: str = "us"
-    _last_refresh: float = None
-    _concurrent_connections: int = 25
-    _multithreading: bool = True
-    _scraper: Scraper = None
-    _parser: Parser = None
-
-    def __init__(self, region: str = "us", concurrent_connections: int = 25, multithreading: bool = True) -> None:
+    def __init__(self, region: str = "us", multithreading: bool = False) -> None:
         if region not in self._supported_regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
+        self._multithreading = multithreading
         self._region = region
         self._last_refresh = time.time()
-        self._multithreading = multithreading
-        self._concurrent_connections = concurrent_connections
-        self._scraper = Scraper(self.region, concurrent_connections=concurrent_connections)
-        self._parser = Parser(self.region)
+        self.scraper = Scraper(self.region)
 
     @property
     def region(self) -> str:
@@ -51,10 +41,6 @@ class Handler:
     @property
     def supported_regions(self) -> Set[str]:
         return self._supported_regions
-
-    @property
-    def concurrent_connections(self) -> int:
-        return self._concurrent_connections
 
     @property
     def multithreading(self) -> bool:
@@ -70,19 +56,7 @@ class Handler:
         if region not in self._supported_regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
         self._region = region
-        self._scraper = Scraper(region, concurrent_connections=self._concurrent_connections)
-        self._parser = Parser(region)
-
-    def set_concurrent_connections(self, concurrent_connections: int) -> None:
-        """
-        Function that allows the user to set how many concurrent connections should be opened
-        to PCPartPicker.com. Higher values are more prone to cause timeout failures, while low
-        values increase the time needed to collect results.
-        :param concurrent_connections:
-        :return:
-        """
-        self._concurrent_connections = concurrent_connections
-        self._scraper = Scraper(self.region, concurrent_connections=self._concurrent_connections)
+        self.scraper = Scraper(region)
 
     def set_multithreading(self, multithreading: bool) -> None:
         """
@@ -127,24 +101,18 @@ class Handler:
 
         start = time.perf_counter()
         loop = asyncio.get_event_loop()
-        html: List[Tuple[str, List[str]]] = loop.run_until_complete(self._scraper.retrieve(parts_to_download))
+        raw_data: Dict[str, str] = loop.run_until_complete(self.scraper.retrieve(parts_to_download))
         total_time = time.perf_counter() - start
 
         logger.debug(f"Completed downloading! Time elapsed is {total_time} seconds.")
 
         start = time.perf_counter()
-        if self._multithreading:
-            logger.debug(f"Parsing with multiple threads...")
-            pool = multiprocessing.Pool()
-            parsed_objects = pool.map(self._parser.parse, html)
-        else:
-            logger.debug(f"Parsing with one thread...")
-            parsed_objects = [self._parser.parse(page) for page in html]
+        parsed_data = parse(raw_data, self._multithreading)
         total_time = time.perf_counter() - start
 
         logger.debug(f"Completed parsing! Time elapsed is {total_time} seconds.")
 
-        for part, data in parsed_objects:
+        for part, data in parsed_data.items():
             setattr(self, f"{part_classes[part].__name__.lower()}_{self._region}", data)
             results[part] = data
         return results

@@ -14,12 +14,8 @@ class API:
     the internals and the externally available functions.
     """
 
-    def __init__(self, region: str = "us", concurrent_connections: int = 25, multithreading=True) -> None:
-        self._handler = Handler(region, concurrent_connections=concurrent_connections, multithreading=multithreading)
-
-    @property
-    def concurrent_connections(self) -> int:
-        return self._handler.concurrent_connections
+    def __init__(self, region: str = "us", multithreading=True) -> None:
+        self._handler = Handler(region, multithreading=multithreading)
 
     @property
     def multithreading(self) -> bool:
@@ -47,17 +43,6 @@ class API:
 
         self._handler.set_region(region)
         logger.debug(f"Region set to {self.region}")
-
-    def set_concurrent_connections(self, connections: int) -> None:
-        """
-        Public function that allows the user to change the number of concurrent connections to open
-        to PCPartpicker. Higher values typically mean shorter scraping times, but also typically means
-        a higher chance of the connection getting timed out. This value should most always be lowered.
-        :param connections:
-        :return:
-        """
-        self._handler.set_concurrent_connections(connections)
-        logger.debug(f"Concurrent connections set to {self.concurrent_connections}")
 
     def set_multithreading(self, multithreading: bool) -> None:
         """

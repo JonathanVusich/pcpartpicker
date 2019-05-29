@@ -1,8 +1,6 @@
 import unittest
 
-from moneyed import USD
-
-from pcpartpicker.parts import *
+from pcpartpicker.parts import check_typing, Bytes, Resolution, ClockSpeed, Decibels, RPM, CFM, NetworkSpeed
 
 
 class PartTest(unittest.TestCase):
