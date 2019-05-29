@@ -1,4 +1,4 @@
 py-moneyed==0.8.0
 lz4==2.1.6
 dacite==1.0.0
-requests-async=0.4.1
+requests-async==0.4.1
