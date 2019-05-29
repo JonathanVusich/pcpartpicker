@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Iterable, Dict
 
-import requests_async as requests
+import aiohttp
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARN)
@@ -31,18 +31,19 @@ class Scraper:
     async def retrieve(self, args: Iterable[str]) -> Dict[str, str]:
         parts = [arg for arg in args]
         urls = [self.generate_product_url(part) for part in parts]
-        get_requests = [requests.get(url) for url in urls]
-        results = await asyncio.gather(*get_requests, return_exceptions=True)
-        retry_parts = []
-        final_results = {}
-        for part, result in zip(parts, results):
-            if isinstance(result, asyncio.TimeoutError):
-                logger.debug(f"Fetching data for {part} timed out! Retrying...")
-                retry_parts.append(part)
-            elif isinstance(result, Exception):
-                raise result
-            else:
-                final_results.update({part: result.text})
+        async with aiohttp.ClientSession() as session:
+            requests = [session.get(url) for url in urls]
+            results = await asyncio.gather(*requests, return_exceptions=True)
+            retry_parts = []
+            final_results = {}
+            for part, result in zip(parts, results):
+                if isinstance(result, asyncio.TimeoutError):
+                    logger.debug(f"Fetching data for {part} timed out! Retrying...")
+                    retry_parts.append(part)
+                elif isinstance(result, Exception):
+                    raise result
+                else:
+                    final_results.update({part: await result.text()})
 
         if retry_parts:
             final_results.update(await self.retrieve(retry_parts))
