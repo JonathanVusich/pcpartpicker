@@ -10,24 +10,24 @@ This package is currently in a stable beta.
 
 ## Installation:
 Package retrieval and installation can be easily accomplished through pip.
-```
+```python
 pip install pcpartpicker
 ```
 
 ## Examples:
 In order to use the API, simply import API from the pcpartpicker package.
-```
+```python
 from pcpartpicker import API
 ```
 You can then instantiate the API class and use it to make requests.
-```
+```python
 api = API()
 cpu_data = api.retrieve("cpu")
 all_data = api.retrieve_all()
 ```
 
 A list of supported parts can be obtained in the following manner:
-```
+```python
 api = API()
 print(api.supported_parts)
 >>> {'wireless-network-card', 'case-fan', 'cpu', 'cpu-cooler', 'headphones', 'motherboard', 'monitor', 'internal-hard-drive', 'external-hard-drive', 'ups', 'fan-controller', 'case', 'keyboard', 'mouse', 'wired-network-card', 'sound-card', 'video-card', 'speakers', 'optical-drive', 'power-supply', 'thermal-paste', 'memory'}
@@ -38,28 +38,28 @@ For example, you can change the region, determine the number of concurrent, asyn
 that can be made, and can also set whether or not the API can use multiple threads.
 
 Retrieving supported API regions:
-```
+```python
 api = API()
 print(api.supported_regions)
 >>> {'be', 'us', 'it', 'uk', 'ie', 'nz', 'de', 'ca', 'au', 'fr', 'se', 'es', 'in'}
 ```
 
 Retrieving currently selected region (default is US):
-```
+```python
 api = API()
 print(api.region)
 >>> us
 ```
 
 Creating an API object with a different default region:
-```
+```python
 api = API("de")
 print(api.region)
 >>> de
 ```
 
 Changing the default region:
-```
+```python
 api = API()
 api.set_region("de")
 print(api.region)
@@ -67,27 +67,27 @@ print(api.region)
 ```
 
 Changing the maximum number of allowed concurrent requests:
-```
+```python
 api = API()
 api.set_concurrent_connections(100)
 print(api.concurrent_connections)
 >>> 100 
 ```
 Or you can use the concurrent_connections keyword argument for API():
-```
+```python
 api = API(concurrent_connections=100)
 print(api.concurrent_connections)
 >>> 100
 ```
 You can also configure whether or not the API is allowed to use multiple threads or not (default is True):
-```
+```python
 api = API()
 api.set_multithreading(False)
 print(api.multithreading)
 >>> False
 ```
 You can also use a keyword argument to configure this behavior:
-```
+```python
 api = API(multithreading=False)
 print(api.multithreading)
 >>> False
