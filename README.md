@@ -66,19 +66,6 @@ print(api.region)
 >>> de
 ```
 
-Changing the maximum number of allowed concurrent requests:
-```python
-api = API()
-api.set_concurrent_connections(100)
-print(api.concurrent_connections)
->>> 100 
-```
-Or you can use the concurrent_connections keyword argument for API():
-```python
-api = API(concurrent_connections=100)
-print(api.concurrent_connections)
->>> 100
-```
 You can also configure whether or not the API is allowed to use multiple threads or not (default is True):
 ```python
 api = API()
