@@ -319,6 +319,7 @@ class Memory:
     price_per_gb: Money
     color: str
     cas_timing: int
+    error_correction: str
     price: Money
 
     def __post_init__(self):
@@ -333,6 +334,7 @@ class Memory:
         check_typing(self.color, str)
         check_typing(self.cas_timing, int)
         check_typing(self.price, Money)
+        check_typing(self.error_correction, str)
 
     @property
     def total_size(self):
