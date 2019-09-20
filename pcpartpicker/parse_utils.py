@@ -1,11 +1,9 @@
-import base64
 import json
 import re
 from decimal import Decimal
 from multiprocessing import Pool
 from typing import Tuple, Dict
 
-import lz4.frame
 from dacite import from_dict, Config
 from moneyed import Money
 
@@ -28,8 +26,7 @@ def dataclass_from_dict(datatype, dictionary: dict):
 
 def deserialize_part_data(part_data: Tuple[str, str]) -> list:
     body = re.findall('<body>(.*?)</body>', part_data[1], re.DOTALL)[0].strip().lstrip()
-    byte_str = base64.urlsafe_b64decode(body)
-    deserialized_parts = json.loads(lz4.frame.decompress(byte_str))
+    deserialized_parts = json.loads(body)
     return [dataclass_from_dict(part_classes[part_data[0]], item) for item in deserialized_parts]
 
 
