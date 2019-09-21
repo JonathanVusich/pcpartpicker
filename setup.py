@@ -8,7 +8,7 @@ def read(file_name: str):
 
 setup(
     name="pcpartpicker",
-    version="2.1.0",
+    version="2.1.1",
     author="Jonathan Vusich",
     author_email="jonathanvusich@gmail.com",
     description="A fast, simple API for PCPartPicker.com.",
