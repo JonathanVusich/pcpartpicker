@@ -43,7 +43,7 @@ class Resolution:
         check_typing(self.height, int)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class Bytes:
     """Dataclass that stores byte numbers for easier user manipulation."""
     total: int
@@ -170,7 +170,7 @@ class FrequencyResponse(Range):
         check_typing(self.default, (float, int))
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class ClockSpeed:
     """Dataclass that stores clock speed data for various parts."""
     cycles: int
@@ -204,7 +204,7 @@ class ClockSpeed:
         return cls(int(number * 1000000))
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class NetworkSpeed:
     """Dataclass that stores network speed data."""
 
