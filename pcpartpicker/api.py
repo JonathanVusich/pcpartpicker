@@ -14,7 +14,7 @@ class API:
     the internals and the externally available functions.
     """
 
-    def __init__(self, region: str = "us", multithreading=True) -> None:
+    def __init__(self, region: str = "us", multithreading=False) -> None:
         self._handler = Handler(region, multithreading=multithreading)
 
     @property
