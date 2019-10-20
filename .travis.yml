@@ -23,7 +23,7 @@ matrix:
       osx_image: xcode10.2
       language: shell
       before_install:
-        - pip install -r requirements-dev.txt
+        - pip3 install -r requirements-dev.txt
         - python3 setup.py install
       script:
         - python3 -m pytest --cov-config=.coveragerc --cov=pcpartpicker tests/
