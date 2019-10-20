@@ -14,11 +14,19 @@ matrix:
     - os: windows
       language: sh
       python: "3.7"
+      env: export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
       before_install:
         - choco install python3
-        - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
         - pip install -r requirements-dev.txt
         - python setup.py install
+    - os: osx
+      osx_image: xcode10.2
+      language: shell
+      before_install:
+        - pip3 install -r requirements-dev.txt
+        - python3 setup.py install
+      script:
+        - python3 -m pytest --cov-config=.coveragerc --cov=pcpartpicker tests/
 script:
     - pytest --cov-config=.coveragerc --cov=pcpartpicker tests/
 after_success:
