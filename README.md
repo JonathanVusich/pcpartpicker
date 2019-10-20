@@ -65,17 +65,3 @@ api.set_region("de")
 print(api.region)
 >>> de
 ```
-
-You can also configure whether or not the API is allowed to use multiple threads or not (default is True):
-```python
-api = API()
-api.set_multithreading(False)
-print(api.multithreading)
->>> False
-```
-You can also use a keyword argument to configure this behavior:
-```python
-api = API(multithreading=False)
-print(api.multithreading)
->>> False
-```
