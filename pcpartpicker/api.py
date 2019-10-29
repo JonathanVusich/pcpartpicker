@@ -2,6 +2,7 @@ import logging
 from typing import Set, Dict, List
 
 from .handler import Handler
+from .part_data import PartData
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARN)
@@ -14,12 +15,8 @@ class API:
     the internals and the externally available functions.
     """
 
-    def __init__(self, region: str = "us", multithreading=True) -> None:
-        self._handler = Handler(region, multithreading=multithreading)
-
-    @property
-    def multithreading(self) -> bool:
-        return self._handler.multithreading
+    def __init__(self, region: str = "us") -> None:
+        self._handler = Handler(region)
 
     @property
     def supported_regions(self) -> Set[str]:
@@ -44,17 +41,7 @@ class API:
         self._handler.set_region(region)
         logger.debug(f"Region set to {self.region}")
 
-    def set_multithreading(self, multithreading: bool) -> None:
-        """
-        Function that allows the user to determine whether the scraped HTML is parsed using multiple threads or not.
-        Single threading is especially useful for debugging purposes.
-        :param multithreading:
-        :return:
-        """
-        self._handler.set_multithreading(multithreading)
-        logger.debug(f"Multithreading set to {self.multithreading}")
-
-    def retrieve(self, *args, force_refresh: bool = False) -> Dict[str, List]:
+    def retrieve(self, *args, force_refresh: bool = False) -> PartData:
         """
         Public function that allows the user to make part requests.
 
@@ -67,7 +54,7 @@ class API:
         logger.debug(f"Retrieving {args}...")
         return self._handler.retrieve(*args, force_refresh=force_refresh)
 
-    def retrieve_all(self, force_refresh: bool = False) -> Dict[str, List]:
+    def retrieve_all(self, force_refresh: bool = False) -> PartData:
         """
         Public function that allows the user to retrieve all supported part types.
 

@@ -7,6 +7,7 @@ from .errors import UnsupportedRegion, UnsupportedPart
 from .mappings import part_classes
 from .parse_utils import parse
 from .scraper import Scraper
+from .part_data import PartData
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARN)
@@ -22,10 +23,9 @@ class Handler:
     _supported_regions: Set[str] = {"au", "be", "ca", "de", "es", "fr", "se",
                                     "in", "ie", "it", "nz", "uk", "us"}
 
-    def __init__(self, region: str = "us", multithreading: bool = False) -> None:
+    def __init__(self, region: str = "us") -> None:
         if region not in self._supported_regions:
             raise UnsupportedRegion(f"Region '{region}' is not supported for this API!")
-        self._multithreading = multithreading
         self._region = region
         self._last_refresh = time.time()
         self.scraper = Scraper(self.region)
@@ -42,10 +42,6 @@ class Handler:
     def supported_regions(self) -> Set[str]:
         return self._supported_regions
 
-    @property
-    def multithreading(self) -> bool:
-        return self._multithreading
-
     def set_region(self, region: str) -> None:
         """
         Hidden method that changes the region for the parser and scraper objects contained in this instance.
@@ -58,26 +54,16 @@ class Handler:
         self._region = region
         self.scraper = Scraper(region)
 
-    def set_multithreading(self, multithreading: bool) -> None:
-        """
-        Function that allows the user to specify whether or not the API should run multithreaded or not.
-        Multithreading allows for easier debugging of the internals but also greatly amplifies the amount
-        of time necessary to process all of the retrieved data.
-        :param multithreading:
-        :return:
-        """
-        self._multithreading = multithreading
-
-    def retrieve(self, *args, force_refresh=False):
+    def retrieve(self, *args, force_refresh=False) -> PartData:
         """
         Hidden function that is designed to retrieve and parse part data from PCPartPicker.
 
         :param args: str: Variable number of arguments that must map to valid parts.
         :param force_refresh: bool: This value determines whether or not to completely refresh the
         entire API database, or to simply retrieve cached values.
-        :return: dict: A dictionary of the input part types with their mapped data object values.
+        :return: dict: A part data object that contains the part names and their mapped data object values.
         """
-        results: Dict[str, List] = {}
+        results: PartData = PartData()
 
         # Verify the validity of the parts
         for part in args:
@@ -107,7 +93,7 @@ class Handler:
         logger.debug(f"Completed downloading! Time elapsed is {total_time} seconds.")
 
         start = time.perf_counter()
-        parsed_data = parse(raw_data, self._multithreading)
+        parsed_data = parse(raw_data)
         total_time = time.perf_counter() - start
 
         logger.debug(f"Completed parsing! Time elapsed is {total_time} seconds.")

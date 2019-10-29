@@ -20,7 +20,6 @@ class APITest(unittest.TestCase):
                                                  "in", "ie", "it", "nz", "uk", "us"})
 
         self.assertEqual(api.region, 'us')
-        self.assertTrue(api.multithreading)
 
     # Ensure that API can be initialized with a different region
     def test_api_region_init(self):
@@ -46,19 +45,3 @@ class APITest(unittest.TestCase):
             api = API()
             api.set_region('oc')
         assert 'Region \'oc\' is not supported for this API!' in str(excinfo.exception)
-
-    def test_api_multithreading_kwd(self):
-        api = API(multithreading=False)
-        self.assertFalse(api.multithreading)
-        self.assertFalse(api._handler.multithreading)
-
-    def test_api_modify_multithreading(self):
-        api = API()
-        self.assertTrue(api.multithreading)
-        self.assertTrue(api._handler._multithreading)
-        api.set_multithreading(False)
-        self.assertFalse(api._handler._multithreading)
-        self.assertFalse(api.multithreading)
-        api.set_multithreading(True)
-        self.assertTrue(api.multithreading)
-        self.assertTrue(api._handler._multithreading)
