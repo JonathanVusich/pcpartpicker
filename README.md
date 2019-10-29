@@ -25,6 +25,7 @@ api = API()
 cpu_data = api.retrieve("cpu")
 all_data = api.retrieve_all()
 ```
+`api.retrieve()` and `api.retrieve_all()` methods both return a `PartData` instance, which contains a timestamp and a `to_json()` method. 
 
 A list of supported parts can be obtained in the following manner:
 ```python
