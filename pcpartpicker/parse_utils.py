@@ -1,13 +1,13 @@
 import json
 import re
 from decimal import Decimal
-from multiprocessing import Pool
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 
 from dacite import from_dict, Config
 from moneyed import Money
 
 from .mappings import part_classes
+from .part_data import PartData
 
 
 def dataclass_from_dict(datatype, dictionary: dict):
@@ -30,10 +30,6 @@ def deserialize_part_data(part_data: Tuple[str, str]) -> list:
     return [dataclass_from_dict(part_classes[part_data[0]], item) for item in deserialized_parts]
 
 
-def parse(part_dict: Dict[str, str], multithreading: bool = True) -> Dict[str, list]:
-    if multithreading:
-        with Pool() as pool:
-            results = pool.map(deserialize_part_data, (item for item in part_dict.items()))
-    else:
-        results = [deserialize_part_data(item) for item in part_dict.items()]
+def parse(part_dict: Dict[str, str]) -> Dict[str, List]:
+    results = [deserialize_part_data(item) for item in part_dict.items()]
     return dict(zip(part_dict.keys(), results))
