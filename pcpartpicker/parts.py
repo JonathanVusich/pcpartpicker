@@ -614,7 +614,7 @@ class Monitor:
     size: float
     resolution: Resolution
     refresh_rate: int
-    response_time: int
+    response_time: float
     panel_type: str
     aspect_ratio: str
     price: Money
@@ -625,7 +625,7 @@ class Monitor:
         check_typing(self.size, (float, int))
         check_typing(self.resolution, Resolution)
         check_typing(self.refresh_rate, int)
-        check_typing(self.response_time, int)
+        check_typing(self.response_time, float)
         check_typing(self.panel_type, str)
         check_typing(self.aspect_ratio, str)
         check_typing(self.price, Money)
