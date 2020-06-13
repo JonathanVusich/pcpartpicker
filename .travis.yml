@@ -23,6 +23,7 @@ matrix:
       osx_image: xcode10.2
       language: shell
       before_install:
+        - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ulimit -n 1024; fi
         - pip3 install -r requirements-dev.txt
         - python3 setup.py install
       script:
