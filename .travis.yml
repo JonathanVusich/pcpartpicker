@@ -23,6 +23,7 @@ matrix:
       osx_image: xcode10.2
       language: shell
       before_install:
+        - ulimit -n 99999
         - pip3 install -r requirements-dev.txt
         - python3 setup.py install
       script:
