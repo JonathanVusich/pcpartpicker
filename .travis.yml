@@ -13,8 +13,8 @@ matrix:
         - python setup.py install
     - os: windows
       language: sh
-      python: "3.7"
-      env: export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+      python: "3.9"
+      env: export PATH="/c/Python39:/c/Python39/Scripts:$PATH"
       before_install:
         - choco install python3
         - pip install -r requirements-dev.txt
