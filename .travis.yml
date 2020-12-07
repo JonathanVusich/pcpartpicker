@@ -1,33 +1,16 @@
 language: python
-python: 3.7
+python: 3.9
 dist: xenial
 sudo: true
 matrix:
   include:
     - os: linux
       dist: xenial
-      python: 3.7
+      python: 3.9
       sudo: true
       before_install:
         - pip install -r requirements-dev.txt
         - python setup.py install
-    - os: windows
-      language: sh
-      python: "3.9"
-      env: export PATH="/c/Python39:/c/Python39/Scripts:$PATH"
-      before_install:
-        - choco install python3
-        - pip install -r requirements-dev.txt
-        - python setup.py install
-    - os: osx
-      osx_image: xcode10.2
-      language: shell
-      before_install:
-        - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ulimit -n 1024; fi
-        - pip3 install -r requirements-dev.txt
-        - python3 setup.py install
-      script:
-        - python3 -m pytest --cov-config=.coveragerc --cov=pcpartpicker tests/
 script:
     - pytest --cov-config=.coveragerc --cov=pcpartpicker tests/
 after_success:
