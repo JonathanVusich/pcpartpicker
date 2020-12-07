@@ -313,11 +313,11 @@ class Memory:
     model: str
     module_type: str
     speed: ClockSpeed
-    form_factor: str
     number_of_modules: int
     module_size: Bytes
     price_per_gb: Money
     color: str
+    first_word_latency: float
     cas_timing: int
     error_correction: str
     price: Money
@@ -327,11 +327,11 @@ class Memory:
         check_typing(self.model, str)
         check_typing(self.module_type, str)
         check_typing(self.speed, ClockSpeed)
-        check_typing(self.form_factor, str)
         check_typing(self.number_of_modules, int)
         check_typing(self.module_size, Bytes)
         check_typing(self.price_per_gb, Money)
         check_typing(self.color, str)
+        check_typing(self.first_word_latency, float)
         check_typing(self.cas_timing, int)
         check_typing(self.price, Money)
         check_typing(self.error_correction, str)
@@ -379,8 +379,8 @@ class GPU:
     vram: Bytes
     core_clock: ClockSpeed
     boost_clock: ClockSpeed
-    interface: str
     color: str
+    length: float
     price: Money
 
     def __post_init__(self):
@@ -390,8 +390,8 @@ class GPU:
         check_typing(self.vram, Bytes)
         check_typing(self.core_clock, ClockSpeed)
         check_typing(self.boost_clock, ClockSpeed)
-        check_typing(self.interface, str)
         check_typing(self.color, str)
+        check_typing(self.length, float)
         check_typing(self.price, Money)
 
 
