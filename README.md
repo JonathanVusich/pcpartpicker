@@ -35,8 +35,8 @@ print(api.supported_parts)
 ```
 
 There are also a number of methods that can be used in order to customize the API behavior.
-For example, you can change the region, determine the number of concurrent, asynchronous connections
-that can be made, and can also set whether or not the API can use multiple threads.
+For example, you can change the region and determine the number of concurrent, asynchronous connections
+that can be made.
 
 Retrieving supported API regions:
 ```python
